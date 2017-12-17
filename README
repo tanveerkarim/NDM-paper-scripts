@@ -104,16 +104,15 @@ tractor-download-d2f4.sh
 /---- Data pre-processing
 After downloading/acquiring the DECaLS DR5 and DEEP2 catalogs, they are pre-processed into convenient forms as described in this section.
 
-- Combine all downloaded Tractor files by DEEP2 Field: 
-	- Notes: Apply the DEEP2 window functions to concentrate on the relevant region only.
-	- Script used: combine-Tractor-bricks.py
-	- Products: 
-		- DR5: DR5-Tractor-D2f*.fits
-		- DR3: DR3-Tractor-D2f*.fits
+Combine all downloaded Tractor files by DEEP2 Field
+- Notes: Combine all Tractor files by Field, append Tycho-2 stellar mask column, and mask objects using DEEP2 window funtions. Note that no other catalog quality cuts were made at this point. Tycho-2 masks were appended but not imposed as may be altered in the future.
+- Script used: combine-Tractor-bricks.py
+- Products:
+	- DR5-Tractor-D2f*.fits
 
 
-/----- Combine DEEP2 catalogs -----/
-- Combine pcats and zcats. Window masks were applied. Tycho-2 column was applied as well.
+Combine DEEP2 catalogs
+- Notes: Combine pcats and zcats. Window masks were applied. Tycho-2 column was applied as well.
 - Script used: produce-deep2-f234-photo-redz-oii.py
 - Products: 
 	- deep2-f**-photo-trimmed.fits
