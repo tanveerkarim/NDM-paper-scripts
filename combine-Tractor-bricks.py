@@ -1,8 +1,5 @@
 from utils import *
 
-large_random_constant = -999119283571
-deg2arcsec=3600
-
 dr_v = "5" # Data release version
 data_directory = "../data/DR"+dr_v+"/"
 tycho_directory = "../data/"
