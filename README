@@ -1,6 +1,7 @@
 This text file documents scripts used to produce results reported in the NDM selection method paper (2018). It also details scripts and their results not reported in the paper but documented here for reproducibility and complete update on the status of the method. 
 
 Contents: I group scripts and their results according to topic.
+- Organization
 - Software requirements
 - utils and NDM_models modules
 - Data download and retrieval
@@ -11,6 +12,26 @@ README convention (for the author):
 - "/----" to denote the beginning of a new grouping or section. 
 - Five "\n" between sections.
 - Use only "-" for lists.
+
+
+
+
+
+/---- Organization
+To orient the user of this document, I provide a high level overview of the documentation of the project. Here is the directory structure
+/NDM-paper
+	/article
+	/data
+		/derived
+	/scripts
+	/notes
+
+- "article" contains the manuscript .tex file and all other immediate relevant packages, figures, bibliography, etc. 
+- "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "data/derived" directory. 
+- "scripts" contains all Python scripts used to produce any results.
+- "notes" are a collection of text files that summarize important results that are not included in the NDM paper.
+
+
 
 
 
@@ -72,4 +93,7 @@ tractor-download-d2f3.sh
 tractor-download-d2f4.sh
 
 - Tycho-2 catalog: The file was obtained from one of the DESI collaborators though I cannot remember whom. Named tycho2.fits in the data repostiory.
+
+- spitzer catalogs: (add further description)
+
 
