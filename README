@@ -4,8 +4,9 @@ Contents: I group scripts and their results according to topic.
 - Organization
 - Software requirements
 - utils and NDM_models modules
-- Data download and retrieval
+- Data download and acquisition
 - Data pre-processing
+- Data quality reports
 - Cross-matching DECaLS DR5 and DEEP2 catalogs
 
 README convention (for the author):
@@ -58,7 +59,7 @@ All author defined functions are collected in utils and NDM_models. The latter i
 
 
 
-/---- Data download and retrieval
+/---- Data download and acquisition
 In this section, I document how key data for the project were obtained. All of these data are available via a single download from (provide URL) or can be obtained from the author in a .zip file. 
 
 - DEEP2 photometric catalogs: Downloaded from the DEEP2 survey website using below commands.
@@ -97,3 +98,44 @@ tractor-download-d2f4.sh
 - spitzer catalogs: (add further description)
 
 
+
+
+
+/---- Data pre-processing
+After downloading/acquiring the DECaLS DR5 and DEEP2 catalogs, they are pre-processed into convenient forms as described in this section.
+
+- Combine all downloaded Tractor files by DEEP2 Field: 
+	- Notes: Apply the DEEP2 window functions to concentrate on the relevant region only.
+	- Script used: combine-Tractor-bricks.py
+	- Products: 
+		- DR5: DR5-Tractor-D2f*.fits
+		- DR3: DR3-Tractor-D2f*.fits
+
+
+/----- Combine DEEP2 catalogs -----/
+- Combine pcats and zcats. Window masks were applied. Tycho-2 column was applied as well.
+- Script used: produce-deep2-f234-photo-redz-oii.py
+- Products: 
+	- deep2-f**-photo-trimmed.fits
+
+/----- Combine DEEP2 and DR5 -----/
+- Cuts prior to cross matching
+	- Common: Tycho mask and window function.
+	- DR5: g < 25. grz_allmask == 0. grz_ivar > 0. brick_primary == 0.
+- Match DEEP2 catalogs onto DR5.
+- Script used: combine-Tractor-DEEP2.py
+- Products:
+	- unmatched-deep2-f**-photo-redz-oii.fits
+	- DR5-matched-to-DEEP2-f**-glim25.fits
+
+/----- Note on DEEP2 and DR5 Venn Diagram -----/
+- We only consider objects within DEEP2 windown function and Tycho-2 masked set. We match DEEP2 pcats in its entirety with DR5 with g < 25.
+- Ideally, DEEP2 pcat is deep and complete enough to include all objects in DR5, say, down to g < 25. 
+- In both DR5 and DEEP2: These are used to model the number densities of ELG and non-ELG. (Rlim = 24.1 does not matter.)
+- In DR5 g < 25 but not in DEEP2: About 6 percent in Field 4: We may 1) categorize them as non-ELG and hence to be avoided; or 2) ignore them while training but re-scale the total number density after training the density models to account for them.
+- In DEEP2 set but not in DR5: For the purpose of modeling, let's not worry about characterizing these objects. It may be possible to improve DESI cataloging process by looking at why certain bright objects observed in DEEP2 were not observed in Tractor but we do not pursue that.
+
+
+/----- GMM training -----/
+- Make sure to hand cut outliers before training.
+- When fitting in magnitude space, objects that have very poor colors (say due to negative flux values) should be avoided.
