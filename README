@@ -61,7 +61,7 @@ wget http://deep.ps.uci.edu/DR4/data/windowf.42.fits.gz
 
 - DEEP2 redshift catalogs: These were obtained from John Moustakas and are described in a Tech Report (DESI docDB-912). The redshift catalogs from Fields 2, 3, and 4 are named deep2-f2-redz-oii.fits, deep2-f3-redz-oii.fits, and deep2-f4-redz-oii.fits in the data repository.
 
-- DEEP2 color selection: The file is a union list of DEEP2 photometric catalogs with an additional information regarding color selection. It was obtained from Jeff Newman. See "Cross-matching..." section scripts for description.
+- DEEP2 color selection: The file is a union list of DEEP2 photometric catalogs with an additional information regarding color selection. It was obtained from Jeff Newman and named color-selection.txt in the data repository. See "Cross-matching..." section scripts for description.
 
 - survey-bricks-dr5: A useful file that can be used to determine Tractor bricks that cover regions of interest. Downloaded using the below command.
 wget http://portal.nersc.gov/project/cosmo/data/legacysurvey/dr5/survey-bricks-dr5.fits.gz
