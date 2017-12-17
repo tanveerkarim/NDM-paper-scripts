@@ -2,10 +2,15 @@ This text file documents scripts used to produce results reported in the NDM sel
 
 Contents: I group scripts and their results according to topic.
 - Software requirements
+- utils and NDM_models modules
 - Data download and retrieval
 - Data pre-processing
 - Cross-matching DECaLS DR5 and DEEP2 catalogs
-- utils and NDM_models modules
+
+README convention (for the author):
+- "/----" to denote the beginning of a new grouping or section. 
+- Five "\n" between sections.
+- Use only "-" for lists.
 
 
 
@@ -19,9 +24,52 @@ Unless mentioned otherwise, the work contained here is based on Python 2.7.12. B
 The rest is based on Python 3.5.2. In particular, an application of Random Forest (RF) method to DEEP2-DECaLS DR5 data is performed using the following package compatible with Python 3.5.2:
 - scikit-learn v0.19.1
 
+These are not stringent requirements, and there is no reason to believe that other compatible versions of Python would produce different results.
+
+
+
+
+
+/---- utils and NDM_models
+All author defined functions are collected in utils and NDM_models. The latter is a collection of classes and methods that are specific to the NDM method whereas the former provides general convenience functions. For convenience, I employ the bad practice of importing all external modules, functions, and classes at the same time via "from utils, NDM_models import *". 
+
+
+
 
 
 /---- Data download and retrieval
-In this section, I document how key data for the project were obtained.
-- DEEP2 survey data
+In this section, I document how key data for the project were obtained. All of these data are available via a single download from (provide URL) or can be obtained from the author in a .zip file. 
+
+- DEEP2 photometric catalogs: Downloaded from the DEEP2 survey website using below commands.
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.21.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.22.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.31.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.32.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.33.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.41.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.42.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/pcat_ext.43.fits.gz
+
+- DEEP2 window functions: Downloaded from the DEEP2 survey website using below commands.
+wget http://deep.ps.uci.edu/DR4/data/windowf.21.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/windowf.22.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/windowf.31.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/windowf.32.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/windowf.33.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/windowf.41.fits.gz
+wget http://deep.ps.uci.edu/DR4/data/windowf.42.fits.gz
+
+- DEEP2 redshift catalogs: These were obtained from John Moustakas and are described in a Tech Report (DESI docDB-912). The redshift catalogs from Fields 2, 3, and 4 are named deep2-f2-redz-oii.fits, deep2-f3-redz-oii.fits, and deep2-f4-redz-oii.fits in the data repository.
+
+- DEEP2 color selection: The file is a union list of DEEP2 photometric catalogs with an additional information regarding color selection. It was obtained from Jeff Newman. See "Cross-matching..." section scripts for description.
+
+- survey-bricks-dr5: A useful file that can be used to determine Tractor bricks that cover regions of interest. Downloaded using the below command.
+wget http://portal.nersc.gov/project/cosmo/data/legacysurvey/dr5/survey-bricks-dr5.fits.gz
+
+- DR5 Tractor catalogs in DEEP2 Fields 2, 3, and 4: Using the "bricks" file above and a short script (generate-tractor-download-scripts.py), the below download scripts were generated:
+tractor-download-d2f2.sh
+tractor-download-d2f3.sh
+tractor-download-d2f4.sh
+
+- Tycho-2 catalog: The file was obtained from one of the DESI collaborators though I cannot remember whom. Named tycho2.fits in the data repostiory.
 
