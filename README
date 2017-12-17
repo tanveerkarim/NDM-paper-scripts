@@ -1,2 +1,27 @@
 This text file documents scripts used to produce results reported in the NDM selection method paper (2018). It also details scripts and their results not reported in the paper but documented here for reproducibility and complete update on the status of the method. 
 
+Contents: I group scripts and their results according to topic.
+- Software requirements
+- Data download and retrieval
+- Data pre-processing
+- Cross-matching DECaLS DR5 and DEEP2 catalogs
+- utils and NDM_models modules
+
+
+
+/---- Software requirements
+Unless mentioned otherwise, the work contained here is based on Python 2.7.12. Below is a non-exhaustive list of key packages used: 
+- numpy v1.9.1
+- astropy v1.1.1
+- scipy v0.19.0
+- extreme-deconvolution-1.4: https://github.com/jobovy/extreme-deconvolution
+
+The rest is based on Python 3.5.2. In particular, an application of Random Forest (RF) method to DEEP2-DECaLS DR5 data is performed using the following package compatible with Python 3.5.2:
+- scikit-learn v0.19.1
+
+
+
+/---- Data download and retrieval
+In this section, I document how key data for the project were obtained.
+- DEEP2 survey data
+
