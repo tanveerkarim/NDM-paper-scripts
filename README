@@ -6,7 +6,7 @@ Contents: I group scripts and their results according to topic.
 - utils and NDM_models modules
 - Data download and acquisition
 - Data pre-processing
-- Data quality reports
+- Data quality checks
 - Cross-matching DECaLS DR5 and DEEP2 catalogs
 
 README convention (for the author):
@@ -141,3 +141,28 @@ Combine DEEP2 catalogs
 /----- GMM training -----/
 - Make sure to hand cut outliers before training.
 - When fitting in magnitude space, objects that have very poor colors (say due to negative flux values) should be avoided.
+
+
+
+
+Intersection set area calculation
+
+
+/---- Data quality checks
+After pre-processing the data into convenient forms, we perform sanity checks on the data quality.
+
+DEEP2 raw and weighted number comparison
+- Notes: Based on the combined DEEP2 photometric and redshift catalogs, the weighted total number using DEEP2 target probability must be comparable to the raw total number in each Field. 
+
+DEEP2 ELG properties comparison by Field
+- Notes: Based on the combined DEEP2 photometric and redshift catalogs, the target probability weighted properties of ELG in the three Fields must be comparable. Compare the following quantities: number density, redshift distribution, OII distribution, BRI-magnitude distribution.
+
+DECaLS DR5 number density comparison by Field
+- Notes: Based on combined DECaLS DR5 catalogs only, the following quantities should be comparable given g < 24.25: grz-magnitude distribution and total number density.
+
+DEEP2-DECaLS DR5 intersection set (g < 24.25)
+- Notes: The properties of the intersection set in different Fields should be comparable to each other: grz-magnitude distribution, total number density, redshift distribution, and OII distribution. Both weighted and unweighted should be compared.
+
+DECaLS DR5 unmatched to DEEP2 set
+- Notes: Confirm that the unmatched set has the same grz-color-magnitude distribution as the matched set.
+
