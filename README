@@ -112,10 +112,13 @@ Combine all downloaded Tractor files by DEEP2 Field
 
 
 Combine DEEP2 catalogs
-- Notes: Combine pcats and zcats. Window masks were applied. Tycho-2 column was applied as well.
+- Notes: Combine photometric and redshift catalogs (by matching the two and appending select columns from redshift catalogs to photometric catalogs). DEEP2 window functions are applied and Tycho-2 mask column is applied to the objects. For more information, please see produce-deep2-f234-photo-redz-oii-prints.txt.
 - Script used: produce-deep2-f234-photo-redz-oii.py
 - Products: 
-	- deep2-f**-photo-trimmed.fits
+	- deep2-f**-photo-trimmed.fits: Intermediate products after applying DEEP2 window mask and BADFLAG quality cut. Consult the code.
+	- deep2-f**-photo-redz-oii.fits: Final products of the combined DEEP2 photometric and redshift catalogs.
+
+
 
 /----- Combine DEEP2 and DR5 -----/
 - Cuts prior to cross matching
