@@ -31,7 +31,7 @@ To orient the user of this document, I provide a high level overview of the docu
 - "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "data/derived" directory. 
 - "figures" contains all graphic products. Unless mentioned otherwise, all figures saved on the flat directory level.
 - "scripts" contains all Python scripts used to produce any results.
-- "notes" are a collection of text files that summarize important results that are not included in the NDM paper.
+- "notes" contains a PDF file that documents analysis/results that were not included in the NDM paper but are important to remember.
 
 
 
@@ -140,11 +140,15 @@ Definition of asinh magnitude
 - Notes: 
 
 
+
+
+
 /---- Data quality checks
 After pre-processing the data into convenient forms, we perform sanity checks on the data quality.
 
 DEEP2 raw and weighted number comparison
 - Notes: Based on the combined DEEP2 photometric and redshift catalogs, the weighted total number using DEEP2 target probability must be comparable to the raw total number in each Field. 
+- Script used: 
 
 DEEP2 ELG properties comparison by Field
 - Notes: Based on the combined DEEP2 photometric and redshift catalogs, the target probability weighted properties of ELG in the three Fields must be comparable. Compare the following quantities: number density, redshift distribution, OII distribution, BRI-magnitude distribution.
