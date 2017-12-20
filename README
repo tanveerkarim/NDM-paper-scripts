@@ -125,16 +125,19 @@ Combine DEEP2 and DR5
 	grz_all mask might be too stringent but this is done for convenience. This condition may be loosened down the road. We match DEEP2 catalogs onto DR5. Please refer to combine-Tractor-DEEP2-prints.txt
 - Script used: combine-Tractor-DEEP2.py
 - Products:
-	- unmatched-deep2-f**-photo-redz-oii.fits
-	- DR5-matched-to-DEEP2-f**-glim24p25.fits
+	- unmatched-deep2-f**-photo-redz-oii.fits: A subset of DEEP2 combined catalogs that did not find match in DR5.
+	- DR5-matched-to-DEEP2-f**-glim24p25.fits: Original DR5 combined catalogs with DEEP2 information appended.
 
-Estimate the intersection set area
+Estimate the intersection set area (DEEP2 window function AND Tycho mask)
 - Notes: Monte Carlo estimation of the intersection set area. Throw random points in the footprint and cross-match.
 - Script used: estimate-spec-area-DR5-matched.py
-- Produts: 
-
+- Products: 
+	- spec-area.npy: Areas of the intersection set: [0.70446343918138887, 0.85027729873967495, 0.57165023559554096] 2.12639097352
+- Figures:
+	- estimate-area-monte-carlo-DR5-matched.png: Shows the matched vs. unmatched MC randoms.
 
 Definition of asinh magnitude
+- Notes: 
 
 
 /---- Data quality checks
