@@ -106,27 +106,6 @@ tbhdu.writeto(data_directory_cleaned+'deep2-f4-photo-trimmed.fits', clobber=True
 print("Completed.\n")
 
 
-# ##############################################################################
-# 2017/12/17: This part is not used as it produces erroneous estimate of the area.
-# print("5. Estimate the spectroscopic area using window functions.")
-# print("File names: windowf.**.fits")
-# # Field 2
-# area_f2 = est_spec_area(windowf_directory+"windowf.21.fits")+est_spec_area(windowf_directory+"windowf.22.fits")
-# print("Field 2 area: %.3f" % area_f2)
-
-# # Field 3
-# area_f3 = est_spec_area(windowf_directory+"windowf.31.fits")+est_spec_area(windowf_directory+"windowf.32.fits")+est_spec_area(windowf_directory+"windowf.33.fits")
-# print("Field 3 area: %.3f" % area_f3)
-
-# # Field 4
-# area_f4 = est_spec_area(windowf_directory+"windowf.41.fits")+est_spec_area(windowf_directory+"windowf.42.fits")
-# print("Field 4 area: %.3f" % area_f4)
-
-# # Total
-# print("Total DEEP2 spectroscopic area: %.3f" % (area_f2+area_f3+area_f4))
-
-# print("Completed.\n")
-
 
 ##############################################################################
 print("6. Load other catalogs.")
@@ -241,7 +220,7 @@ print("Completed.")
 ##############################################################################
 print("8. Compute the class number based on the information above and append to the table.")
 print("Recall: ")
-for cn in range(9):
+for cn in range(len(cnames)):
     print("cn%d: %s"% (cn, cnames[cn]))
 
 col_name_list = ["cn"]
@@ -265,7 +244,7 @@ idx = range(pcat4.shape[0])
 for i in range(len(new_col_list)):
     pcat4 = pcat_append(pcat4, new_col_list[i], col_name_list[i], idx, idx)
 
-print("Category counts 0 through 8")
+print("Category counts 0 through %d" % (len(cnames)-1))
 print(np.bincount(pcat2["cn"].astype(int)))
 print(np.bincount(pcat3["cn"].astype(int)))
 print(np.bincount(pcat4["cn"].astype(int)))
@@ -311,7 +290,7 @@ nobjs_after = pcat4.size
 print "F4: %d / %d" % (nobjs_before, nobjs_after)
     
 
-# ##############################################################################
+# # ##############################################################################
 # print("10. Print the class breakdown in LaTex format.")
 # table_header = generate_table_header()
 # print(table_header)
@@ -324,3 +303,4 @@ print "F4: %d / %d" % (nobjs_before, nobjs_after)
 # print("Note: D2unboserved should be equal to zero for weighted and density cases.")
 # print("Completed.\n")
 
+#     
