@@ -1,0 +1,81 @@
+1. Load and combine DEEP2 extended pcat files for Fields 2, 3, and 4, respectively.
+File names for Fields 2, 3 and 4: pcat_ext.**.fits
+Special treatment to Field 4 data.
+ra,dec discrepancy: 0.002, -0.003
+ra,dec discrepancy: 0.004, -0.010
+Completed.
+
+2. Mask BADFLAG==0 objects.
+Completed.
+
+3. Mask objects that lie outside DEEP2 window functions.
+Completed.
+
+4. Save the trimmed DEEP2 photometric catalogs as deep2-f**-photo-trimmed.fits.
+Completed.
+
+6. Load other catalogs.
+color-selection.txt: Catalog that provides DEEP2 BRI color selection information.
+     Contains object ID, RA, dec, whether the object would have been targeted if in EGS. 
+     (1=yes, 0=no), and whether it would have been targeted in a non-EGS field.
+     Provided by Jeff Newman
+Completed.
+
+deep2-f**-redz-oii.fits: DEEP2 redshift catalogs that John Moustakas provided.
+ 	Extract OBJNO, RA, DEC, OII_3727, OII_3727_ERR, ZHELIO, ZHELIO_ERR, ZQUALITY.
+ 	Note 1: Negative errors have the following meaning
+     	-1.0 = line not detected with amplitude S/N > 1.5. Upper limit calculated.
+     	-2.0 = line not measured (not in spectral range)
+ 	Note 2: For ZQUALITY values, see http://deep.ps.uci.edu/DR4/zquality.html.
+Completed.
+
+7. Append additional columns to the photometric catalogs from others.
+7a. Append redshift catalogs.
+Columns added: OBJNO_zcat, RA_zcat, DEC_zcat, OII_3727, OII_3727_ERR, RED_Z, Z_ERR, Z_QUALITY, TARG_WEIGHT
+# of elements in intersection: 9336
+# of elements in intersection: 11644
+# of elements in intersection: 9126
+f2: # in zcat minus # in pcat matched 266
+f3: # in zcat minus # in pcat matched 342
+f4: # in zcat minus # in pcat matched 2164
+The number of overlapping objects are smaller because certain
+ spectroscopic areas were masked out in previous steps (the area
+ estimates above are compatible). I ignore the small number of object
+ loss.
+Completed.
+
+7c. Append color-selection information.
+Columns added: OBJNO_color, BRI_cut
+# of elements in intersection: 101179
+# of elements in intersection: 135206
+# of elements in intersection: 103017
+f2: # in pcat minus # in pcat matched 0
+f3: # in pcat minus # in pcat matched 0
+f4: # in pcat minus # in pcat matched 223
+The last 223 objects will be classified as DEEP2 BRI color rejected objects.
+Completed.
+
+7d. Append Tycho2 stark mask field.
+Completed.
+8. Compute the class number based on the information above and append to the table.
+Recall: 
+cn0: Gold
+cn1: Silver
+cn2: NoOII
+cn3: NoZ
+cn4: Non-ELG
+cn5: DEEP2_unobserved
+Category counts 0 through 5
+[ 1570  3985   817  2365 86013  6429]
+[  2307   4647    836   3207 115551   8658]
+[ 1643  3833   820  2328 88686  5930]
+Completed.
+
+9. Save the resulting catalogs.
+Completed.
+
+Check number of objects before and after save.
+Field: Before vs. After
+F2: 101179 / 101179
+F3: 135206 / 135206
+F4: 103240 / 103240
