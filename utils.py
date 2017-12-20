@@ -1908,24 +1908,24 @@ def class_breakdown(fn, cn, weight, area, rwd="D"):
             counts += tmp/len(fn)
         
         # Printing counts
-        print(str_counts(fn[i], rwd, tmp))            
+        print(str_counts(fn[i], tmp))            
 
     # Total or average counts
     if rwd in ["R", "W"]:
-        print(str_counts("Total", rwd, counts))
+        print(str_counts("Total", counts))
     else:
-        print(str_counts("Avg.", rwd, counts))
+        print(str_counts("Avg.", counts))
 
 
     
-def str_counts(fn, rwd_str, counts):
+def str_counts(fn, counts):
     """
     Given the counts of various class of objects return a formated string.
     """
     if type(fn)==str:
-        return_str = "%s & %s " % (fn,rwd_str)
+        return_str = "%s " % (fn)
     else:
-        return_str = "%d & %s " % (fn,rwd_str)
+        return_str = "%d " % (fn)
         
     for i in range(counts.size):
         return_str += "& %d " % counts[i]
@@ -1961,7 +1961,7 @@ def generate_density_breakdown(cn, weight,area):
     
 
 def generate_table_header():
-    return "Field & R/W/D & "+" & ".join(cnames) + " & Total" + latex_eol() + latex_hline()
+    return "Field & "+" & ".join(cnames) + " & Total" + latex_eol() + latex_hline()
 
 def latex_eol():
     return "\\\\ \\hline"
