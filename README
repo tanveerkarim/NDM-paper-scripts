@@ -1,5 +1,7 @@
 This text file documents scripts used to produce results reported in the NDM selection method paper (2018). It also details scripts and their results not reported in the paper but documented here for reproducibility and complete update on the status of the method. 
 
+Warning: I emphasize that the primary purpose of documenting the scripts and all codes used is for reproducibility rather than the ease of their adaptation to other projects. (In other words, I have not made a conscious effort to maintain the codes at a professional level beyond general readability and cleanliness.)
+
 Contents: I group scripts and their results according to topic.
 - Organization
 - Software requirements
