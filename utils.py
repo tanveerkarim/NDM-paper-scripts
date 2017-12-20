@@ -36,7 +36,7 @@ mpl.rcParams['xtick.labelsize'] = 15
 mpl.rcParams['ytick.labelsize'] = 15
 
 colors = ["orange", "grey", "purple", "red", "black", "blue"]
-cnames = ["Gold", "Silver", "NoOII",  "NoZ", "Non-ELG", "DEEP2_unobserved"]
+cnames = ["Gold", "Silver", "NoOII",  "NoZ", "Non-ELG", "DEEP2 unobserved"]
 
 large_random_constant = -999119283571
 deg2arcsec=3600
@@ -1885,19 +1885,20 @@ def class_breakdown(fn, cn, weight, area, rwd="D"):
     """
     Given a list of class fields and corresponding weights and areas, return the breakdown of object 
     for each class. fn gives the field number. 
+    
+    R: Raw density
+    W: Weighted Density
     """
     
     # Place holder for tallying
-    counts = np.zeros(8)
+    counts = np.zeros(len(cnames))
     
     # Generate counts
     for i in range(len(fn)):
         # Computing counts
         if rwd == "R":
-            tmp = generate_raw_breakdown(cn[i])
+            tmp = generate_raw_breakdown(cn[i], area[i])
         elif rwd == "W":
-            tmp = generate_weighted_breakdown(cn[i], weight[i])
-        else:
             tmp = generate_density_breakdown(cn[i], weight[i], area[i])
         
         # Tallying counts
@@ -1936,30 +1937,31 @@ def str_counts(fn, rwd_str, counts):
     return return_str
     
     
-def generate_raw_breakdown(cn):
-    return np.delete(np.bincount(cn.astype(int)),7)
+def generate_raw_breakdown(cn, area):
+    return np.bincount(cn.astype(int))/area
 
 def generate_weighted_breakdown(cn, weight):
-    counts = np.zeros(8,dtype=int)
-    for i,e in enumerate(np.delete(np.arange(0,9,1, dtype=int),7)):
-        if (e!=6) and (e!=8):
-            counts[i] = np.sum(weight[cn==e])
+    counts = np.zeros(len(cnames), dtype=int)
+    for i in range(len(cnames)-1):
+        if i != 4: # If the chosen class is not DEEP2 reject then 
+            counts[i] = np.sum(weight[cn==i])
         else:
-            counts[i] = np.sum(cn==e)
+            counts[i] = np.sum(cn==i)
     return counts
 
 def generate_density_breakdown(cn, weight,area):
-    counts = np.zeros(8,dtype=int)
-    for i,e in enumerate(np.delete(np.arange(0,9,1, dtype=int),7)):
-        if (e!=6) and (e!=8):
-            counts[i] = np.sum(weight[cn==e])/np.float(area)
+    counts = np.zeros(len(cnames), dtype=int)
+    for i in range(len(cnames)-1):
+        if i != 4: # If the chosen class is not DEEP2 reject then 
+            counts[i] = np.sum(weight[cn==i])/float(area)
         else:
-            counts[i] = np.sum(cn==e)/np.float(area)
+            counts[i] = np.sum(cn==i)/float(area)
     return counts
+
     
 
 def generate_table_header():
-    return "Field & R/W/D & "+" & ".join(class_names()) + " & Total" + latex_eol() + latex_hline()
+    return "Field & R/W/D & "+" & ".join(cnames) + " & Total" + latex_eol() + latex_hline()
 
 def latex_eol():
     return "\\\\ \\hline"
@@ -1967,11 +1969,6 @@ def latex_eol():
 def latex_hline():
     return "\\hline"
     
-def class_names():
-    """
-    Provide a list of class names.
-    """
-    return ["Gold", "Silver", "LowOII","NoOII", "LowZ", "NoZ", "D2reject", "D2unobserved"]
 
 
 
