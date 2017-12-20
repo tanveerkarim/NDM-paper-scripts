@@ -13,12 +13,13 @@ for fnum in [2, 3, 4]:
     weights.append(pcat["TARG_WEIGHT"])
 
 table_header = generate_table_header()
-print(table_header)
 print "Raw number density"
+print(table_header)
 class_breakdown([2, 3, 4], cns, weights, areas, rwd="R")
 print "\n"
 
 print "Weighted number density"
+print(table_header)
 class_breakdown([2, 3, 4], cns, weights, areas, rwd="W")
 print "\n"
 
