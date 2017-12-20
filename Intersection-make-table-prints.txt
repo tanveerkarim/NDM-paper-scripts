@@ -1,0 +1,18 @@
+Import estimated areas
+Import Intersection catalogs
+Field & Gold & Silver & NoOII & NoZ & Non-ELG & DEEP2 unobserved & Total\\ \hline\hline
+Raw number density
+2 & 868 & 2262 & 457 & 1110 & 19312 & 0 & 24009 \\ \hline
+3 & 1280 & 2515 & 470 & 1730 & 21324 & 0 & 27319 \\ \hline
+4 & 1700 & 3552 & 804 & 2209 & 23761 & 0 & 32026 \\ \hline
+Total & 3848 & 8329 & 1731 & 5049 & 64397 & 0 & 83354 \\ \hline
+
+
+Weighted number density
+2 & 1530 & 3774 & 771 & 2425 & 19312 & 0 & 27812 \\ \hline
+3 & 2334 & 4226 & 813 & 4078 & 21324 & 0 & 32775 \\ \hline
+4 & 3082 & 5983 & 1399 & 5180 & 23761 & 0 & 39405 \\ \hline
+Total & 6946 & 13983 & 2983 & 11683 & 64397 & 0 & 99992 \\ \hline
+
+
+The total densities must match.
