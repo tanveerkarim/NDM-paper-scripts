@@ -35,8 +35,8 @@ mpl.rcParams['ytick.major.width'] = 1.
 mpl.rcParams['xtick.labelsize'] = 15
 mpl.rcParams['ytick.labelsize'] = 15
 
-colors = ["orange", "grey", "brown", "purple", "red", "salmon","black", "white","blue"]
-cnames = ["Gold", "Silver", "LowOII", "NoOII", "LowZ", "NoZ", "D2reject", "DR3unmatched","D2unobserved"]
+colors = ["orange", "grey", "purple", "red", "black", "blue"]
+cnames = ["Gold", "Silver", "NoOII",  "NoZ", "Non-ELG", "DEEP2_unobserved"]
 
 large_random_constant = -999119283571
 deg2arcsec=3600
