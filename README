@@ -112,11 +112,12 @@ Combine all downloaded Tractor files by DEEP2 Field
 
 
 Combine DEEP2 catalogs
-- Notes: Combine photometric and redshift catalogs (by matching the two and appending select columns from redshift catalogs to photometric catalogs). DEEP2 window functions are applied and Tycho-2 mask column is applied to the objects. For more information, please see produce-deep2-f234-photo-redz-oii-prints.txt.
+- Notes: Combine photometric and redshift catalogs (by matching the two and appending select columns from redshift catalogs to photometric catalogs). DEEP2 window functions are applied and Tycho-2 mask column is applied to the objects. For more information, please see produce-deep2-f234-photo-redz-oii-prints.txt. Refer to generate_class_col function for the exact classification scheme used.
 - Script used: produce-deep2-f234-photo-redz-oii.py
 - Products: 
 	- deep2-f**-photo-trimmed.fits: Intermediate products after applying DEEP2 window mask and BADFLAG quality cut. Consult the code.
 	- deep2-f**-photo-redz-oii.fits: Final products of the combined DEEP2 photometric and redshift catalogs.
+
 
 
 
@@ -147,6 +148,8 @@ Combine DEEP2 catalogs
 
 Intersection set area calculation
 
+Definition of asinh magnitude
+
 
 /---- Data quality checks
 After pre-processing the data into convenient forms, we perform sanity checks on the data quality.
@@ -161,7 +164,7 @@ DECaLS DR5 number density comparison by Field
 - Notes: Based on combined DECaLS DR5 catalogs only, the following quantities should be comparable given g < 24.25: grz-magnitude distribution and total number density.
 
 DEEP2-DECaLS DR5 intersection set (g < 24.25)
-- Notes: The properties of the intersection set in different Fields should be comparable to each other: grz-magnitude distribution, total number density, redshift distribution, and OII distribution. Both weighted and unweighted should be compared.
+- Notes: The properties of the intersection set in different Fields should be comparable to each other: grz-magnitude distribution, grz-color distributions, total number density, redshift distribution, and OII distribution. Both weighted and unweighted should be compared. Division by class.
 
 DECaLS DR5 unmatched to DEEP2 set
 - Notes: Confirm that the unmatched set has the same grz-color-magnitude distribution as the matched set.
