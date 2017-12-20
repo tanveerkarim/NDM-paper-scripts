@@ -1824,6 +1824,13 @@ def pcat_append(pcat, new_col, col_name, idx1, idx2):
 def generate_class_col(pcat):
     """
     Given a pcat array with required fields, produce a column that classify objects into different classes.
+
+    - Gold and Silver objects are any ELGs with a measured OII and a secured redshift. For convenience,
+    I do not impose OII>0 condition.
+    - NoOII are objects in DESI redshift range but no measured OII.
+    - NoZ are DEEP2 color selected objects but no secure redshift information and no OII information.
+    - NonELG: DEEP2 rejected, confirmed low-z objects with no OII flux measurement, or objects with no color selection information.
+    - DEEP2_unobserved: Objects that were not targeted by DEEP2 survey.
     """
     # Extracting columns
     OII = pcat["OII_3727"]*1e17
