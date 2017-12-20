@@ -1830,46 +1830,40 @@ def generate_class_col(pcat):
     Z = pcat["RED_Z"]
     ZQUALITY = pcat["Z_QUALITY"]
     OII_ERR = pcat["OII_3727_ERR"]
-    BRIcut = pcat["BRI_cut"]
-    
+    BRIcut = pcat["BRI_cut"].astype(int)
     
     # Placeholder for the class column.
     class_col = np.ones(pcat.shape[0],dtype=int)*large_random_constant
     
-    # Gold, CN=0: OII>8, Z in [1.1, 1.6]
-    ibool = (OII>8) & (Z>1.1) & (Z<1.6)  & (BRIcut==1) & (ZQUALITY>=3) & (OII_ERR>0) 
+    # Gold, CN=0: Z in [1.1, 1.6]
+    ibool = (Z>1.1) & (Z<1.6) & (BRIcut==1) & (ZQUALITY>=3) & (OII_ERR>0) #& (OII > 0)
     class_col[ibool] = 0
     
-    # Silver, CN=1: OII>8, Z in [0.6, 1.1]
-    ibool = (OII>8) & (Z>0.6) & (Z<1.1) & (OII_ERR>0)  & (BRIcut==1) & (ZQUALITY>=3)
+    # Silver, CN=1: Z in [0.6, 1.1]
+    ibool = (Z>0.6) & (Z<1.1) & (BRIcut==1) & (ZQUALITY>=3) & (OII_ERR>0) #& (OII > 0)
     class_col[ibool] = 1
 
-    # LowOII, CN=2: OII<8, Z in [0.6, 1.6]
-    ibool =  (OII<8) & (Z>0.6) & (Z<1.6)  & (OII_ERR>0) & (ZQUALITY>=3) & (BRIcut==1)
+    # NoOII, CN=2: OII=?, Z in [0.6, 1.6] and secure redshift
+    ibool = (Z>0.6) & (Z<1.6) & (BRIcut==1) & (ZQUALITY>=3)  & (OII_ERR<=0)    
     class_col[ibool] = 2
-    # Note that many ELG objects were assigned negative OII, which are unphysical. 
 
-    # NoOII, CN=3: OII=?, Z in [0.6, 1.6] and secure redshift
-    ibool = (Z>0.6) & (Z<1.6) & (OII_ERR<=0) & (ZQUALITY>=3) & (BRIcut==1)    
+    # NoZ, CN=3: OII=NA, Z undetermined.
+    ibool = np.logical_or.reduce(((ZQUALITY==-2) , (ZQUALITY==0) , (ZQUALITY==1) ,(ZQUALITY==2))) & (BRIcut==1)  & (OII_ERR<=0)
     class_col[ibool] = 3
-
-    # LowZ, CN=4: OII=NA, Z outside [0.6, 1.6]
-    ibool = np.logical_or((np.logical_or((Z>1.6), (Z<0.6)) & (ZQUALITY>=3)),(ZQUALITY==-1))  & (OII_ERR<=0) & (BRIcut==1)
+    
+    # NonELG, CN=4. DEEP2 rejected, confirmed stars (ZQUALITY == -1), or confirmed other low-redshift (or Non-DESI redshift objects)
+    ibool_lowZ = np.logical_or((np.logical_or((Z>1.6), (Z<0.6)) & (ZQUALITY>=3)),(ZQUALITY==-1))  & (OII_ERR<=0) & (BRIcut==1)
+    ibool_reject = BRIcut==0
+    ibool_NoInfo = BRIcut <-1000 # Objects with no color selection information.
+    ibool = np.logical_or.reduce((ibool_lowZ, ibool_reject, ibool_NoInfo))
     class_col[ibool] = 4
-
-    # NoZ, CN=5: OII=NA, Z undetermined.
-    ibool = np.logical_or.reduce(((ZQUALITY==-2) , (ZQUALITY==0) , (ZQUALITY==1) ,(ZQUALITY==2)))& (BRIcut==1)  & (OII_ERR<=0)
+    
+    # DEEP2_unobserved, CN=5
+    ibool = (BRIcut==1) & (ZQUALITY<-10)   # Objects that were not assigned color-selection flag are classifed as DEEP2 color rejected objects.
     class_col[ibool] = 5
     
-    # D2reject, CN=6
-    ibool = BRIcut!=1
-    class_col[ibool] = 6
-    
-    # D2unobserved, CN=8
-    ibool = (BRIcut==1) & (ZQUALITY<-10)   # Objects that were not assigned color-selection flag are classifed as DEEP2 color rejected objects.
-    class_col[ibool] = 8  
-    
     return class_col
+
 
 def count_nn(arr):
     """
