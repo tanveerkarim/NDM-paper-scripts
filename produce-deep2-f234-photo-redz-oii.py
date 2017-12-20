@@ -288,19 +288,3 @@ nobjs_before = pcat4.size
 pcat4 = load_fits_table(save_dir + "deep2-f4-photo-redz-oii.fits")
 nobjs_after = pcat4.size
 print "F4: %d / %d" % (nobjs_before, nobjs_after)
-    
-
-# # ##############################################################################
-# print("10. Print the class breakdown in LaTex format.")
-# table_header = generate_table_header()
-# print(table_header)
-# # Raw number
-# class_breakdown([2, 3, 4],[pcat2["cn"],pcat3["cn"],pcat4["cn"]],[pcat2["TARG_WEIGHT"],pcat3["TARG_WEIGHT"],pcat4["TARG_WEIGHT"]], [area_f2,area_f3,area_f4],rwd="R")
-# # Weighted number
-# class_breakdown([2, 3, 4],[pcat2["cn"],pcat3["cn"],pcat4["cn"]],[pcat2["TARG_WEIGHT"],pcat3["TARG_WEIGHT"],pcat4["TARG_WEIGHT"]], [area_f2,area_f3,area_f4],rwd="W")
-# # Density (weighted divided by area)
-# class_breakdown([2, 3, 4],[pcat2["cn"],pcat3["cn"],pcat4["cn"]],[pcat2["TARG_WEIGHT"],pcat3["TARG_WEIGHT"],pcat4["TARG_WEIGHT"]], [area_f2,area_f3,area_f4],rwd="D")
-# print("Note: D2unboserved should be equal to zero for weighted and density cases.")
-# print("Completed.\n")
-
-#     
