@@ -1,0 +1,93 @@
+----- Processing 2 Field -----
+1. Load processed DEEP2 and Tractor catalogs.
+DEEP2 catalogs.
+Apply Tycho-2 mask.
+
+# in DEEP2 pcat: 97590
+
+DECaLS catalogs.
+Apply Tycho-2 stellar mask and other masks. glim < 24.2
+# in Tractor: 20536
+
+Completed.
+
+2. Cross-matching Tractor objects with g<24.25 and DEEP2 objects within each field. Check astrometric difference.
+# of matches 19278
+ra, dec median differences in arcsec: -0.011, 0.012
+
+Completed.
+
+3. Crossmatch the catalogs taking into account astrometric differences.
+Save 1) DECaLS appended with DEEP2 and 2) Unmatched DEEP2.
+Following columns have been appended.
+[('OBJNO', '>i4'), ('BESTB', '>f4'), ('BESTR', '>f4'), ('BESTI', '>f4'), ('BESTBERR', '>f4'), ('BESTRERR', '>f4'), ('BESTIERR', '>f4'), ('BADFLAG', 'u1'), ('OII_3727', '>f8'), ('OII_3727_ERR', '>f8'), ('RED_Z', '>f8'), ('Z_ERR', '>f8'), ('ZQUALITY', '>f8'), ('TARG_WEIGHT', '>f8'), ('BRI_cut', '>f8'), ('cn', '>f8')]
+Completed.
+
+Comparison of number of objects before and after save.
+F2: 20536 / 20536
+
+
+
+
+----- Processing 3 Field -----
+1. Load processed DEEP2 and Tractor catalogs.
+DEEP2 catalogs.
+Apply Tycho-2 mask.
+
+# in DEEP2 pcat: 125519
+
+DECaLS catalogs.
+Apply Tycho-2 stellar mask and other masks. glim < 24.2
+# in Tractor: 29223
+
+Completed.
+
+2. Cross-matching Tractor objects with g<24.25 and DEEP2 objects within each field. Check astrometric difference.
+# of matches 26913
+ra, dec median differences in arcsec: -0.047, 0.052
+
+Completed.
+
+3. Crossmatch the catalogs taking into account astrometric differences.
+Save 1) DECaLS appended with DEEP2 and 2) Unmatched DEEP2.
+Following columns have been appended.
+[('OBJNO', '>i4'), ('BESTB', '>f4'), ('BESTR', '>f4'), ('BESTI', '>f4'), ('BESTBERR', '>f4'), ('BESTRERR', '>f4'), ('BESTIERR', '>f4'), ('BADFLAG', 'u1'), ('OII_3727', '>f8'), ('OII_3727_ERR', '>f8'), ('RED_Z', '>f8'), ('Z_ERR', '>f8'), ('ZQUALITY', '>f8'), ('TARG_WEIGHT', '>f8'), ('BRI_cut', '>f8'), ('cn', '>f8')]
+Completed.
+
+Comparison of number of objects before and after save.
+F3: 29223 / 29223
+
+
+
+
+----- Processing 4 Field -----
+1. Load processed DEEP2 and Tractor catalogs.
+DEEP2 catalogs.
+Apply Tycho-2 mask.
+
+# in DEEP2 pcat: 100987
+
+DECaLS catalogs.
+Apply Tycho-2 stellar mask and other masks. glim < 24.2
+# in Tractor: 23072
+
+Completed.
+
+2. Cross-matching Tractor objects with g<24.25 and DEEP2 objects within each field. Check astrometric difference.
+# of matches 21307
+ra, dec median differences in arcsec: -0.048, 0.048
+
+Completed.
+
+3. Crossmatch the catalogs taking into account astrometric differences.
+Save 1) DECaLS appended with DEEP2 and 2) Unmatched DEEP2.
+Following columns have been appended.
+[('OBJNO', '>i4'), ('BESTB', '>f4'), ('BESTR', '>f4'), ('BESTI', '>f4'), ('BESTBERR', '>f4'), ('BESTRERR', '>f4'), ('BESTIERR', '>f4'), ('BADFLAG', 'u1'), ('OII_3727', '>f8'), ('OII_3727_ERR', '>f8'), ('RED_Z', '>f8'), ('Z_ERR', '>f8'), ('ZQUALITY', '>f8'), ('TARG_WEIGHT', '>f8'), ('BRI_cut', '>f8'), ('cn', '>f8')]
+Completed.
+
+Comparison of number of objects before and after save.
+F4: 23072 / 23072
+
+
+
+
