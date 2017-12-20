@@ -24,10 +24,12 @@ To orient the user of this document, I provide a high level overview of the docu
 	/data
 		/derived
 	/scripts
+	/figures
 	/notes
 
 - "article" contains the manuscript .tex file and all other immediate relevant packages, figures, bibliography, etc. 
 - "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "data/derived" directory. 
+- "figures" contains all graphic products. Unless mentioned otherwise, all figures saved on the flat directory level.
 - "scripts" contains all Python scripts used to produce any results.
 - "notes" are a collection of text files that summarize important results that are not included in the NDM paper.
 
@@ -126,9 +128,11 @@ Combine DEEP2 and DR5
 	- unmatched-deep2-f**-photo-redz-oii.fits
 	- DR5-matched-to-DEEP2-f**-glim24p25.fits
 
+Estimate the intersection set area
+- Notes: Monte Carlo estimation of the intersection set area. Throw random points in the footprint and cross-match.
+- Script used: estimate-spec-area-DR5-matched.py
+- Produts: 
 
-
-Intersection set area calculation
 
 Definition of asinh magnitude
 
