@@ -1912,9 +1912,9 @@ def class_breakdown(fn, cn, weight, area, rwd="D"):
 
     # Total or average counts
     if rwd in ["R", "W"]:
-        print(str_counts("Total", counts))
-    else:
-        print(str_counts("Avg.", counts))
+        # print(str_counts("Total", counts))
+    # else:
+        print(str_counts("Avg.", counts/len(fn)))
 
 
     
@@ -1938,16 +1938,12 @@ def str_counts(fn, counts):
     
     
 def generate_raw_breakdown(cn, area):
-    return np.bincount(cn.astype(int))/area
-
-def generate_weighted_breakdown(cn, weight):
     counts = np.zeros(len(cnames), dtype=int)
     for i in range(len(cnames)-1):
-        if i != 4: # If the chosen class is not DEEP2 reject then 
-            counts[i] = np.sum(weight[cn==i])
-        else:
-            counts[i] = np.sum(cn==i)
+        counts[i] = np.sum(cn==i)/float(area)
     return counts
+
+
 
 def generate_density_breakdown(cn, weight,area):
     counts = np.zeros(len(cnames), dtype=int)
