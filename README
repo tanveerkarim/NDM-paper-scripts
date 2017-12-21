@@ -216,3 +216,6 @@ Modeling-related challenges
 - Selection region convergence: Insufficient MC convolution and sampling in general may leave noisy features. Would it be possible to use random grid to solve this problem?
 - Efficient representation of selection region: A selection region represented by a set of cells in a chosen color-color-magnitude space may be more efficiently represented through other means such as tesselation.
 - Redshift modeling: Due to cosmic variance, redshift distribution is not explicitly modeled. 
+
+Post SV-period modeling
+- During Science Validation period, DESI will gain 500K additional spectra. How should the selection region be updated to incorporate information gained from these observations?
