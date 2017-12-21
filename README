@@ -157,7 +157,7 @@ DEEP2 raw and weighted number comparison
 	- DEEP2-make-table-prints.txt
 
 Intersection set raw and weighted number comparison
-- Notes: Based on the intersection set, the weighted total number using DEEP2 target probability must be comparable to the raw total number in each Field. There are about 20-30% more objects in Field 4 compared to Field 2 (see Intersection-make-table-prints.txt). There are about 10-20% more objects in the weighted. This means that a selection based on the number density model trained on weighted data set may be too conservative and return fewer than expected number of objects.
+- Notes: Based on the intersection set, the weighted total number using DEEP2 target probability must be comparable to the raw total number in each Field. There are about 20-30% more objects in Field 4 compared to Field 2 (see Intersection-make-table-prints.txt). There are about 10-20% more objects in the weighted. This means that a selection based on the number density model trained on weighted data set may be too conservative and return fewer than expected number of objects. In order to take into account the number of unmatched objects (about 6-8%), we simply scale the intersection set by the fraction of unmathced objects. (Note that this does not solve the problem of weighted vs. raw density.)
 - Script used: Intersection-make-table.py
 - Product:
 	- Intersection-make-table-prints.txt	
