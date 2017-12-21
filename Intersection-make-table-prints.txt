@@ -1,5 +1,11 @@
 Import estimated areas
 Import Intersection catalogs
+Field: Unmatched fraction
+F2: 6.13%
+F3: 7.90%
+F4: 7.63%
+
+
 Raw number density
 Field & Gold & Silver & NoOII & NoZ & Non-ELG & DEEP2 unobserved & Total\\ \hline\hline
 2 & 868 & 2262 & 457 & 1110 & 19312 & 0 & 24009 \\ \hline
