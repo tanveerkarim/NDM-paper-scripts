@@ -178,6 +178,9 @@ DEEP2 ELG properties comparison by Field
 
 DECaLS DR5 number density comparison by Field
 - Notes: Based on combined DECaLS DR5 catalogs only, the following quantities should be comparable given g < 24.25: grz-magnitude distribution and total number density.
+- Script used: DR5-properties.py
+- Products:
+	- DR5-grz-hist.png
 
 DEEP2-DECaLS DR5 intersection set (g < 24.25)
 - Notes: The properties of the intersection set in different Fields should be comparable to each other: grz-magnitude distribution, grz-color distributions, total number density, redshift distribution, and OII distribution. Both weighted and unweighted should be compared. Division by class.
