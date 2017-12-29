@@ -170,7 +170,10 @@ Intersection set raw and weighted number comparison
 	- Intersection-make-table-prints.txt	
 
 DEEP2 ELG properties comparison by Field
-- Notes: Based on the combined DEEP2 photometric and redshift catalogs, the target probability weighted properties of ELG in the three Fields must be comparable. Compare the following quantities: number density, redshift distribution, OII distribution, BRI-magnitude-color distribution.
+- Notes: Based on the combined DEEP2 photometric and redshift catalogs, the target probability weighted properties of ELG in the three Fields should be comparable. Compare the following quantities: number density, redshift distribution, OII distribution, BRI-magnitude-color distribution.
+- Script used: DEEP2-ELG-properties.py
+- Product:
+	- 
 
 DECaLS DR5 number density comparison by Field
 - Notes: Based on combined DECaLS DR5 catalogs only, the following quantities should be comparable given g < 24.25: grz-magnitude distribution and total number density.
@@ -181,7 +184,6 @@ DEEP2-DECaLS DR5 intersection set (g < 24.25)
 DECaLS DR5 unmatched to DEEP2 set
 - Notes: Confirm that the unmatched set has the same grz-color-magnitude distribution as the matched set.
 
-Additional exploration of DEEP2 data set.
 
 Depths estimation
 
