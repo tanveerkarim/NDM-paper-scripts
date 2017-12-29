@@ -15,6 +15,7 @@ README convention (for the author):
 - "/----" to denote the beginning of a new grouping or section. 
 - Five "\n" between sections.
 - Use only "-" for lists.
+- "!" means the particular analysis is not performed to completion.
 
 
 
@@ -149,7 +150,7 @@ Definition of asinh magnitude
 /---- Data quality checks
 After pre-processing the data into convenient forms, we perform sanity checks on the data quality.
 
-RADEC plots of DEEP2 and DR5 (all, matched, unmatched)
+! RADEC plots of DEEP2 and DR5 (all, matched, unmatched)
 - Notes: 3 x 3 RA/DEC plots. Columns refer to Fields and rows to (all, matched, unmatched) in order.
 - Script used: plot-RADEC-All-Matched-Unmatched.py
 - Product: 
@@ -157,7 +158,7 @@ RADEC plots of DEEP2 and DR5 (all, matched, unmatched)
 	- RADEC-DR5-All-Matched-Unmatched.png
 
 DEEP2 raw and weighted number comparison
-- Notes: Based on the combined DEEP2 photometric and redshift catalogs, the weighted total number using DEEP2 target probability must be comparable to the raw total number in each Field. In each Field, the weighted number is greater than the raw total density by ~5%. Also, there are about 20% more objects in Field 4 compared to Field 2 (see DEEP2-make-table-prints.txt).
+- Notes: Based on the combined DEEP2 photometric and redshift catalogs, the weighted total number using DEEP2 target probability must be comparable to the raw total number in each Field. In each Field, the weighted number is greater than the raw total density by ~5%. Also, there are about 20% more raw objects in Field 4 compared to Field 2 (see DEEP2-make-table-prints.txt).
 - Script used: DEEP2-make-table.py
 - Product:
 	- DEEP2-make-table-prints.txt
