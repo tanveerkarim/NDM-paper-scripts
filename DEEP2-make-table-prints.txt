@@ -2,18 +2,18 @@ Import estimated areas
 Import DEEP2 combined catalogs
 Raw number density
 Field & Gold & Silver & NoOII & NoZ & Non-ELG & DEEP2 unobserved & Total\\ \hline\hline
-2 & 2228 & 5656 & 1159 & 3357 & 122097 & 0 & 134497 \\ \hline
-3 & 2713 & 5465 & 983 & 3771 & 135898 & 0 & 148830 \\ \hline
-4 & 2874 & 6705 & 1434 & 4072 & 155140 & 0 & 170225 \\ \hline
-Avg. & 2605 & 5942 & 1192 & 3733 & 137711 & 0 & 151184 \\ \hline
+2 & 2194 & 5585 & 1264 & 3357 & 122097 & 0 & 134497 \\ \hline
+3 & 2643 & 5361 & 1156 & 3771 & 135898 & 0 & 148829 \\ \hline
+4 & 2816 & 6633 & 1563 & 4072 & 155140 & 0 & 170224 \\ \hline
+Avg. & 2551 & 5859 & 1327 & 3733 & 137711 & 0 & 151183 \\ \hline
 
 
 Weighted number density
 Field & Gold & Silver & NoOII & NoZ & Non-ELG & DEEP2 unobserved & Total\\ \hline\hline
-2 & 3916 & 9538 & 1992 & 7055 & 122097 & 0 & 144598 \\ \hline
-3 & 4953 & 9259 & 1716 & 8354 & 135898 & 0 & 160180 \\ \hline
-4 & 5172 & 11372 & 2504 & 9011 & 155140 & 0 & 183199 \\ \hline
-Avg. & 4680 & 10056 & 2070 & 8140 & 137711 & 0 & 162659 \\ \hline
+2 & 3855 & 9418 & 2173 & 7055 & 122097 & 0 & 144598 \\ \hline
+3 & 4826 & 9082 & 2021 & 8354 & 135898 & 0 & 160181 \\ \hline
+4 & 5069 & 11244 & 2735 & 9011 & 155140 & 0 & 183199 \\ \hline
+Avg. & 4583 & 9914 & 2309 & 8140 & 137711 & 0 & 162659 \\ \hline
 
 
 The total densities must match.
