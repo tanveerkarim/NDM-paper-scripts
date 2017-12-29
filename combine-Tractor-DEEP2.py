@@ -85,7 +85,7 @@ for i, fnum in enumerate([2, 3, 4]):
     
     # Save unmatched DEEP2
     deep2_unmatched = deep2[np.setdiff1d(np.arange(nobjs_d2_total, dtype=int),idx2)]
-    save_fits(deep2_unmatched, "unmatched-deep2-f%d-photo-redz-oii.fits" % fnum)
+    save_fits(deep2_unmatched, dir_derived + "unmatched-deep2-f%d-photo-redz-oii.fits" % fnum)
 
     # Append DEEP2 info for matched DR3 objects.
     append_list = [('OBJNO', '>i4'), ('BESTB', '>f4'), ('BESTR', '>f4'), ('BESTI', '>f4'), ('BESTBERR', '>f4'), ('BESTRERR', '>f4'), ('BESTIERR', '>f4'), ('BADFLAG', 'u1'), ('OII_3727', '>f8'), ('OII_3727_ERR', '>f8'), ('RED_Z', '>f8'), ('Z_ERR', '>f8'), ('ZQUALITY', '>f8'), ('TARG_WEIGHT', '>f8'), ('BRI_cut', '>f8'), ('cn', '>f8')]
