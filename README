@@ -181,15 +181,15 @@ DECaLS DR5 number density comparison by Field
 - Script used: DR5-properties.py
 - Products:
 	- DR5-grz-hist.png
+	- DR5-mag-depths.png
+	- depths-all-objects.png: grz magnitude 5-sig depths computed from the Tractor quoted errors.
+	- depths-rexp.png: grz magnitude 5-sig depths of r_exp [0.35, 0.55] objects.
 
 DEEP2-DECaLS DR5 intersection set (g < 24.25)
 - Notes: The properties of the intersection set in different Fields should be comparable to each other: grz-magnitude distribution, grz-color distributions, total number density, redshift distribution, and OII distribution. Both weighted and unweighted should be compared. Division by class.
 
 DECaLS DR5 unmatched to DEEP2 set
 - Notes: Confirm that the unmatched set has the same grz-color-magnitude distribution as the matched set.
-
-
-Depths estimation
 
 
 
