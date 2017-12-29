@@ -1843,15 +1843,15 @@ def generate_class_col(pcat):
     class_col = np.ones(pcat.shape[0],dtype=int)*large_random_constant
     
     # Gold, CN=0: Z in [1.1, 1.6]
-    ibool = (Z>1.1) & (Z<1.6) & (BRIcut==1) & (ZQUALITY>=3) & (OII_ERR>0) #& (OII > 0)
+    ibool = (Z>1.1) & (Z<1.6) & (BRIcut==1) & (ZQUALITY>=3) & (OII_ERR>0) & (OII > 0)
     class_col[ibool] = 0
     
     # Silver, CN=1: Z in [0.6, 1.1]
-    ibool = (Z>0.6) & (Z<1.1) & (BRIcut==1) & (ZQUALITY>=3) & (OII_ERR>0) #& (OII > 0)
+    ibool = (Z>0.6) & (Z<1.1) & (BRIcut==1) & (ZQUALITY>=3) & (OII_ERR>0) & (OII > 0)
     class_col[ibool] = 1
 
     # NoOII, CN=2: OII=?, Z in [0.6, 1.6] and secure redshift
-    ibool = (Z>0.6) & (Z<1.6) & (BRIcut==1) & (ZQUALITY>=3)  & (OII_ERR<=0)    
+    ibool = (Z>0.6) & (Z<1.6) & (BRIcut==1) & (ZQUALITY>=3)  & np.logical_or((OII_ERR<=0), OII <=0)
     class_col[ibool] = 2
 
     # NoZ, CN=3: OII=NA, Z undetermined.
