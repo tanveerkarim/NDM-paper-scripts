@@ -141,7 +141,13 @@ Estimate the intersection set area (DEEP2 window function AND Tycho mask)
 	- estimate-area-monte-carlo-DR5-matched.png: Shows the matched vs. unmatched MC randoms.
 
 Definition of asinh magnitude
-- Notes: 
+- Notes: Throughout this work, we use asinh magnitude which is defined by a single parameter for each band which is comparable to typical 1-sig error.
+- Script used: 
+- Results: b parameter for g, r, z, and oii.
+	g 0.0285114
+	r 0.0423106
+	z 0.122092
+	oii 0.581528277909
 
 
 
@@ -186,11 +192,19 @@ DECaLS DR5 number density comparison by Field
 	- depths-rexp.png: grz magnitude 5-sig depths of r_exp [0.35, 0.55] objects.
 
 DEEP2-DECaLS DR5 intersection set (g < 24.25)
-- Notes: The properties of the intersection set in different Fields should be comparable to each other: grz-magnitude distribution, grz-color distributions, total number density, redshift distribution, and OII distribution. Both weighted and unweighted should be compared. Division by class.
+- Notes: The properties of the intersection set (only DEEP2 matched DR5 objects) in different Fields should be comparable to each other: grz-magnitude distribution (weighted AND unweighted), grz-color distributions (division by class), redshift and OII distribution (ELG). 
+- Script used: Intersection-properties.py
+- Products:
+	- Intersection-grz-hist-raw.png
+	- Intersection-grz-hist-weighted.png
+	- Intersection-grz-color-cn**.png: raw only with g > 20.
+	- Intersection-redz-oii-hist-ELG.png: weighted only
 
 DECaLS DR5 unmatched to DEEP2 set
 - Notes: Confirm that the unmatched set has the same grz-color-magnitude distribution as the matched set.
 
+DEEP2-DECaLS DR5 intersection set (g < 24.25) ELG selection challenge plots
+- Notes: These plots are used to illustrate the challenge of ELG target selection problem.
 
 
 
