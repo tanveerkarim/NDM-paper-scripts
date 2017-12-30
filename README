@@ -142,7 +142,7 @@ Estimate the intersection set area (DEEP2 window function AND Tycho mask)
 
 Definition of asinh magnitude
 - Notes: Throughout this work, we use asinh magnitude which is defined by a single parameter for each band which is comparable to typical 1-sig error.
-- Script used: 
+- Script used: define-asinh-mag.py
 - Results: b parameter for g, r, z, and oii.
 	g 0.0285114
 	r 0.0423106
