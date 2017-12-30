@@ -873,13 +873,13 @@ def flux2asinh_mag(flux, band = "g"):
     """
     b = None
     if band == "g":
-        b = 1.042 * 0.0284297
+        b = 1.042 * 0.0285114
     elif band == "r":
-        b = 1.042 * 0.0421544
+        b = 1.042 * 0.0423106
     elif band == "z":
-        b = 1.042 * 0.122832
+        b = 1.042 * 0.122092
     elif band == "oii":
-        b = 1.042 * 0.574175
+        b = 1.042 * 0.581528277909
     return 22.5-2.5 * np.log10(b) - 2.5 * np.log10(np.e) * np.arcsinh(flux/(2*b))
 
 
@@ -890,13 +890,13 @@ def asinh_mag2flux(mu, band = "g"):
     """
     b = None
     if band == "g":
-        b = 1.042 * 0.0284297
+        b = 1.042 * 0.0285114
     elif band == "r":
-        b = 1.042 * 0.0421544
+        b = 1.042 * 0.0423106
     elif band == "z":
-        b = 1.042 * 0.122832
+        b = 1.042 * 0.122092
     elif band == "oii":
-        b = 1.042 * 0.574175
+        b = 1.042 * 0.581528277909
         
     flux = 2* b * np.sinh((22.5-2.5 * np.log10(b) - mu) / (2.5 * np.log10(np.e)))
     return flux
