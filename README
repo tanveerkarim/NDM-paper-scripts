@@ -132,6 +132,14 @@ Combine DEEP2 and DR5
 	- unmatched-deep2-f**-photo-redz-oii.fits: A subset of DEEP2 combined catalogs that did not find match in DR5.
 	- DR5-matched-to-DEEP2-f**-glim24p25.fits: Original DR5 combined catalogs with DEEP2 information appended.
 
+Combine DEEP2 and DR5 -- No Mask version
+- Notes: The same as above except I do not apply any Tractor mask or Tycho mask except for DEEP2 spectrosopic window function. Please refer to 
+combine-Tractor-DEEP2-prints-NoMask.txt.
+- Script used: combine-Tractor-DEEP2-NoMask.py
+- Products:
+	- unmatched-deep2-f**-photo-redz-oii-NoMask.fits: (Not saved)
+	- DR5-matched-to-DEEP2-f**-glim24p25-NoMask.fits
+
 Estimate the intersection set area (DEEP2 window function AND Tycho mask)
 - Notes: Monte Carlo estimation of the intersection set area. Throw random points in the footprint and cross-match.
 - Script used: estimate-spec-area-DR5-matched.py
