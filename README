@@ -140,6 +140,12 @@ combine-Tractor-DEEP2-prints-NoMask.txt.
 	- unmatched-deep2-f**-photo-redz-oii-NoMask.fits: (Not saved)
 	- DR5-matched-to-DEEP2-f**-glim24p25-NoMask.fits
 
+ConvNet examples
+- Notes: This script select DR5 objects that will be used as training examples for a ConvNet whose purpose is to reject "bad" objects based on images. 
+- Script used: produce-ConvNet-examples.py
+- Products:
+	- DR5-matched-to-DEEP2-glim24p25-NoMask-ConvNet-examples.fits
+
 Estimate the intersection set area (DEEP2 window function AND Tycho mask)
 - Notes: Monte Carlo estimation of the intersection set area. Throw random points in the footprint and cross-match.
 - Script used: estimate-spec-area-DR5-matched.py
