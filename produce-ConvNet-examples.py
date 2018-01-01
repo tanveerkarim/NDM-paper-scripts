@@ -101,7 +101,7 @@ grz_names = ["g", "r", "z"]
 
 print "Total number of examples: %d" % ra.size
 image_width = 48
-print "Total image file size assuming %d x %d image size: %d MB" % (image_width, image_width, ra.size * 3 * image_width * image_width / float(10**6))
+print "Total image file size assuming %d x %d image size: %d MB" % (image_width, image_width, 4 * ra.size * 3 * image_width * image_width / float(10**6))
 print "Randomly subsample when building the training dataset."
 
 tbl1 = load_fits_table(dir_derived + "DR5-matched-to-DEEP2-f2-glim24p25-NoMask.fits")

@@ -141,7 +141,7 @@ combine-Tractor-DEEP2-prints-NoMask.txt.
 	- DR5-matched-to-DEEP2-f**-glim24p25-NoMask.fits
 
 ConvNet examples
-- Notes: This script select DR5 objects that will be used as training examples for a ConvNet whose purpose is to reject "bad" objects based on images. 
+- Notes: This script select DR5 objects that will be used as training examples for a ConvNet whose purpose is to reject "bad" objects based on images. The rationale for excluding DEEP2 unobserved objects but including unmatched objects is that we want to understand why certain DR5 objects were unmatched in DEEP2 whereas if an object is matched in DEEP2 but was previously unobserved we can assume that those objects can be characterized by the included set. Objects that have "too close" to low redshift loci are excluded. 
 - Script used: produce-ConvNet-examples.py
 - Products:
 	- DR5-matched-to-DEEP2-glim24p25-NoMask-ConvNet-examples.fits
