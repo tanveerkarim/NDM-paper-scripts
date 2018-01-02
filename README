@@ -211,7 +211,8 @@ DEEP2-DECaLS DR5 intersection set (g < 24.25)
 - Products:
 	- Intersection-grz-hist-raw.png
 	- Intersection-grz-hist-weighted.png
-	- Intersection-grz-color-by-class.png: raw only with g > 21.
+	- Intersection-grz-color-by-class-field.png: raw only with g > 21.
+	- Intersection-grz-color-by-class.png: raw only with g > 21.	
 	- Intersection-redz-oii-hist-ELG.png: weighted only
 
 DECaLS DR5 unmatched to DEEP2 set

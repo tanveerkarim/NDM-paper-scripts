@@ -185,6 +185,36 @@ for i, name in enumerate(cnames):
         ax_list[i, j].set_ylabel("asinh $g-r$", fontsize=ft_size2) 
         ax_list[i, j].legend(loc="upper left", fontsize=ft_size*1.5)
 
+plt.savefig(dir_figure + "Intersection-grz-color-by-class-field.png", dpi=200, bbox_inches="tight")
+# plt.show() 
+plt.close()
+
+
+print "Color distribution by class only and all together"
+plt.close()
+fig, ax_list = plt.subplots(3, 2, figsize = (16, 25))
+for i, name in enumerate(cnames):
+    ax_row = i // 2
+    ax_col = i % 2    
+    if i < 5:
+        ibool = (g > 21) & (g < 24) &  (cn == i)
+        ax_list[ax_row, ax_col].scatter(mu_gz[ibool], mu_gr[ibool], s=25, marker="s", c=colors[i], label="%s" % cnames[i])
+        ax_list[ax_row, ax_col].set_xlim([-3, 5])
+        ax_list[ax_row, ax_col].set_ylim([-1, 2]) 
+        ax_list[ax_row, ax_col].grid(ls="--")
+        ax_list[ax_row, ax_col].set_xlabel("asinh $g-z$", fontsize=ft_size2)
+        ax_list[ax_row, ax_col].set_ylabel("asinh $g-r$", fontsize=ft_size2) 
+        ax_list[ax_row, ax_col].legend(loc="upper left", fontsize=ft_size*1.5)
+    else: # Last panel is used to plot everything all together except the unobserved.
+        for j in [4, 3, 2, 1, 0]:
+            ibool = (g > 21) & (g < 24) &  (cn == j)
+            ax_list[ax_row, ax_col].scatter(mu_gz[ibool], mu_gr[ibool], s=25, marker="s", c=colors[j], label="%s" % cnames[j])
+            ax_list[ax_row, ax_col].set_xlim([-3, 5])
+            ax_list[ax_row, ax_col].set_ylim([-1, 2]) 
+            ax_list[ax_row, ax_col].grid(ls="--")
+            ax_list[ax_row, ax_col].set_xlabel("asinh $g-z$", fontsize=ft_size2)
+            ax_list[ax_row, ax_col].set_ylabel("asinh $g-r$", fontsize=ft_size2) 
+            ax_list[ax_row, ax_col].legend(loc="lower right", fontsize=ft_size*1.)
 plt.savefig(dir_figure + "Intersection-grz-color-by-class.png", dpi=200, bbox_inches="tight")
 # plt.show() 
 plt.close()
