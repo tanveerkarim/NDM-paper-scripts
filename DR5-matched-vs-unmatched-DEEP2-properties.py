@@ -127,7 +127,7 @@ for i, mag in enumerate([g, r, z]):
     for l in [1, 0]: # Matched and unamtched
         for fnum in [2, 3, 4]:
             ibool = (D2matched==l) & (field==fnum)
-            ax_list[i, fnum-2].hist(mag[ibool], bins=mag_bins, color=colors[l], histtype="step", alpha=1, lw=2.5, label="F%d" % fnum, normed=True)
+            ax_list[i, fnum-2].hist(mag[ibool], bins=mag_bins, color=colors[l], histtype="step", alpha=1, lw=2.5, label=labels[l], normed=True)
             ax_list[i, fnum-2].set_xlim([19, 26])
             ax_list[i, fnum-2].set_xlabel(grz_names[i], fontsize=ft_size2)
             ax_list[i, fnum-2].set_ylabel("dNd(0.1mag)", fontsize=ft_size2)            
