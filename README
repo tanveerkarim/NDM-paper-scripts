@@ -216,9 +216,14 @@ DEEP2-DECaLS DR5 intersection set (g < 24.25)
 	- Intersection-redz-oii-hist-ELG.png: weighted only
 
 DECaLS DR5 unmatched to DEEP2 set
-- Notes: Confirm that the unmatched set has the same grz-color-magnitude distribution as the matched set.
+- Notes: The generated figures are used to confirm visually that the objects in the unmatched set has the same grz-color-magnitude distribution as that of the matched set.
+- Scipt used: DR5-matched-vs-unmatched-properties.py
+- Products:
+	- DR5-matched-vs-unmatched-grz-hist-normed-by-field.png
+	- DR5-matched-vs-unmatched-grz-color-by-field.png
 
-DEEP2-DECaLS DR5 intersection set (g < 24.25) ELG selection challenge plots
+
+! DEEP2-DECaLS DR5 intersection set (g < 24.25) ELG selection challenge plots
 - Notes: These plots are used to illustrate the challenge of ELG target selection problem.
 
 
