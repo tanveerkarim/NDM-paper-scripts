@@ -9,6 +9,7 @@ Contents: I group scripts and their results according to topic.
 - Data download and acquisition
 - Data pre-processing
 - Data quality checks
+- MMT observational study scripts/data archive
 - List of challenges
 
 README convention (for the author):
@@ -225,6 +226,19 @@ DECaLS DR5 unmatched to DEEP2 set
 
 ! DEEP2-DECaLS DR5 intersection set (g < 24.25) ELG selection challenge plots
 - Notes: These plots are used to illustrate the challenge of ELG target selection problem.
+
+
+
+
+
+! /---- MMT observational study scripts/data archive
+The following scripts were used to process the MMT study data:
+append-DR1-MMT-DR3.py	process-MMT-16hr-1.py	process-MMT-16hr-2.py	process-MMT-23hr.py	produce-DR1-MMT-DR3.py
+
+The original data files are stored in ../data/MMT_data/
+
+Any dervied files can be found in ../data/derived/
+
 
 
 
