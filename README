@@ -249,13 +249,16 @@ Any dervied files can be found in ../data/derived/
 /---- Application
 In this section, I document exactly how all the figures and results reported in the NDM paper are produced. There are additional scripts used to produce other results not included as well.
 
-All relevant convenience functions are collected in utils.py and any integral facilities to the NDM method are included in DESI_NDM class module in NDM_models.py. 
+All relevant convenience functions are collected in utils.py and any integral facilities to the NDM method are included in DESI_NDM class module in NDM_models.py.
 
 DESI_NDM class module is able to perform the following tasks:
 - Given training data, perform intrinsic number density fitting. This includes broken power law fititng and color distribution fitting for all five classes defined in the paper. 
 - Generate and retain MC samples from the intrinsic densities.
 - Convolve the intrinsic densities with noise models to generate the observed densities.
-- Define a selection region given a desired total number density.
+- Define a selection region given a desired total number density. Given grz-fluxes of an external catalog, return the NDM selection as a vector.
+- Provides a prediction for the properties of the selection including grz and OII flux distributions and the redshift distribution.
+
+To keep DESI_NDM as a light-weight class, I made a conscious effort to collect any inessential functions to utils.py.
 
 Intrinsic density fitting
 - Notes: The script documents how the DESI_NDM class module is used to fit intrinsic densitiy models to the training data. For the color distributions, following the model fitting with various number of component gaussians, I visually inspect the fits and pick a model with the lesat number of components that can adequately reproduce the data.
