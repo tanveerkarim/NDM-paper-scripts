@@ -81,6 +81,8 @@ class DESI_NDM(object):
         self.ra, self.dec, self.w1_flux, self.w2_flux, self.w1_err, self.w2_err, self.cn,\
         self.iELG_DESI, self.iNoZ, self.iNoOII, self.iNonELG = self.import_data_DEEP2_full()
 
+        # ---- Place holders for other variables used
+
         return
 
     def import_data_DEEP2_full(self):
@@ -116,37 +118,6 @@ class DESI_NDM(object):
 
         return gflux, gf_err, rflux, rf_err, zflux, zf_err, red_z, z_err, oii, oii_err, w, field, \
         ra, dec, w1_flux, w2_flux, w1_err, w2_err, cn, iELG_DESI, iNoZ, iNoOII, iNonELG
-
-
-
-    # def plot_dNdm_all(self):
-    #     """
-    #     Plot dNdm for all four classes (ALL ELG, DESI ELG, NoZ, NonELG) in 3 by 4 plot.
-
-    #     rows: g, r, z
-    #     columns: classes
-    #     graphs: fields
-    #     """
-    #     colors = ["black", "red", "blue"]
-    #     fig, ax_list = plt.subplots(3, 4, figsize = (28, 20))
-    #     class_names = ["All ELGs", "DESI ELGs", "NoZ", "NonELG"]
-    #     mag_names = [r"$g$", r"$r$", r"$z$"]
-    #     mag_bins = np.arange(20, 25., 0.1)
-    #     for j, iclass in enumerate([self.iELG, self.iELG & (self.oii>8), self.iNoZ, self.iNonELG]):
-    #         for i, flux in enumerate([self.gflux, self.rflux, self.zflux]):
-    #             for fnum in [2, 3, 4]:
-    #                 ibool = iclass & (self.field==fnum)
-    #                 A = self.areas[fnum-2]
-    #                 ax_list[i][j].hist(flux2mag(flux[ibool]), bins=mag_bins, weights = self.w[ibool]/float(A),\
-    #                     label = "F%d" % fnum, color = colors[fnum-2], histtype="step", lw = 2.5)
-    #             title_str = "%s. %s" % (class_names[j], mag_names[i])
-    #             ax_list[i][j].set_title(title_str, fontsize=25)
-    #             ax_list[i][j].set_xlabel(mag_names[i], fontsize=20)
-    #             ax_list[i][j].set_ylabel("dNdm", fontsize=20)
-    #     plt.suptitle("dNdm with g [%.2f, %.2f]. Only matched. Weighted density" %(self.mag_min, self.mag_max), fontsize=30)
-    #     plt.savefig("dNdm-grz-all-DR5-matched-wdensity.png", dpi = 400, bbox_inches="tight")
-    #     plt.close()
-
 
 
 
@@ -338,33 +309,6 @@ class DESI_NDM(object):
 #         # Re-parametrizing variables
 #         self.var_x, self.var_y, self.var_z, self.gmag =\
 #             self.var_reparam(self.gflux, self.rflux, self.zflux, self.oii) 
-
-#         # Plot variables
-#         # var limits
-#         self.lim_x = [-1.25, 5.] # g-z
-#         self.lim_y = [-.75, 2.75] # r-z
-#         self.lim_z = [-0, 6] # g-oii
-#         self.lim_gmag = [21.5, 24.0]
-
-#         # bin widths
-#         self.dx = 0.05
-#         self.dy = 0.025
-#         self.dz = 0.05
-#         self.dgmag = 0.025
-
-#         # var names
-#         self.var_x_name = r"$\mu_g - \mu_z$"        
-#         self.var_y_name = r"$\mu_g - \mu_r$"  
-#         self.var_z_name = r"$\mu_g - \mu_{OII}$"
-#         self.red_z_name = r"$\eta$"
-#         self.gmag_name  = r"$g$"
-
-#         # var lines
-#         self.var_x_lines = np.arange(-0.0, 4.5, 1.)
-#         self.var_y_lines = np.arange(-0.0, 2.5, 1.)
-#         self.var_z_lines = np.arange(-0.0, 6, 1.)
-#         self.redz_lines = [0.6, 1.1, 1.6] # Redz
-#         self.gmag_lines = [21, 22, 23, 24]
 
 #         # Fit parameters for pow/broken pow law
 #         self.MODELS_pow = [None, None, None]
