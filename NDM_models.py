@@ -292,7 +292,7 @@ class DESI_NDM(object):
         If None, author specified (best fit) number is used.
         """
         if K_list is None:
-            K_list = [1] * 5
+            K_list = [2, 2, 2, 2, 6] # Based on visual inspection
         for i in range(5):
             self.MoG_model[i] = np.load(save_dir + ("MoG-params-cn%d-K%d.npy" % (i, K_list[i]))).item()
 
