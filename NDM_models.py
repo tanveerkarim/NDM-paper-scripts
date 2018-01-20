@@ -201,6 +201,17 @@ class DESI_NDM(object):
         return gflux, gf_err, rflux, rf_err, zflux, zf_err, red_z, z_err, oii, oii_err, w, field, \
         ra, dec, w1_flux, w2_flux, w1_err, w2_err, cn, iELG_DESI, iNoZ, iNoOII, iNonELG
 
+    def set_err_lims(self, glim, rlim, zlim, oii_lim):
+        """
+        Set the error characteristics.
+        """
+        self.glim_err = glim
+        self.rlim_err = rlim 
+        self.zlim_err = zlim
+        self.oii_lim_err = oii_lim
+
+        return        
+
     def gen_sample_intrinsic_mag(self):
         """
         Given load models (dNdm and MoG), draw intrinsic samples proportional to MC area.
@@ -743,16 +754,7 @@ class DESI_NDM(object):
 
 
 
-#     def set_err_lims(self, glim, rlim, zlim, oii_lim):
-#         """
-#         Set the error characteristics.
-#         """
-#         self.glim_err = glim
-#         self.rlim_err = rlim 
-#         self.zlim_err = zlim
-#         self.oii_lim_err = oii_lim
 
-#         return
 
 
 
