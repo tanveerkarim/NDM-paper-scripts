@@ -165,6 +165,9 @@ class DESI_NDM(object):
         self.redz_obs = [None] * 5        
         self.gmag_obs = [None] * 5        
 
+        # Observed utility
+        self.utility_obs = [None] * 5
+
         return
 
     def import_data_DEEP2_full(self):
@@ -613,97 +616,70 @@ class DESI_NDM(object):
 
         return Covar
 
-#     def gen_err_conv_sample(self):
-#         """
-#         model3
-#         Given the error properties glim_err, rlim_err, zlim_err, oii_lim_err, add noise to the intrinsic density
-#         sample and compute the parametrization.
-#         """
-#         print "Convolving error and re-parametrizing"        
-#         # NonELG, NoZ and ELG
-#         for i in range(3):
-#             print "%s" % self.category[i]
-#             self.gflux_obs[i] = self.gflux0[i] + self.g_err_seed[i] * mag2flux(self.glim_err)/5.
-#             self.rflux_obs[i] = self.rflux0[i] + self.r_err_seed[i] * mag2flux(self.rlim_err)/5.
-#             self.zflux_obs[i] = self.zflux0[i] + self.z_err_seed[i] * mag2flux(self.zlim_err)/5.
+    def gen_err_conv_sample(self):
+        """
+        Given the error properties glim_err, rlim_err, zlim_err, oii_lim_err, 
+        add noise to the intrinsic density sample and compute the parametrization.
+        """
+        for i in range(5):
+            print "Noise convolution for %s" % cnames[i]
+            self.gflux_obs[i] = self.gflux0[i] + self.g_err_seed[i] * mag2flux(self.glim_err)/5.
+            self.rflux_obs[i] = self.rflux0[i] + self.r_err_seed[i] * mag2flux(self.rlim_err)/5.
+            self.zflux_obs[i] = self.zflux0[i] + self.z_err_seed[i] * mag2flux(self.zlim_err)/5.
 
-#             # Make flux cut
-#             ifcut = self.gflux_obs[i] > self.fcut
-#             self.gflux_obs[i] = self.gflux_obs[i][ifcut]
-#             self.rflux_obs[i] = self.rflux_obs[i][ifcut]
-#             self.zflux_obs[i] = self.zflux_obs[i][ifcut]
+            # Make flux cut
+            ifcut = self.gflux_obs[i] > self.fcut
+            self.gflux_obs[i] = self.gflux_obs[i][ifcut]
+            self.rflux_obs[i] = self.rflux_obs[i][ifcut]
+            self.zflux_obs[i] = self.zflux_obs[i][ifcut]
 
-#             # Compute model parametrization
-#             mu_g = flux2asinh_mag(self.gflux_obs[i], band="g")
-#             mu_r = flux2asinh_mag(self.rflux_obs[i], band="r")
-#             mu_z = flux2asinh_mag(self.zflux_obs[i], band="z")
-#             self.var_x_obs[i] = mu_g - mu_z
-#             self.var_y_obs[i] = mu_g - mu_r
-#             self.gmag_obs[i] = flux2mag(self.gflux_obs[i])
+            # Compute model parametrization
+            mu_g = flux2asinh_mag(self.gflux_obs[i], band="g")
+            mu_r = flux2asinh_mag(self.rflux_obs[i], band="r")
+            mu_z = flux2asinh_mag(self.zflux_obs[i], band="z")
+            self.var_x_obs[i] = mu_g - mu_z
+            self.var_y_obs[i] = mu_g - mu_r
+            self.gmag_obs[i] = flux2mag(self.gflux_obs[i])
 
-#             # Updating the importance weight with the cut
-#             self.iw[i] = self.iw0[i][ifcut]
+            # Updating the importance weight with the cut
+            self.iw[i] = self.iw0[i][ifcut]
 
-#             # Number of samples after the cut.
-#             Nsample = self.gmag_obs[i].size
+            # Number of samples after the cut.
+            Nsample = self.gmag_obs[i].size
 
-#             # More parametrization to compute for ELGs. Also, compute FoM.
-#             if i==2:
-#                 # oii parameerization
-#                 self.oii_obs[i] = self.oii0[i] + self.oii_err_seed[i] * (self.oii_lim_err/7.) # 
-#                 self.oii_obs[i] = self.oii_obs[i][ifcut]
-#                 mu_oii = flux2asinh_mag(self.oii_obs[i], band="oii")
-#                 self.var_z_obs[i] = mu_g - mu_oii
+            # More parametrization to compute for ELGs. Also, compute FoM.
+            if (i==0) or (i==1):
+                # oii paramerization
+                self.oii_obs[i] = self.oii0[i] + self.oii_err_seed[i] * (self.oii_lim_err/7.) # 
+                self.oii_obs[i] = self.oii_obs[i][ifcut]
+                mu_oii = flux2asinh_mag(self.oii_obs[i], band="oii")
+                self.var_z_obs[i] = mu_g - mu_oii
 
-#                 # Redshift has no uncertainty
-#                 self.redz_obs[i] = self.redz0[i][ifcut]
+            # Gen utility_obs
+            self.utility_obs[i] = self.gen_utility(i, Nsample, self.oii_obs[i])
 
-#                 # Gen FoM 
-#                 self.FoM_obs[i] = self.gen_FoM(i, Nsample, self.oii_obs[i], self.redz_obs[i])
-#             else:
-#                 # Gen FoM 
-#                 self.FoM_obs[i] = self.gen_FoM(i, Nsample)
-
-#         return
+        return
 
 
-#     def gen_FoM(self, cat, Nsample, oii=None, redz=None):
-#         """
-#         Model3 
+    def gen_utility(self, cat, Nsample, oii=None):
+        """
+        Given the user specified utility metric of the form in the NDM paper,
+        provide the utility numbers.
+        """
+        if cat == 0: # If Gold
+            util = np.ones(Nsample, dtype=float) * self.U_Gold
+            util[oii<8] = 0
+        if cat == 1: # If Silver
+            util = np.ones(Nsample, dtype=float) * self.U_Silver
+            util[oii<8] = 0            
+        if cat == 2: # If NoOII
+            util = np.ones(Nsample, dtype=float) * self.U_NoOII
+        if cat == 3: # If Gold
+            util = np.ones(Nsample, dtype=float) * self.U_NoZ
+        if cat == 4: # If Gold
+            util = np.ones(Nsample, dtype=float) * self.U_NonELG
 
-#         Give the category number
-#         0: NonELG
-#         1: NoZ
-#         2: ELG
-#         compute the appropriate FoM corresponding to each sample.
-#         """
-#         if cat == 0:
-#             return np.ones(Nsample, dtype=float) * self.FoM_NonELG
-#         elif cat == 1:
-#             return np.ones(Nsample, dtype=float) * self.FoM_NoZ # Some arbitrary number. 25% success rate.
-#         elif cat == 2:
-#             if (oii is None) or (redz is None):
-#                 "You must provide oii AND redz"
-#                 assert False
-#             else:
-#                 if self.FoM_option == "flat":# Flat option
-#                     ibool = (oii>8) & (redz > 0.6) # For objects that lie within this criteria
-#                     FoM = np.zeros(Nsample, dtype=float)
-#                     FoM[ibool] = 1.0
-#                 elif self.FoM_option == "NoOII": # NoOII means objects without OII values are also included.
-#                     ibool = (redz > 0.6) # For objects that lie within this criteria
-#                     FoM = np.zeros(Nsample, dtype=float)
-#                     FoM[ibool] = 1.0
-#                 elif self.FoM_option == "Linear_redz": # FoM linearly scale with redshift
-#                     ibool = (oii>8) & (redz > 0.6) & (redz <1.6) # For objects that lie within this criteria
-#                     FoM = np.zeros(Nsample, dtype=float)
-#                     FoM[ibool] = 1 + (redz[ibool]-0.6) * 5. # This means redz = 1.6 has FoM of 2.
-#                 elif self.FoM_option == "Quadratic_redz": # FoM linearly scale with redshift
-#                     ibool = (oii>8) & (redz > 0.6) & (redz <1.6) # For objects that lie within this criteria
-#                     FoM = np.zeros(Nsample, dtype=float)
-#                     FoM[ibool] = 1 + 10 * (redz[ibool]-0.6) ** 2 # This means redz = 1.6 has FoM of 2.                    
-
-#                 return FoM
+        return util                    
 
 
 
