@@ -193,6 +193,152 @@ class DESI_NDM(object):
 
         return
 
+
+    def plot_colors(self, cn, show=True, savefig=False, save_dir="../figures/", fits=False, num_bins = 100., train=True):
+        """
+        Plot colors of each pair of variables being modeled.
+
+        The user must specify the class number.
+
+        If train True, only plot Field 3 and 4.
+        
+        If fits True, then plot the Models. If False, K set to zero.
+
+        pari_num variable
+        - 0: g-z vs. g-r
+        - 1: g-z vs. g-oii
+        - 2: g-r vs. g-oii
+        """
+        if train:
+            ibool = np.logical_or((self.field == 3), (self.field == 4))
+            A = self.area_train
+        else:
+            ibool = np.ones(self.field.size, dtype=bool)
+            A = np.sum(self.areas)
+
+        # If fit requested, count the number of components.
+        if fits:
+            K = 0 # FIX later.
+        else:
+            K = 0
+            pair_num = 0
+
+        # Bins to use for each color variables
+        var_x_bins = np.arange(-2, 5.5+1e-3, 7.5/num_bins)
+        var_y_bins = np.arange(-1, 2.5+1e-3, 3.5/num_bins)
+        var_z_bins = np.arange(-1, 8+1e-3, 11/num_bins)
+
+        #---- For all classes, plot g-z vs. g-r
+        itmp = ibool & (self.cn==cn) # Sub select class of samples to plot.
+        fig, ax_list = plt.subplots(2, 2, figsize=(16, 16))
+        ax_list[1, 1].axis("off") # Turn off unused axis. 
+
+        # (0,0) Scatter plot 
+        ax_list[0, 0].scatter(self.var_x[itmp], self.var_y[itmp], s=5, marker="o", color="black", edgecolor="none")
+        ax_list[0, 0].set_xlim([var_x_bins[0], var_x_bins[-1]])
+        ax_list[0, 0].set_ylim([var_y_bins[0], var_y_bins[-1]])
+        ax_list[0, 0].set_xlabel(r"$\mu_g - \mu_z$", fontsize=25)
+        ax_list[0, 0].set_ylabel(r"$\mu_g - \mu_r$", fontsize=25)
+
+        # (0,1) g-r histogram
+        ax_list[0, 1].hist(self.var_y[itmp], bins=var_y_bins, color="black", histtype="step", \
+            lw=1.5, orientation="horizontal", weights=self.w[itmp])
+        ax_list[0, 1].set_ylim([var_y_bins[0], var_y_bins[-1]])
+        ax_list[0, 1].set_ylabel(r"$\mu_g - \mu_r$", fontsize=25)
+
+        # (1,0) g-z histogram
+        ax_list[1, 0].hist(self.var_x[itmp], bins=var_x_bins, color="black", histtype="step", \
+            lw=1.5, weights=self.w[itmp])
+        ax_list[1, 0].set_xlim([var_x_bins[0], var_x_bins[-1]])
+        ax_list[1, 0].set_xlabel(r"$\mu_g - \mu_z$", fontsize=25)
+
+        # Fits
+        # if fits: # Plot fitted models.
+        #     assert self.dNdm_model[i] is not None
+        #     bin_centers = (mag_bins[1:]+mag_bins[:-1])/2.
+        #     ax.plot(bin_centers, bw * mag_broken_pow_law(self.dNdm_model[i], bin_centers), lw=1.5, c=colors[i], ls="--")
+
+        if savefig: plt.savefig(save_dir+"Intersection-colors-cn%d-K%d-pair%d.png" % (cn, K, pair_num), dpi=400, bbox_inches="tight")
+        if show: plt.show()
+        plt.close()
+
+
+        #---- For Gold and Silver classes only
+        if (cn==0) or (cn==1):
+            #---- plot g-z vs. g-oii            
+            pair_num = 1            
+            fig, ax_list = plt.subplots(2, 2, figsize=(16, 16))
+            ax_list[1, 1].axis("off") # Turn off unused axis. 
+
+            # (0,0) Scatter plot 
+            ax_list[0, 0].scatter(self.var_x[itmp], self.var_z[itmp], s=5, marker="o", color="black", edgecolor="none")
+            ax_list[0, 0].set_xlim([var_x_bins[0], var_x_bins[-1]])
+            ax_list[0, 0].set_ylim([var_z_bins[0], var_z_bins[-1]])
+            ax_list[0, 0].set_xlabel(r"$\mu_g - \mu_z$", fontsize=25)
+            ax_list[0, 0].set_ylabel(r"$\mu_g - \mu_{OII}$", fontsize=25)
+
+            # (0,1) g-oii histogram
+            ax_list[0, 1].hist(self.var_z[itmp], bins=var_z_bins, color="black", histtype="step", \
+                lw=1.5, orientation="horizontal", weights=self.w[itmp])
+            ax_list[0, 1].set_ylim([var_z_bins[0], var_z_bins[-1]])
+            ax_list[0, 1].set_ylabel(r"$\mu_g - \mu_{OII}$", fontsize=25)
+
+            # (1,0) g-z histogram
+            ax_list[1, 0].hist(self.var_x[itmp], bins=var_x_bins, color="black", histtype="step", \
+                lw=1.5, weights=self.w[itmp])
+            ax_list[1, 0].set_xlim([var_x_bins[0], var_x_bins[-1]])
+            ax_list[1, 0].set_xlabel(r"$\mu_g - \mu_z$", fontsize=25)
+            # Fits
+            # if fits: # Plot fitted models.
+            #     assert self.dNdm_model[i] is not None
+            #     bin_centers = (mag_bins[1:]+mag_bins[:-1])/2.
+            #     ax.plot(bin_centers, bw * mag_broken_pow_law(self.dNdm_model[i], bin_centers), lw=1.5, c=colors[i], ls="--")
+
+            if savefig: plt.savefig(save_dir+"Intersection-colors-cn%d-K%d-pair%d.png" % (cn, K, pair_num), dpi=400, bbox_inches="tight")
+            if show: plt.show()
+            plt.close()
+
+
+            #---- plot g-r vs. g-oii
+            pair_num = 2
+            fig, ax_list = plt.subplots(2, 2, figsize=(16, 16))
+            ax_list[1, 1].axis("off") # Turn off unused axis. 
+
+            # (0,0) Scatter plot 
+            ax_list[0, 0].scatter(self.var_y[itmp], self.var_z[itmp], s=5, marker="o", color="black", edgecolor="none")
+            ax_list[0, 0].set_xlim([var_y_bins[0], var_y_bins[-1]])
+            ax_list[0, 0].set_ylim([var_z_bins[0], var_z_bins[-1]])
+            ax_list[0, 0].set_xlabel(r"$\mu_g - \mu_r$", fontsize=25)
+            ax_list[0, 0].set_ylabel(r"$\mu_g - \mu_{OII}$", fontsize=25)
+
+            # (0,1) g-oii histogram
+            ax_list[0, 1].hist(self.var_z[itmp], bins=var_z_bins, color="black", histtype="step", \
+                lw=1.5, orientation="horizontal", weights=self.w[itmp])
+            ax_list[0, 1].set_ylim([var_z_bins[0], var_z_bins[-1]])
+            ax_list[0, 1].set_ylabel(r"$\mu_g - \mu_{OII}$", fontsize=25)
+
+            # (1,0) g-z histogram
+            ax_list[1, 0].hist(self.var_y[itmp], bins=var_y_bins, color="black", histtype="step", \
+                lw=1.5, weights=self.w[itmp])
+            ax_list[1, 0].set_xlim([var_y_bins[0], var_y_bins[-1]])
+            ax_list[1, 0].set_xlabel(r"$\mu_g - \mu_r$", fontsize=25)
+            # Fits
+            # if fits: # Plot fitted models.
+            #     assert self.dNdm_model[i] is not None
+            #     bin_centers = (mag_bins[1:]+mag_bins[:-1])/2.
+            #     ax.plot(bin_centers, bw * mag_broken_pow_law(self.dNdm_model[i], bin_centers), lw=1.5, c=colors[i], ls="--")
+
+            if savefig: plt.savefig(save_dir+"Intersection-colors-cn%d-K%d-pair%d.png" % (cn, K, pair_num), dpi=400, bbox_inches="tight")
+            if show: plt.show()
+            plt.close()
+
+
+
+
+        #---- Only for Gold and Silver, plot g-z vs. g-OII and g-r vs. g-OII
+
+        return        
+
     def fit_dNdm_broken_pow(self, save_dir=dir_derived, Niter=5, bw=0.025):
         """
         This function is exclusively used for fitting the dNdm broken power law. 
