@@ -99,7 +99,72 @@ class DESI_NDM(object):
         self.dNdm_model = [None] * 5
         self.MoG_model = [None] * 5
 
-        #---- MC variables
+        # Fraction of objects we believe to be desired DESI objects
+        self.f_Gold = 1
+        self.f_Silver = 1
+        self.f_NoOII = 0.6
+        self.f_NoZ = 0.25
+        self.f_NonELG = 0
+
+        #---- MC parameters
+        self.area_MC = 10
+
+        # Mag Power law from which to generate importance samples.
+        self.alpha_q = [20, 20, 20, 20, 9]
+
+        # Utility metric options
+        self.U_Gold = 1
+        self.U_Silver = 1
+        self.U_NoOII = 0.6
+        self.U_NoZ = 0.25
+        self.U_NonELG = 0
+
+        # Noise model parameters
+        self.glim_err = 23.8
+        self.rlim_err = 23.4
+        self.zlim_err = 22.4
+        self.oii_lim_err = 8 # 7 sigma
+
+        # sigma factor for the proposal        
+        self.sigma_proposal = 1.5         
+
+        # After noise addition, we make a cut at 24 since we do not use those.
+        self.fcut = mag2flux(24.) 
+
+
+        #---- MC variable place holder
+        # Original sample.
+        # 0: NonELG, 1: NoZ, 2: ELG
+        self.NSAMPLE = [None] * 5
+        self.gflux0 = [None] * 5 # 0 for original
+        self.rflux0 = [None] * 5 # 0 for original
+        self.zflux0 = [None] * 5 # 0 for original
+        self.oii0 = [None] * 5 # Although only ELG class has oii and redz, for consistency, we have three elements lists.
+        self.redz0 = [None] * 5
+    
+        # Noise seed. err_seed ~ N(0, 1). This can be transformed by scaling appropriately.
+        self.g_err_seed = [None] * 5 # Error seed.
+        self.r_err_seed = [None] * 5 # Error seed.
+        self.z_err_seed = [None] * 5 # Error seed.
+        self.oii_err_seed = [None] * 5 # Error seed.
+        
+        # Noise convolved values
+        self.gflux_obs = [None] * 5 # obs for observed
+        self.rflux_obs = [None] * 5 # obs for observed
+        self.zflux_obs = [None] * 5 # obs for observed
+        self.oii_obs = [None] * 5 # Although only ELG class has oii and redz, for consistency, we have three elements lists.
+        
+        # Importance weight: Used when importance sampling is asked for
+        self.iw = [None] * 5
+        self.iw0 = [None] * 5 # 0 denotes intrinsic sample
+
+        # Observed final distributions
+        self.var_x_obs = [None] * 5 # g-z
+        self.var_y_obs = [None] * 5 # g-r
+        self.var_z_obs = [None] * 5 # g-oii
+        self.redz_obs = [None] * 5        
+        self.gmag_obs = [None] * 5        
+
         return
 
     def import_data_DEEP2_full(self):
@@ -136,6 +201,68 @@ class DESI_NDM(object):
         return gflux, gf_err, rflux, rf_err, zflux, zf_err, red_z, z_err, oii, oii_err, w, field, \
         ra, dec, w1_flux, w2_flux, w1_err, w2_err, cn, iELG_DESI, iNoZ, iNoOII, iNonELG
 
+    def gen_sample_intrinsic_mag(self):
+        """
+        Given load models (dNdm and MoG), draw intrinsic samples proportional to MC area.
+
+        Importance sampling is always used.
+        """
+        for i in range(5): # For each class
+            #---- Import model parameters
+            # MoG model
+            amps, means, covs = self.MoG_model[i]["amps"], self.MoG_model[i]["means"], self.MoG_model[i]["covs"]
+
+            #---- Compute the number of sample to draw.
+            NSAMPLE = int(integrate_mag_broken_pow_law(self.dNdm_model[i], self.mag_min, self.mag_max, area = self.area_MC))
+            print "%s sample number: %d" % (cnames[i], NSAMPLE)
+
+            #---- Generate magnitudes
+            gmag = gen_mag_pow_law_samples([1, self.alpha_q[i]], self.mag_min, self.mag_max, NSAMPLE)
+            r_tilde = mag_broken_pow_law(self.dNdm_model[i], gmag)/mag_pow_law([1, self.alpha_q[i]], gmag)
+            self.iw0[i] = (r_tilde/r_tilde.sum()) 
+            gflux = mag2flux(gmag)
+
+            #---- Generate Nsample from MoG.
+            MoG_sample, iw = sample_MoG(amps, means, covs, NSAMPLE, importance_sampling=True, \
+                factor_importance = self.sigma_proposal)
+            self.iw0[i] *= iw            
+
+            #---- Compute variables of interest for all categories
+            mu_g = flux2asinh_mag(gflux, band = "g")
+            mu_gz, mu_gr = MoG_sample[:,0], MoG_sample[:,1]
+            mu_z = mu_g - mu_gz
+            mu_r = mu_g - mu_gr
+            zflux = asinh_mag2flux(mu_z, band = "z")
+            rflux = asinh_mag2flux(mu_r, band = "r")
+            
+            # Save grz-fluxes
+            self.gflux0[i] = gflux
+            self.rflux0[i] = rflux
+            self.zflux0[i] = zflux
+            self.NSAMPLE[i] = NSAMPLE
+
+            # Gen err seed and save
+            # Also, collect unormalized importance weight factors, multiply and normalize.
+            self.g_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+            # print "g_err_seed importance weights. First 10", iw[]
+            self.iw0[i] *= iw
+            self.r_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+            self.iw0[i] *= iw        
+            self.z_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+            self.iw0[i] *= iw
+            if (i==0) or (i==1): #ELG 
+                mu_goii = MoG_sample[:, 2]
+                mu_oii = mu_g - mu_goii
+                oii = asinh_mag2flux(mu_oii, band = "oii")
+
+                # oii error seed
+                self.oii_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+                self.iw0[i] *= iw
+                # Saving
+            self.iw0[i] = (self.iw0[i]/self.iw0[i].sum()) * self.NSAMPLE[i] # Normalization and multiply by the number of samples generated.
+
+        return                
+
     def load_dNdm_models(self, save_dir=dir_derived):
         """
         Load best fit dNdm models.
@@ -153,8 +280,7 @@ class DESI_NDM(object):
         if K_list is None:
             K_list = [1] * 5
         for i in range(5):
-            self.MoG_model[i] = np.load(save_dir + ("MoG-params-cn%d-K%d.npy" % (i, K_list[i])))
-
+            self.MoG_model[i] = np.load(save_dir + ("MoG-params-cn%d-K%d.npy" % (i, K_list[i]))).item()
 
         return 
 
@@ -210,7 +336,8 @@ class DESI_NDM(object):
         return
 
 
-    def plot_colors(self, cn, show=True, savefig=False, save_dir="../figures/", fits=False, num_bins = 100., train=True):
+    def plot_colors(self, cn, show=True, savefig=False, save_dir="../figures/",\
+     num_bins = 100., train=True, plot_ext=False, gflux=None, rflux=None, zflux=None, oii=None):
         """
         Plot colors of each pair of variables being modeled.
 
@@ -219,6 +346,8 @@ class DESI_NDM(object):
         If train True, only plot Field 3 and 4.
         
         If fits True, then plot the Models. If False, K set to zero.
+
+        If plot_ext, then plot external objects given by gflux, rflux, zflux, and oii.
 
         pari_num variable
         - 0: g-z vs. g-r
@@ -594,78 +723,7 @@ class DESI_NDM(object):
 
 
 
-#     def gen_sample_intrinsic_mag(self, K_selected=None):
-#         """
-#         model 3
-#         Given MoG x dNdm parameters specified by [amps, means, covs] corresponding to K_selected[i] components
-#         and either MODELS_mag_pow. Broken power law version is used. 
 
-#         Importance sampling is always used.
-#         """
-#         if K_selected is None:
-#             K_selected = self.K_best
-
-#         # NonELG, NoZ and ELG
-#         for i in range(3):
-#             # MoG model
-#             MODELS = self.MODELS[i]
-#             MODELS = MODELS[MODELS.keys()[0]][K_selected[i]] # We only want the model with K components
-#             amps, means, covs = MODELS["amps"], MODELS["means"], MODELS["covs"]
-
-#             # Compute the number of sample to draw.
-#             NSAMPLE = int(integrate_mag_broken_pow_law(self.MODELS_mag_pow[i], flux2mag(self.fmax_MC), flux2mag(self.fmin_MC), area = self.area_MC))
-#             # Sample flux ***************************
-#             gmag = gen_mag_pow_law_samples([self.A_q[i], self.alpha_q[i]], flux2mag(self.fmax_MC), flux2mag(self.fmin_MC), NSAMPLE)
-#             # assert False            
-#             r_tilde = mag_broken_pow_law(self.MODELS_mag_pow[i], gmag)/mag_pow_law([self.A_q[i], self.alpha_q[i]], gmag)
-#             self.iw0[i] = (r_tilde/r_tilde.sum()) 
-
-#             print "%s sample number: %d" % (self.category[i], NSAMPLE)
-#             gflux = mag2flux(gmag)
-#             # assert False
-
-#             # Generate Nsample from MoG.
-#             MoG_sample, iw = sample_MoG(amps, means, covs, NSAMPLE, importance_sampling=True, factor_importance = self.sigma_proposal)
-#             self.iw0[i] *= iw            
-
-#             # For all categories
-#             mu_g = flux2asinh_mag(gflux, band = "g")
-#             mu_gz, mu_gr = MoG_sample[:,0], MoG_sample[:,1]
-#             mu_z = mu_g - mu_gz
-#             mu_r = mu_g - mu_gr
-
-#             zflux = asinh_mag2flux(mu_z, band = "z")
-#             rflux = asinh_mag2flux(mu_r, band = "r")
-            
-#             # Saving
-#             self.gflux0[i] = gflux
-#             self.rflux0[i] = rflux
-#             self.zflux0[i] = zflux
-#             self.NSAMPLE[i] = NSAMPLE
-
-#             # Gen err seed and save
-#             # Also, collect unormalized importance weight factors, multiply and normalize.
-#             self.g_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-#             # print "g_err_seed importance weights. First 10", iw[]
-#             self.iw0[i] *= iw
-#             self.r_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-#             self.iw0[i] *= iw        
-#             self.z_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-#             self.iw0[i] *= iw
-#             if i==2: #ELG 
-#                 mu_goii, redz = MoG_sample[:,2], MoG_sample[:,3]
-#                 mu_oii = mu_g - mu_goii
-#                 oii = asinh_mag2flux(mu_oii, band = "oii")
-
-#                 # oii error seed
-#                 self.oii_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-#                 self.iw0[i] *= iw
-#                 # Saving
-#                 self.redz0[i] = redz
-#                 self.oii0[i] = oii
-#             self.iw0[i] = (self.iw0[i]/self.iw0[i].sum()) * self.NSAMPLE[i] # Normalization and multiply by the number of samples generated.
-
-#         return        
 
 
 #     def set_err_lims(self, glim, rlim, zlim, oii_lim):
