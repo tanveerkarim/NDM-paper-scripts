@@ -253,7 +253,7 @@ class DESI_NDM(object):
             if (i==0) or (i==1): #ELG 
                 mu_goii = MoG_sample[:, 2]
                 mu_oii = mu_g - mu_goii
-                oii = asinh_mag2flux(mu_oii, band = "oii")
+                self.oii0[i] = asinh_mag2flux(mu_oii, band = "oii")
 
                 # oii error seed
                 self.oii_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
@@ -295,7 +295,7 @@ class DESI_NDM(object):
             mu_oii = flux2asinh_mag(oii, band = "oii")
             return mu_g - mu_z, mu_g - mu_r, mu_g - mu_oii, flux2mag(gflux)
         else:
-            return mu_g - mu_z, mu_g - mu_r, flux2mag(gflux)
+            return mu_g - mu_z, mu_g - mu_r, None, flux2mag(gflux)
 
     def set_area_MC(self, val):
         self.area_MC = val
@@ -336,18 +336,18 @@ class DESI_NDM(object):
         return
 
 
-    def plot_colors(self, cn, show=True, savefig=False, save_dir="../figures/",\
-     num_bins = 100., train=True, plot_ext=False, gflux=None, rflux=None, zflux=None, oii=None):
+    def plot_colors(self, cn, K=0, show=True, savefig=False, save_dir="../figures/",\
+     num_bins = 100., train=True, plot_ext=False, gflux=None, rflux=None, zflux=None, oii=None, iw=None, A_ext=None):
         """
         Plot colors of each pair of variables being modeled.
 
         The user must specify the class number.
 
         If train True, only plot Field 3 and 4.
-        
-        If fits True, then plot the Models. If False, K set to zero.
 
         If plot_ext, then plot external objects given by gflux, rflux, zflux, and oii.
+        K is used as an additional user provided tag number. iw is the associated importance
+        number.
 
         pari_num variable
         - 0: g-z vs. g-r
@@ -361,12 +361,13 @@ class DESI_NDM(object):
             ibool = np.ones(self.field.size, dtype=bool)
             A = np.sum(self.areas)
 
-        # If fit requested, count the number of components.
-        if fits:
-            K = 0 # FIX later.
-        else:
-            K = 0
-            pair_num = 0
+        # If ext requested, count the number of components.
+        if plot_ext:
+            # Reparameterize the input external data sets and insist on A_ext.
+            var_x_ext, var_y_ext, var_z_ext, _ = self.var_reparam(gflux, rflux, zflux, oii)
+            assert A_ext is not None
+            if iw is None:
+                iw = np.ones(var_x_ext.size, dtype=float)
 
         # Bins to use for each color variables
         var_x_bins = np.arange(-2, 5.5+1e-3, 7.5/num_bins)
@@ -374,9 +375,17 @@ class DESI_NDM(object):
         var_z_bins = np.arange(-1, 8+1e-3, 11/num_bins)
 
         #---- For all classes, plot g-z vs. g-r
+        pair_num = 0        
         itmp = ibool & (self.cn==cn) # Sub select class of samples to plot.
         fig, ax_list = plt.subplots(2, 2, figsize=(16, 16))
         ax_list[1, 1].axis("off") # Turn off unused axis. 
+
+        if plot_ext:
+            ax_list[0, 0].scatter(var_x_ext, var_y_ext, s=5, marker="o", color="red", edgecolor="none")
+            ax_list[0, 1].hist(var_y_ext, bins=var_y_bins, color="red", histtype="step", \
+                lw=1.5, orientation="horizontal", weights=iw/A_ext)
+            ax_list[1, 0].hist(var_x_ext, bins=var_x_bins, color="red", histtype="step", \
+                lw=1.5, weights=iw/A_ext)            
 
         # (0,0) Scatter plot 
         ax_list[0, 0].scatter(self.var_x[itmp], self.var_y[itmp], s=5, marker="o", color="black", edgecolor="none")
@@ -387,21 +396,15 @@ class DESI_NDM(object):
 
         # (0,1) g-r histogram
         ax_list[0, 1].hist(self.var_y[itmp], bins=var_y_bins, color="black", histtype="step", \
-            lw=1.5, orientation="horizontal", weights=self.w[itmp])
+            lw=1.5, orientation="horizontal", weights=self.w[itmp]/A)
         ax_list[0, 1].set_ylim([var_y_bins[0], var_y_bins[-1]])
         ax_list[0, 1].set_ylabel(r"$\mu_g - \mu_r$", fontsize=25)
 
         # (1,0) g-z histogram
         ax_list[1, 0].hist(self.var_x[itmp], bins=var_x_bins, color="black", histtype="step", \
-            lw=1.5, weights=self.w[itmp])
+            lw=1.5, weights=self.w[itmp]/A)
         ax_list[1, 0].set_xlim([var_x_bins[0], var_x_bins[-1]])
         ax_list[1, 0].set_xlabel(r"$\mu_g - \mu_z$", fontsize=25)
-
-        # Fits
-        # if fits: # Plot fitted models.
-        #     assert self.dNdm_model[i] is not None
-        #     bin_centers = (mag_bins[1:]+mag_bins[:-1])/2.
-        #     ax.plot(bin_centers, bw * mag_broken_pow_law(self.dNdm_model[i], bin_centers), lw=1.5, c=colors[i], ls="--")
 
         if savefig: plt.savefig(save_dir+"Intersection-colors-cn%d-K%d-pair%d.png" % (cn, K, pair_num), dpi=400, bbox_inches="tight")
         if show: plt.show()
@@ -415,6 +418,13 @@ class DESI_NDM(object):
             fig, ax_list = plt.subplots(2, 2, figsize=(16, 16))
             ax_list[1, 1].axis("off") # Turn off unused axis. 
 
+            if plot_ext:
+                ax_list[0, 0].scatter(var_x_ext, var_z_ext, s=5, marker="o", color="red", edgecolor="none")
+                ax_list[0, 1].hist(var_z_ext, bins=var_z_bins, color="red", histtype="step", \
+                    lw=1.5, orientation="horizontal", weights=iw/A_ext)
+                ax_list[1, 0].hist(var_x_ext, bins=var_x_bins, color="red", histtype="step", \
+                    lw=1.5, weights=iw/A_ext)            
+
             # (0,0) Scatter plot 
             ax_list[0, 0].scatter(self.var_x[itmp], self.var_z[itmp], s=5, marker="o", color="black", edgecolor="none")
             ax_list[0, 0].set_xlim([var_x_bins[0], var_x_bins[-1]])
@@ -424,13 +434,13 @@ class DESI_NDM(object):
 
             # (0,1) g-oii histogram
             ax_list[0, 1].hist(self.var_z[itmp], bins=var_z_bins, color="black", histtype="step", \
-                lw=1.5, orientation="horizontal", weights=self.w[itmp])
+                lw=1.5, orientation="horizontal", weights=self.w[itmp]/A)
             ax_list[0, 1].set_ylim([var_z_bins[0], var_z_bins[-1]])
             ax_list[0, 1].set_ylabel(r"$\mu_g - \mu_{OII}$", fontsize=25)
 
             # (1,0) g-z histogram
             ax_list[1, 0].hist(self.var_x[itmp], bins=var_x_bins, color="black", histtype="step", \
-                lw=1.5, weights=self.w[itmp])
+                lw=1.5, weights=self.w[itmp]/A)
             ax_list[1, 0].set_xlim([var_x_bins[0], var_x_bins[-1]])
             ax_list[1, 0].set_xlabel(r"$\mu_g - \mu_z$", fontsize=25)
             # Fits
@@ -449,6 +459,13 @@ class DESI_NDM(object):
             fig, ax_list = plt.subplots(2, 2, figsize=(16, 16))
             ax_list[1, 1].axis("off") # Turn off unused axis. 
 
+            if plot_ext:
+                ax_list[0, 0].scatter(var_y_ext, var_z_ext, s=5, marker="o", color="red", edgecolor="none")
+                ax_list[0, 1].hist(var_z_ext, bins=var_z_bins, color="red", histtype="step", \
+                    lw=1.5, orientation="horizontal", weights=iw/A_ext)
+                ax_list[1, 0].hist(var_y_ext, bins=var_y_bins, color="red", histtype="step", \
+                    lw=1.5, weights=iw/A_ext)            
+
             # (0,0) Scatter plot 
             ax_list[0, 0].scatter(self.var_y[itmp], self.var_z[itmp], s=5, marker="o", color="black", edgecolor="none")
             ax_list[0, 0].set_xlim([var_y_bins[0], var_y_bins[-1]])
@@ -458,13 +475,13 @@ class DESI_NDM(object):
 
             # (0,1) g-oii histogram
             ax_list[0, 1].hist(self.var_z[itmp], bins=var_z_bins, color="black", histtype="step", \
-                lw=1.5, orientation="horizontal", weights=self.w[itmp])
+                lw=1.5, orientation="horizontal", weights=self.w[itmp]/A)
             ax_list[0, 1].set_ylim([var_z_bins[0], var_z_bins[-1]])
             ax_list[0, 1].set_ylabel(r"$\mu_g - \mu_{OII}$", fontsize=25)
 
             # (1,0) g-z histogram
             ax_list[1, 0].hist(self.var_y[itmp], bins=var_y_bins, color="black", histtype="step", \
-                lw=1.5, weights=self.w[itmp])
+                lw=1.5, weights=self.w[itmp]/A)
             ax_list[1, 0].set_xlim([var_y_bins[0], var_y_bins[-1]])
             ax_list[1, 0].set_xlabel(r"$\mu_g - \mu_r$", fontsize=25)
             # Fits
