@@ -264,6 +264,20 @@ To keep DESI_NDM as a light-weight class, I made a conscious effort to collect a
 
 Intrinsic density fitting
 - Notes: The script documents how the DESI_NDM class module is used to fit intrinsic densitiy models to the training data. For the color distributions, following the model fitting with various number of component gaussians, I visually inspect the fits and pick a model with the lesat number of components that can adequately reproduce the data.
+- Script used: fit-intrinsic-densities.py
+- Products: ./data/derived/
+	- broken-power-law-params-cn*.npy: Broken power law params. 	
+	- Intersection-dNdm-by-class.png: Plot of dNdm by class and their fits.
+	- MoG-params-cn*-K*.npy: MoG params. K denotes number of components. 
+	- Intersection-colors-cn*-K*-pair*.png: Plot of color distributions and their fits with varying number of components.
+		- For each pair of colors include 
+			1) scatter plot of data and MC draws.
+			2) Histogram of data and MC draws.
+		- This means for Gold and Silver, we need three panels corrresponding to each pair. 
+		Pair number
+			- 0: g-z vs. g-r
+			- 1: g-z vs. g-oii
+			- 2: g-r vs. g-oii
 
 Fiducial selection
 
