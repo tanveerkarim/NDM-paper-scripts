@@ -95,9 +95,11 @@ class DESI_NDM(object):
         self.var_x, self.var_y, self.var_z, self.gmag =\
             self.var_reparam(self.gflux, self.rflux, self.zflux, self.oii) 
 
-        # ---- Place holders for other variables used
+        # ---- Models
         self.dNdm_model = [None] * 5
+        self.MoG_model = [None] * 5
 
+        #---- MC variables
         return
 
     def import_data_DEEP2_full(self):
@@ -141,6 +143,20 @@ class DESI_NDM(object):
         for i in range(5):
             self.dNdm_model[i] = np.load(save_dir + ("broken-power-law-params-cn%d.npy" % i))
         return
+
+    def load_MoG_models(self, K_list=None, save_dir=dir_derived):
+        """
+        K list specified the number of components to be imported.
+
+        If None, author specified (best fit) number is used.
+        """
+        if K_list is None:
+            K_list = [1] * 5
+        for i in range(5):
+            self.MoG_model[i] = np.load(save_dir + ("MoG-params-cn%d-K%d.npy" % (i, K_list[i])))
+
+
+        return 
 
     def var_reparam(self, gflux, rflux, zflux, oii = None):
         """
