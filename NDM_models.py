@@ -366,7 +366,6 @@ class DESI_NDM(object):
 
         cn is the class to fit and K is the number of components to fit.
         """
-        print "Fitting MoGs to %s" % cnames[cn]        
         ifit = (self.cn==cn) & self.iTrain        
         if (cn > 1): # Other than Gold or Silver
             ND = 2 # Dimension of model
@@ -377,7 +376,7 @@ class DESI_NDM(object):
         Ycovar = self.gen_covar(ifit, ND=ND)
         weight = self.w[ifit]
         params = fit_GMM(Ydata, Ycovar, ND, K=K, Niter=Niter, weight=weight)
-        np.save(save_dir+"MoG-params-cn%d-K%d.npy" % (cn, k), params)
+        np.save(save_dir+"MoG-params-cn%d-K%d.npy" % (cn, K), params)
 
         return
 

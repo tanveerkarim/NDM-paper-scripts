@@ -2492,16 +2492,15 @@ def fit_GMM(ydata, ycovar, ND, K, Niter=1, weight=None):
 
     # Initialization of amps and covariance
     init_amp = gen_uni_init_amps(K)
-    ydata = ydata.T # Why is this necessary?
-    init_covar = gen_init_covar_from_data(Ndim, ydata_T, K)
+    init_covar = gen_init_covar_from_data(ND, ydata.T, K)
 
     for j in range(Niter): # Number of trials
         print "Trial num: %d" % j
         # Initialization of means
         # Randomly pick K samples from the generated set.                
-        init_mean_tmp = gen_init_mean_from_sample(Ndim, ydata, K)
+        init_mean_tmp = gen_init_mean_from_sample(ND, ydata, K)
         fit_mean_tmp, fit_amp_tmp, fit_covar_tmp = np.copy(init_mean_tmp), np.copy(init_amp), np.copy(init_covar)
-        
+
         #Set up your arrays: ydata has the data, ycovar the uncertainty covariances
         #initamp, initmean, and initcovar are initial guesses
         #get help on their shapes and other options using
