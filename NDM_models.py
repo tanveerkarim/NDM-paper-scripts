@@ -68,24 +68,32 @@ class DESI_NDM(object):
         """
         Import the intersection training data. Set global parameters to default values.
         """
-
-        # mag_max, mag_min: Magnitue range considered for intrinsic density modeling and MC sampling
+        # mag_max, mag_min: Magnitue range considered for MC sampling and intrinsic density modeling. 
+        # Additional cuts might be made later on, however.
         self.mag_max = 24.25 
-        self.mag_min = 17.
+        self.mag_min = 17.                
 
         # Areas of Field 2, 3, and 4
         self.areas = np.load(dir_derived+"spec-area.npy")        
 
         # Model variables
-        self.gflux, self.gf_err, self.rflux, self.rf_err, self.zflux, self.zf_err, self.red_z, self.z_err, self.oii, self.oii_err, self.w, self.field,\
+        self.gflux, self.gf_err, self.rflux, self.rf_err, self.zflux, self.zf_err, self.red_z,\
+        self.z_err, self.oii, self.oii_err, self.w, self.field,\
         self.ra, self.dec, self.w1_flux, self.w2_flux, self.w1_err, self.w2_err, self.cn,\
         self.iELG_DESI, self.iNoZ, self.iNoOII, self.iNonELG = self.import_data_DEEP2_full()
+
+        # Training is based on Field 3 and 4 data.
+        self.iTrain = np.logical_or(self.field==3, self.field==4)
+        self.area_train = np.sum(self.  areas[1:])
+
+        # Test data is base d on Field 2 data.
+        self.iTest = self.field == 2
+        self.area_test = self.areas[0]
 
         # Reparameterization
         # asinh mag g-r (x), asinh mag g-z (y), asinh mag g-oii (z), and gmag
         self.var_x, self.var_y, self.var_z, self.gmag =\
             self.var_reparam(self.gflux, self.rflux, self.zflux, self.oii) 
-
 
         # ---- Place holders for other variables used
 
@@ -125,6 +133,68 @@ class DESI_NDM(object):
         return gflux, gf_err, rflux, rf_err, zflux, zf_err, red_z, z_err, oii, oii_err, w, field, \
         ra, dec, w1_flux, w2_flux, w1_err, w2_err, cn, iELG_DESI, iNoZ, iNoOII, iNonELG
 
+    def var_reparam(self, gflux, rflux, zflux, oii = None):
+        """
+        Given the input variables return the model3 parametrization as noted above.
+        """
+        mu_g = flux2asinh_mag(gflux, band = "g")
+        mu_r = flux2asinh_mag(rflux, band = "r")
+        mu_z = flux2asinh_mag(zflux, band = "z")
+        if oii is not None:
+            mu_oii = flux2asinh_mag(oii, band = "oii")
+            return mu_g - mu_z, mu_g - mu_r, mu_g - mu_oii, flux2mag(gflux)
+        else:
+            return mu_g - mu_z, mu_g - mu_r, flux2mag(gflux)
+
+    def set_area_MC(self, val):
+        self.area_MC = val
+        return
+
+    def plot_dNdm_all(self, show=True, savefig=False, save_dir="../figures/", fits=False, bw = 0.025, train=True):
+        """
+        Plot magnitude histogram of all classes (on the same plot).
+
+        If train True, only plot Field 3 and 4.
+        
+        If fits True, then plot the Models.
+        """
+        if train:
+            ibool = np.logical_or((self.field == 3), (self.field == 4))
+        else:
+            ibool = np.ones(self.field.size, dtype=bool)
+
+        mag_bins = np.arange(self.mag_min, self.mag_max+bw/2., bw)
+        fig, ax = plt.subplots(1, figsize=(7, 7))
+        for i in range(5):
+            itmp = ibool & (self.cn==i)
+            ax.hist(self.gmag[itmp], bins=mag_bins, histtype="step", \
+                lw=1, label=cnames[i], weights=self.w[itmp], color=colors[i])
+        ax.set_xlim([self.mag_min, self.mag_max])
+        ax.legend(loc="upper left", fontsize=20)
+        if savefig: plt.savefig(save_dir+"Intersection-dNdm-by-class.png", dpi=400, bbox_inches="tight")
+        if show: plt.show()
+        plt.close()
+
+        return
+
+    # def fit_dNdm_broken_pow(self, Niter=5, bw=0.025):
+    #     """
+    #     This function is exclusively used for fitting the dNdm broken power law and nothing else.
+    #     """
+    #     for i in range(5): # Fit densities of classes 0 through 4.
+    #         print "Fitting broken power law for %s" % self.category[i]
+    #         ifit = self.iTrain & (cn==i)
+    #         if i == 0:
+    #             mag_max = 24.
+    #             mag_min = 17.
+    #         else:
+    #             mag_max = 24.25                 
+    #             mag_min = 22.
+
+    #         self.MODELS_mag_pow[i] = dNdm_fit_broken_pow(flux2mag(flux), weight, bw, mag_min, mag_max, self.area_train, niter = Niter)
+    #         np.save("MODELS-%s-%s-%s-mag-broken-pow.npy" % (self.category[i], model_tag, cv_tag), self.MODELS_mag_pow[i])
+
+    #     return None
 
 
 #         # Fit parameters for pow/broken pow law
@@ -231,23 +301,6 @@ class DESI_NDM(object):
 
 
 
-#     def var_reparam(self, gflux, rflux, zflux, oii = None):
-#         """
-#         Given the input variables return the model3 parametrization as noted above.
-#         """
-#         mu_g = flux2asinh_mag(gflux, band = "g")
-#         mu_r = flux2asinh_mag(rflux, band = "r")
-#         mu_z = flux2asinh_mag(zflux, band = "z")
-#         if oii is not None:
-#             mu_oii = flux2asinh_mag(oii, band = "oii")
-#             return mu_g - mu_z, mu_g - mu_r, mu_g - mu_oii, flux2mag(gflux)
-#         else:
-#             return mu_g - mu_z, mu_g - mu_r, flux2mag(gflux)
-
-#     def set_area_MC(self, val):
-#         self.area_MC = val
-#         return
-
 
 #     def fit_MoG(self, NK_list, model_tag="", cv_tag="", cache=False, Niter=5):
 #         """
@@ -318,36 +371,7 @@ class DESI_NDM(object):
 
 
 
-#     def fit_dNdm_broken_pow(self, model_tag="", cv_tag="", cache=False, Niter=5, bw=0.05):
-#         """
-#         Model 3
-#         Fit mag pow laws
-#         """
-#         cache_success = False
-#         if cache:
-#             for i in range(3):
-#                 model_fname = "./MODELS-%s-%s-%s-mag-broken-pow.npy" % (self.category[i], model_tag, cv_tag)
-#                 if os.path.isfile(model_fname):
-#                     self.MODELS_mag_pow[i] = np.load(model_fname)
-#                     cache_success = True
-#                     print "Cached result will be used for MODELS-%s-%s-%s-mag-broken-pow." % (self.category[i], model_tag, cv_tag)
-#         if not cache_success:
-#             for i, ibool in enumerate([self.iNonELG, self.iNoZ, self.iELG]):
-#                 print "Fitting broken power law for %s" % self.category[i]
-#                 ifit = self.iTrain & ibool
-#                 flux = self.gflux[ifit]
-#                 weight = self.w[ifit]
-#                 if i == 0:
-#                     mag_max = 24.
-#                     mag_min = 17.
-#                 else:
-#                     mag_max = 24.25                 
-#                     mag_min = 22.
 
-#                 self.MODELS_mag_pow[i] = dNdm_fit_broken_pow(flux2mag(flux), weight, bw, mag_min, mag_max, self.area_train, niter = Niter)                
-#                 np.save("MODELS-%s-%s-%s-mag-broken-pow.npy" % (self.category[i], model_tag, cv_tag), self.MODELS_mag_pow[i])
-
-#         return None
 
 
 #     def gen_sample_intrinsic_mag(self, K_selected=None):
