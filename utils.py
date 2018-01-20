@@ -2472,107 +2472,54 @@ def gen_err_seed(nsample, sigma=1, return_iw_factor=False):
     
 
 
-def fit_GMM(Ydata, Ycovar, ND, ND_fit, NK_list=[1], Niter=1, fname_suffix="test", MaxDIM=False, weight=None):
+def fit_GMM(ydata, ycovar, ND, K, Niter=1, weight=None):
     """
-    Given the data matrix Ydata [Nsample, ND], the error covariance matrix Ycovar [Nsample, [ND, ND]],
-    fit 1D, 2D, 3D, ..., ND multivariate gaussian for each pair of variables.
+    Given the data matrix ydata [Nsample, ND], the error covariance matrix Ycovar [Nsample, [ND, ND]],
+    fit K component MoG and return the fit parameters.
     
     Input: 
-    - ND: Number of dimensions of the data points. 
-    - ND_fit: Only consider variables up to ND_fit (var0, var1, ... varND_fit-1) in making the fits.
-    - NK_list: Number of component gaussians to use for fitting.
+    - ND: Number of dimensions of the data points.
+    - K: Number of components to fit.
     - Niter: Number of trials for the XD fit.
-    - MaxDIM: Fit only max dimensional model allowed by ND_fit.
     - weight: Weight of data points.
 
     Output:
-    - MODELS: A dictionary that contains all models. Each model is labeled with a tuple of (ordered)
-    variables used. In each model contains a dictionary that contains entries 1, ..., NK. One level below
-    area means, covars, and amps.
+    - params: A dictionary that contains means, covars, and amps.
     """
-    # List of all models, labeled by a list of variables to be used.
-    model_list = None
-    if MaxDIM:
-        model_list = gen_comb(ND, ND_fit)
-    else:
-        for nd in range(1, ND_fit+1):
-            if model_list is None:
-                model_list =  gen_comb(ND, nd)
-            else:
-                model_list += gen_comb(ND, nd)
-    # Turn model labels from lists into tuples to use them as keys.
-    model_list = [tuple(e) for e in model_list]
-    
-    # Create an empty dictionary to save all the models
-    MODELS = {}
-    
-    # Fit each model and save the result
-    for m in model_list:
-        print "Model: ", m # Indicate which model is being trained
-        MODELS[m] = {} # Add an empty dictionary
+
+    lnL_best = -np.inf # Initially lnL is infinitely terrible
+    init_mean = None
+
+    # Initialization of amps and covariance
+    init_amp = gen_uni_init_amps(K)
+    ydata = ydata.T # Why is this necessary?
+    init_covar = gen_init_covar_from_data(Ndim, ydata_T, K)
+
+    for j in range(Niter): # Number of trials
+        print "Trial num: %d" % j
+        # Initialization of means
+        # Randomly pick K samples from the generated set.                
+        init_mean_tmp = gen_init_mean_from_sample(Ndim, ydata, K)
+        fit_mean_tmp, fit_amp_tmp, fit_covar_tmp = np.copy(init_mean_tmp), np.copy(init_amp), np.copy(init_covar)
         
-        # Dimension of the model
-        Ndim = len(m)
+        #Set up your arrays: ydata has the data, ycovar the uncertainty covariances
+        #initamp, initmean, and initcovar are initial guesses
+        #get help on their shapes and other options using
+        # ?XD.extreme_deconvolution
+
+        # XD fitting. Minimal regularization for the power law is used here. w=1e-4.
+        lnL = XD.extreme_deconvolution(ydata, ycovar, fit_amp_tmp, fit_mean_tmp, fit_covar_tmp, w=1e-4, weight=weight)
+
+        # Take the best result so far
+        if lnL > lnL_best:
+            fit_mean, fit_amp, fit_covar = fit_mean_tmp, fit_amp_tmp, fit_covar_tmp
+
+    # Save the dictionary after fitting each model so that 
+    # if the function crashses partial results are still saved.
+    # Format example 
+    params = {"means": fit_mean, "amps": fit_amp, "covs": fit_covar}
         
-        # Selecting subset of data relevant for the model being trained.
-        ydata = []
-        for i in range(Ndim):
-            ydata.append(Ydata[:, m[i]])
-        ydata_T = np.asarray(ydata)
-        ydata = ydata_T.T
-#         print ydata.shape
-        
-        # Constructing sub-convariance matrix
-        ycovar = []
-
-        for cov in Ycovar:
-            ycovar.append(cov[:, m][list(m)])
-        ycovar = np.asarray(ycovar)
-#         print "ycovar", ycovar.shape
-                    
-        for K in NK_list: # Number of component gaussians to be fit
-            lnL_best = -np.inf # Initially lnL is infinitely terrible
-            init_mean = None
-            # Initialization of amps and covariance
-            init_amp = gen_uni_init_amps(K)
-            init_covar = gen_init_covar_from_data(Ndim, ydata_T, K)            
-            for j in range(Niter): # Number of trials
-                print "NK/Trial num: %d, %d" % (K, j)
-                # Initialization of means
-                # Randomly pick K samples from the generated set.                
-                if init_mean is None:
-                    init_mean = gen_init_mean_from_sample(Ndim, ydata, K)
-                    init_mean_tmp = init_mean
-                else:
-                    init_mean_tmp = gen_init_mean_from_sample(Ndim, ydata, K)
-
-#                 For debugging 
-#                 print init_mean.shape
-#                 print init_amp.shape
-#                 print init_covar.shape
-#                 assert False
-
-                fit_mean_tmp, fit_amp_tmp, fit_covar_tmp = np.copy(init_mean_tmp), np.copy(init_amp), np.copy(init_covar)
-                #Set up your arrays: ydata has the data, ycovar the uncertainty covariances
-                #initamp, initmean, and initcovar are initial guesses
-                #get help on their shapes and other options using
-                # ?XD.extreme_deconvolution
-
-                # XD fitting. Minimal regularization for the power law is used here. w=1e-4.
-                lnL = XD.extreme_deconvolution(ydata, ycovar, fit_amp_tmp, fit_mean_tmp, fit_covar_tmp, w=1e-4, weight=weight)
-
-                # Take the best result so far
-                if lnL > lnL_best:
-                    fit_mean, fit_amp, fit_covar = fit_mean_tmp, fit_amp_tmp, fit_covar_tmp
-
-            # Save the dictionary after fitting each model so that 
-            # if the function crashses partial results are still saved.
-            # Format example 
-            MODELS[m][(K)] = {"means": fit_mean, "amps": fit_amp, "covs": fit_covar}
-            np.save("MODELS-"+fname_suffix+".npy", MODELS)
-            # print "\n"
-        
-    return MODELS
+    return params
 
 def apply_mask(table):
     """
