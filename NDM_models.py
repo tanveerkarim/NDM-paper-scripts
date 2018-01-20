@@ -351,7 +351,8 @@ class DESI_NDM(object):
 
 
     def plot_colors(self, cn, K=0, show=True, savefig=False, save_dir="../figures/",\
-     num_bins = 100., train=True, plot_ext=False, gflux=None, rflux=None, zflux=None, oii=None, iw=None, A_ext=None):
+     num_bins = 100., train=True, plot_ext=False, gflux=None, rflux=None, zflux=None, \
+     oii=None, iw=None, A_ext=None, gmag_cut=24.):
         """
         Plot colors of each pair of variables being modeled.
 
@@ -362,6 +363,8 @@ class DESI_NDM(object):
         If plot_ext, then plot external objects given by gflux, rflux, zflux, and oii.
         K is used as an additional user provided tag number. iw is the associated importance
         number.
+        
+        Trainig data is plotted only up to gmag_cut
 
         pari_num variable
         - 0: g-z vs. g-r
@@ -369,10 +372,10 @@ class DESI_NDM(object):
         - 2: g-r vs. g-oii
         """
         if train:
-            ibool = np.logical_or((self.field == 3), (self.field == 4))
+            ibool = np.logical_or((self.field == 3), (self.field == 4)) & (self.gmag < gmag_cut)
             A = self.area_train
         else:
-            ibool = np.ones(self.field.size, dtype=bool)
+            ibool = self.gmag < gmag_cut
             A = np.sum(self.areas)
 
         # If ext requested, count the number of components.
