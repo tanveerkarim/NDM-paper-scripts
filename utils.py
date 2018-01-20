@@ -1243,8 +1243,7 @@ def dNdm_fit_broken_pow(mag, weight, bw, magmin, magmax, area, niter = 5, pow_to
         # Optimize the parameters.
         ms_guess = 22.5
 
-        init_params = [max(A*ms_guess**2, 100), ms_guess, min(alpha, 10), np.random.choice([-0.1, 0.1])]        
-        print init_params        
+        init_params = [max(A*ms_guess**2, 100), ms_guess, min(alpha, 10), np.random.choice([-0.1, 0.1])]           
         res = opt.minimize(ntotal_loglike_pow, init_params, tol=pow_tol,method="Powell")
         counter+=1
 
@@ -1265,7 +1264,7 @@ def dNdm_fit_broken_pow(mag, weight, bw, magmin, magmax, area, niter = 5, pow_to
             print "Stopped at", fitted_params
             print "Optimization failed."
 
-#     print(best_params_pow)
+    print(best_params_pow)
 
     return best_params_pow
 
