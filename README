@@ -1,8 +1,23 @@
-This text file documents scripts used to produce results reported in the NDM selection method paper (2018). It also details scripts and their results not reported in the paper but documented here for reproducibility and complete update on the status of the method. 
+Author: Jae Hyeon Lee
+Last updated: Jan 2018
+E-mail: jaekor91@gmail.com
 
-Warning: I emphasize that the primary purpose of documenting the scripts and all codes used is for reproducibility rather than the ease of their adaptation to other projects. (In other words, I have not made a conscious effort to maintain the codes at a professional level beyond general readability and cleanliness.)
+TODO: 
+- Add a description of spitzer data.
+- Study of WISE W1 and W2 band SN.
+- Study of Random Forest application.
 
-Contents: I group scripts and their results according to topic.
+This text file documents scripts used to produce results reported in the NDM selection method paper (2018). It also details scripts and their products not reported in the paper but documented here for reproducibility and complete update on the status of the method.
+
+Warning: I emphasize that the primary purpose of this documentation is for reproducibility rather than the ease of their adaptation to other projects. (I have not made a strong effort to maintain the codes at a professional level beyond general readability and cleanliness.)
+
+README convention (for the author):
+- "/----" to denote the beginning of a new grouping or section. 
+- Five "\n" between sections.
+- Use only "-" for lists.
+- "!" means the particular analysis is not performed to completion.
+
+Contents: 
 - Organization
 - Software requirements
 - utils and NDM_models modules
@@ -13,31 +28,22 @@ Contents: I group scripts and their results according to topic.
 - Application
 - List of challenges
 
-README convention (for the author):
-- "/----" to denote the beginning of a new grouping or section. 
-- Five "\n" between sections.
-- Use only "-" for lists.
-- "!" means the particular analysis is not performed to completion.
-
-
 
 
 
 /---- Organization
-To orient the user of this document, I provide a high level overview of the documentation of the project. Here is the directory structure
+To orient the user of this document, I provide a high level overview of the documentation. Here is the directory structure
 /NDM-paper
 	/article
 	/data
 		/derived
 	/scripts
 	/figures
-	/notes
 
-- "article" contains the manuscript .tex file and all other immediate relevant packages, figures, bibliography, etc. 
-- "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "data/derived" directory. 
+- "article" contains the manuscript .tex file and all other relevant packages, figures, bibliography, etc. 
+- "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "data/derived/" directory. 
 - "figures" contains all graphic products. Unless mentioned otherwise, all figures saved on the flat directory level.
 - "scripts" contains all Python scripts used to produce any results.
-- "notes" contains a PDF file that documents analysis/results that were not included in the NDM paper but are important to remember.
 
 
 
@@ -48,10 +54,9 @@ Unless mentioned otherwise, the work contained here is based on Python 2.7.12. B
 - numpy v1.9.1
 - astropy v1.1.1
 - scipy v0.19.0
-- extreme-deconvolution-1.4: https://github.com/jobovy/extreme-deconvolution
+- extreme-deconvolution-1.4 (https://github.com/jobovy/extreme-deconvolution)
 
-The rest is based on Python 3.5.2. In particular, an application of Random Forest (RF) method to DEEP2-DECaLS DR5 data is performed using the following package compatible with Python 3.5.2:
-- scikit-learn v0.19.1
+The rest is based on Python 3.5.2. In particular, Random Forest (RF) module from scikit-learn v0.19.1 was applied to DEEP2-DECaLS DR5 data.
 
 These are not stringent requirements, and there is no reason to believe that other compatible versions of Python would produce different results.
 
@@ -67,7 +72,7 @@ All author defined functions are collected in utils and NDM_models. The latter i
 
 
 /---- Data download and acquisition
-In this section, I document how key data for the project were obtained. All of these data are available via a single download from (provide URL) or can be obtained from the author in a .zip file. 
+In this section, I document how key data for the project were obtained. All of these data are available via (*provide URL*) or can be obtained from the author in a .zip file via e-mail. 
 
 - DEEP2 photometric catalogs: Downloaded from the DEEP2 survey website using below commands.
 wget http://deep.ps.uci.edu/DR4/data/pcat_ext.21.fits.gz
@@ -88,14 +93,14 @@ wget http://deep.ps.uci.edu/DR4/data/windowf.33.fits.gz
 wget http://deep.ps.uci.edu/DR4/data/windowf.41.fits.gz
 wget http://deep.ps.uci.edu/DR4/data/windowf.42.fits.gz
 
-- DEEP2 redshift catalogs: These were obtained from John Moustakas and are described in a Tech Report (DESI docDB-912). The redshift catalogs from Fields 2, 3, and 4 are named deep2-f2-redz-oii.fits, deep2-f3-redz-oii.fits, and deep2-f4-redz-oii.fits in the data repository.
+- DEEP2 redshift catalogs: These were obtained from John Moustakas and are described in a Tech Report (DESI docDB-912). The redshift catalogs from Fields 2, 3, and 4 are named deep2-f2-redz-oii.fits, deep2-f3-redz-oii.fits, and deep2-f4-redz-oii.fits in the data directory.
 
-- DEEP2 color selection: The file is a union list of DEEP2 photometric catalogs with an additional information regarding color selection. It was obtained from Jeff Newman and named color-selection.txt in the data repository. See "Cross-matching..." section scripts for description.
+- DEEP2 color selection: The file is a union list of DEEP2 photometric catalogs with an additional information regarding color selection. It was obtained from Jeff Newman and named color-selection.txt.
 
-- survey-bricks-dr5: A useful file that can be used to determine Tractor bricks that cover regions of interest. Downloaded using the below command.
+- survey-bricks-dr5.fits: A DECaLS survey product that contains information about each processed bricks. Downloaded using the below command.
 wget http://portal.nersc.gov/project/cosmo/data/legacysurvey/dr5/survey-bricks-dr5.fits.gz
 
-- DR5 Tractor catalogs in DEEP2 Fields 2, 3, and 4: Using the "bricks" file above and a short script (generate-tractor-download-scripts.py), the below download scripts were generated:
+- DR5 Tractor catalogs in DEEP2 Fields 2, 3, and 4: Using the "survey-bricks-dr5.fits" file above and a short script (generate-tractor-download-scripts.py), the below download scripts were generated:
 tractor-download-d2f2.sh
 tractor-download-d2f3.sh
 tractor-download-d2f4.sh
@@ -112,7 +117,7 @@ tractor-download-d2f4.sh
 After downloading/acquiring the DECaLS DR5 and DEEP2 catalogs, they are pre-processed into convenient forms as described in this section.
 
 Combine all downloaded Tractor files by DEEP2 Field
-- Notes: Combine all Tractor files by Field, append Tycho-2 stellar mask column, and mask objects using DEEP2 window funtions. Note that no other catalog quality cuts were made at this point. Tycho-2 masks were appended but not imposed as may be altered in the future.
+- Notes: Combine all Tractor files by DEEP2 Field, append Tycho-2 stellar mask column, and mask objects using DEEP2 window funtions. Note that no other catalog quality cuts were made at this point. Tycho-2 masks were appended but not imposed as may be altered in the future.
 - Script used: combine-Tractor-bricks.py
 - Products:
 	- DR5-Tractor-D2f*.fits
@@ -126,17 +131,15 @@ Combine DEEP2 catalogs
 
 Combine DEEP2 and DR5
 - Notes: We make the following cuts prior to cross matching.
-	- Common: Tycho mask and window function.
-	- DR5: g < 24.25, grz_allmask == 0, grz_ivar > 0, brick_primary == 0.
-	grz_all mask might be too stringent but this is done for convenience. This condition may be loosened down the road. We match DEEP2 catalogs onto DR5. Please refer to combine-Tractor-DEEP2-prints.txt
+	- Common: Tycho masks and window functions.
+	- DR5: g < 24.25, grz_allmask == 0, grz_ivar > 0, brick_primary == 0. grz_allmask might be too stringent but this is done for convenience. This condition may be loosened down the road. We match DEEP2 catalogs onto DR5. Please refer to combine-Tractor-DEEP2-prints.txt
 - Script used: combine-Tractor-DEEP2.py
 - Products:
-	- unmatched-deep2-f**-photo-redz-oii.fits: A subset of DEEP2 combined catalogs that did not find match in DR5.
+	- unmatched-deep2-f**-photo-redz-oii.fits: A subset of DEEP2 combined catalogs that did not find matches in DR5.
 	- DR5-matched-to-DEEP2-f**-glim24p25.fits: Original DR5 combined catalogs with DEEP2 information appended.
 
 Combine DEEP2 and DR5 -- No Mask version
-- Notes: The same as above except I do not apply any Tractor mask or Tycho mask except for DEEP2 spectrosopic window function. Please refer to 
-combine-Tractor-DEEP2-prints-NoMask.txt.
+- Notes: The same as above except I do not apply any Tractor mask or Tycho mask except for DEEP2 spectrosopic window function. Please refer to combine-Tractor-DEEP2-prints-NoMask.txt.
 - Script used: combine-Tractor-DEEP2-NoMask.py
 - Products:
 	- unmatched-deep2-f**-photo-redz-oii-NoMask.fits: (Not saved)
@@ -224,7 +227,6 @@ DECaLS DR5 unmatched to DEEP2 set
 	- DR5-matched-vs-unmatched-grz-hist-normed-by-field.png
 	- DR5-matched-vs-unmatched-grz-color-by-field.png
 
-
 ! DEEP2-DECaLS DR5 intersection set (g < 24.25) ELG selection challenge plots
 - Notes: These plots are used to illustrate the challenge of ELG target selection problem.
 
@@ -247,7 +249,7 @@ Any dervied files can be found in ../data/derived/
 
 
 /---- Application
-In this section, I document exactly how all the figures and results reported in the NDM paper are produced. There are additional scripts used to produce other results not included as well.
+In this section, I document exactly how all the figures and results reported in the NDM paper are produced. I include additional scripts whose results are not presented in the paper.
 
 All relevant convenience functions are collected in utils.py and any integral facilities to the NDM method are included in DESI_NDM class module in NDM_models.py.
 
@@ -255,7 +257,7 @@ DESI_NDM class module is able to perform the following tasks:
 - Given training data, perform intrinsic number density fitting. This includes broken power law fititng and color distribution fitting for all five classes defined in the paper. 
 - Generate and retain MC samples from the intrinsic densities.
 - Convolve the intrinsic densities with noise models to generate the observed densities.
-- Define a selection region given a desired total number density. Given grz-fluxes of an external catalog, return the NDM selection as a vector.
+- Define a selection region given a desired total number density. (Implement the two regularizing scheme: smoothing and magnitude dependent cruds.) Given grz-fluxes of an external catalog, return the NDM selection as a vector.
 - Provides a prediction for the properties of the selection including grz and OII flux distributions and the redshift distribution.
 
 To keep DESI_NDM as a light-weight class, I made a conscious effort to collect any inessential functions to utils.py.
