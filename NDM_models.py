@@ -96,6 +96,7 @@ class DESI_NDM(object):
             self.var_reparam(self.gflux, self.rflux, self.zflux, self.oii) 
 
         # ---- Place holders for other variables used
+        self.dNdm_model = [None] * 5
 
         return
 
@@ -133,6 +134,14 @@ class DESI_NDM(object):
         return gflux, gf_err, rflux, rf_err, zflux, zf_err, red_z, z_err, oii, oii_err, w, field, \
         ra, dec, w1_flux, w2_flux, w1_err, w2_err, cn, iELG_DESI, iNoZ, iNoOII, iNonELG
 
+    def load_dNdm_models(self, save_dir=dir_derived):
+        """
+        Load best fit dNdm models.
+        """
+        for i in range(5):
+            self.dNdm_model[i] = np.load(save_dir + ("broken-power-law-params-cn%d.npy" % i))
+        return
+
     def var_reparam(self, gflux, rflux, zflux, oii = None):
         """
         Given the input variables return the model3 parametrization as noted above.
@@ -160,16 +169,23 @@ class DESI_NDM(object):
         """
         if train:
             ibool = np.logical_or((self.field == 3), (self.field == 4))
+            A = self.area_train
         else:
             ibool = np.ones(self.field.size, dtype=bool)
+            A = np.sum(self.areas)
+
 
         mag_bins = np.arange(self.mag_min, self.mag_max+bw/2., bw)
-        fig, ax = plt.subplots(1, figsize=(7, 7))
+        fig, ax = plt.subplots(1, figsize=(10, 7))
         for i in range(5):
             itmp = ibool & (self.cn==i)
             ax.hist(self.gmag[itmp], bins=mag_bins, histtype="step", \
-                lw=1, label=cnames[i], weights=self.w[itmp], color=colors[i])
-        ax.set_xlim([self.mag_min, self.mag_max])
+                lw=1, label=cnames[i], weights=self.w[itmp]/A, color=colors[i])
+            if fits: # Plot fitted models.
+                assert self.dNdm_model[i] is not None
+                bin_centers = (mag_bins[1:]+mag_bins[:-1])/2.
+                ax.plot(bin_centers, bw * mag_broken_pow_law(self.dNdm_model[i], bin_centers), lw=1.5, c=colors[i], ls="--")
+        ax.set_xlim([self.mag_min, 24.])
         ax.legend(loc="upper left", fontsize=20)
         if savefig: plt.savefig(save_dir+"Intersection-dNdm-by-class.png", dpi=400, bbox_inches="tight")
         if show: plt.show()
@@ -177,7 +193,7 @@ class DESI_NDM(object):
 
         return
 
-    def fit_dNdm_broken_pow(self, save_dir="../data/derived/", Niter=5, bw=0.025):
+    def fit_dNdm_broken_pow(self, save_dir=dir_derived, Niter=5, bw=0.025):
         """
         This function is exclusively used for fitting the dNdm broken power law. 
         """
