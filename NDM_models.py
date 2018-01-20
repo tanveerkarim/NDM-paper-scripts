@@ -360,6 +360,88 @@ class DESI_NDM(object):
         return None
 
 
+    def fit_MoG(self, cn, K, Niter=5, save_dir=dir_derived):
+        """
+        Fit MoGs to data. Only used for fitting and nothing else. 
+
+        cn is the class to fit and K is the number of components to fit.
+        """
+        print "Fitting MoGs to %s" % cnames[cn]        
+        ifit = (self.cn==cn) & self.iTrain        
+        if (cn > 1): # Other than Gold or Silver
+            ND = 2 # Dimension of model
+            Ydata = np.array([self.var_x[ifit], self.var_y[ifit]]).T
+        else: # If Gold or Silver
+            ND = 3 # Dimension of model
+            Ydata = np.array([self.var_x[ifit], self.var_y[ifit], self.var_z[ifit]]).T
+        Ycovar = self.gen_covar(ifit, ND=ND)
+        weight = self.w[ifit]
+        params = fit_GMM(Ydata, Ycovar, ND, K=K, Niter=Niter, weight=weight)
+        np.save(save_dir+"MoG-params-cn%d-K%d.npy" % (cn, k), params)
+
+        return
+
+    def gen_covar(self, ifit, ND=2):
+        """
+        Covariance matrix corresponding to the new parametrization.
+
+        Original parameterization: zf, rf, oii, gf
+        New parameterization is given by the model3.
+        """
+        Nsample = np.sum(ifit)
+        Covar = np.zeros((Nsample, ND, ND))
+
+        zflux, rflux, gflux, oii = self.zflux[ifit], self.rflux[ifit], self.gflux[ifit], self.oii[ifit]
+        var_err_list = [self.zf_err[ifit], self.rf_err[ifit], self.oii_err[ifit], self.gf_err[ifit]]
+
+        # constant converion factor.
+        const = 0.542868
+
+        # Softening factors for asinh mags
+        b_g = 1.042 * 0.0285114
+        b_r = 1.042 * 0.0423106
+        b_z = 1.042 * 0.122092
+        b_oii = 1.042 * 0.581528277909
+
+        for i in range(Nsample):
+            if ND == 2:
+                # Construct the original space covariance matrix in 3 x 3 subspace.
+                tmp = []
+                for j in [0, 1, 3]:
+                    tmp.append(var_err_list[j][i]**2) # var = err^2
+                Cx = np.diag(tmp)
+
+                g, r, z = gflux[i], rflux[i], zflux[i]
+                M00, M01, M02 = const/np.sqrt(b_z**2+z**2/4.), 0, -const/(g*np.sqrt(b_g**2+g**2/4.))
+                M10, M11, M12 = 0, const/np.sqrt(b_r**2+r**2/4.), -const/(g*np.sqrt(b_g**2+g**2/4.))
+                M = np.array([[M00, M01, M02],
+                            [M10, M11, M12]])
+                
+                Covar[i] = np.dot(np.dot(M, Cx), M.T)
+            elif ND == 3:
+                # Construct the original space covariance matrix in 5 x 5 subspace.
+                tmp = []
+                for j in range(4):
+                    tmp.append(var_err_list[j][i]**2) # var = err^2
+                Cx = np.diag(tmp)
+
+                # Construct the affine transformation matrix.
+                g, r, z, o = gflux[i], rflux[i], zflux[i], oii[i]
+                M00, M01, M02, M03 = const/np.sqrt(b_z**2+z**2/4.), 0, 0, -const/(g*np.sqrt(b_g**2+g**2/4.))
+                M10, M11, M12, M13 = 0, const/np.sqrt(b_r**2+r**2/4.), 0, -const/(g*np.sqrt(b_g**2+g**2/4.))
+                M20, M21, M22, M23 = 0, 0, const/np.sqrt(b_oii**2+o**2/4.), -const/(g*np.sqrt(b_g**2+g**2/4.))
+                
+                M = np.array([[M00, M01, M02, M03],
+                                [M10, M11, M12, M13],
+                                [M20, M21, M22, M23]])
+                Covar[i] = np.dot(np.dot(M, Cx), M.T)
+            else: 
+                print "The input number of variables need to be either 2 or 3."
+                assert False
+
+        return Covar
+
+
 #         # Fit parameters for pow/broken pow law
 #         self.MODELS_pow = [None, None, None]
 #         self.MODELS_broken_pow = [None, None, None]
@@ -464,46 +546,6 @@ class DESI_NDM(object):
 
 
 
-
-#     def fit_MoG(self, NK_list, model_tag="", cv_tag="", cache=False, Niter=5):
-#         """
-#         Fit MoGs to data. Note that here we only consider fitting to 2 or 4 dimensions.
-
-#         If cache = True, then search to see if there are models already fit and if available use them.
-#         """
-#         cache_success = False
-#         if cache:
-#             for i in range(3):
-#                 model_fname = "./MODELS-%s-%s-%s.npy" % (self.category[i], model_tag, cv_tag)
-#                 if os.path.isfile(model_fname):
-#                     self.MODELS[i] = np.load(model_fname).item()
-#                     cache_success = True
-#                     print "Cached result will be used for MODELS-%s-%s-%s." % (self.category[i], model_tag, cv_tag)
-
-#         if not cache_success: # If cached result was not requested or was searched for but not found.
-#             # For NonELG and NoZ
-#             ND = 2 # Dimension of model
-#             ND_fit = 2 # Number of variables up to which MoG is being proposed
-#             for i, ibool in enumerate([self.iNonELG, self.iNoZ]):
-#                 print "Fitting MoGs to %s" % self.category[i]
-#                 ifit = ibool & self.iTrain
-#                 Ydata = np.array([self.var_x[ifit], self.var_y[ifit]]).T
-#                 Ycovar = self.gen_covar(ifit, ND=ND)
-#                 weight = self.w[ifit]
-#                 self.MODELS[i] = fit_GMM(Ydata, Ycovar, ND, ND_fit, NK_list=NK_list, Niter=Niter, fname_suffix="%s-%s-%s" % (self.category[i], model_tag, cv_tag), MaxDIM=True, weight=weight)
-
-#             # For ELG
-#             i = 2
-#             ND = 4 # Dimension of model
-#             ND_fit = 4 # Number of variables up to which MoG is being proposed
-#             print "Fitting MoGs to %s" % self.category[i]
-#             ifit = self.iELG & self.iTrain
-#             Ydata = np.array([self.var_x[ifit], self.var_y[ifit], self.var_z[ifit], self.red_z[ifit]]).T
-#             Ycovar = self.gen_covar(ifit, ND=ND)
-#             weight = self.w[ifit]
-#             self.MODELS[i] = fit_GMM(Ydata, Ycovar, ND, ND_fit, NK_list=NK_list, Niter=Niter, fname_suffix="%s-%s-%s" % (self.category[i], model_tag, cv_tag), MaxDIM=True, weight=weight)
-
-#         return
 
 
 
@@ -717,65 +759,7 @@ class DESI_NDM(object):
 #                 return FoM
 
 
-#     def gen_covar(self, ifit, ND=4):
-#         """
-#         Covariance matrix corresponding to the new parametrization.
-#         Original parameterization: zf, rf, oii, redz, gf
-#         New parameterization is given by the model3.
-#         """
-#         Nsample = np.sum(ifit)
-#         Covar = np.zeros((Nsample, ND, ND))
 
-#         zflux, rflux, gflux, oii, red_z = self.zflux[ifit], self.rflux[ifit], self.gflux[ifit], self.oii[ifit], self.red_z[ifit]
-#         var_err_list = [self.zf_err[ifit], self.rf_err[ifit], self.oii_err[ifit], np.zeros(np.sum(Nsample)), self.gf_err[ifit]]
-
-#         # constant factors
-#         const = 0.542868
-#         # Softening factors for asinh mags
-#         b_g = 1.042 * 0.0284297
-#         b_r = 1.042 * 0.0421544
-#         b_z = 1.042 * 0.122832
-#         b_oii= 1.042 * 0.574175        
-
-#         for i in range(Nsample):
-#             if ND == 2:
-#                 # Construct the original space covariance matrix in 3 x 3 subspace.
-#                 tmp = []
-#                 for j in [0, 1, 4]:
-#                     tmp.append(var_err_list[j][i]**2) # var = err^2
-#                 Cx = np.diag(tmp)
-
-#                 g, r, z = gflux[i], rflux[i], zflux[i]
-#                 M00, M01, M02 = const/np.sqrt(b_z**2+z**2/4.), 0, -const/(g*np.sqrt(b_g**2+g**2/4.))
-#                 M10, M11, M12 = 0, const/np.sqrt(b_r**2+r**2/4.), -const/(g*np.sqrt(b_g**2+g**2/4.))
-#                 M = np.array([[M00, M01, M02],
-#                             [M10, M11, M12]])
-                
-#                 Covar[i] = np.dot(np.dot(M, Cx), M.T)
-#             elif ND == 4:
-#                 # Construct the original space covariance matrix in 5 x 5 subspace.
-#                 tmp = []
-#                 for j in range(5):
-#                     tmp.append(var_err_list[j][i]**2) # var = err^2
-#                 Cx = np.diag(tmp)
-
-#                 # Construct the affine transformation matrix.
-#                 g, r, z, o = gflux[i], rflux[i], zflux[i], oii[i]
-#                 M00, M01, M02, M03, M04 = const/np.sqrt(b_z**2+z**2/4.), 0, 0, 0, -const/(g*np.sqrt(b_g**2+g**2/4.))
-#                 M10, M11, M12, M13, M14 = 0, const/np.sqrt(b_r**2+r**2/4.), 0, 0, -const/(g*np.sqrt(b_g**2+g**2/4.))
-#                 M20, M21, M22, M23, M24 = 0, 0, const/np.sqrt(b_oii**2+o**2/4.), 0, -const/(g*np.sqrt(b_g**2+g**2/4.))
-#                 M30, M31, M32, M33, M34 = 0, 0, 0, 1, 0
-                
-#                 M = np.array([[M00, M01, M02, M03, M04],
-#                                     [M10, M11, M12, M13, M14],
-#                                     [M20, M21, M22, M23, M24],
-#                                     [M30, M31, M32, M33, M34]])
-#                 Covar[i] = np.dot(np.dot(M, Cx), M.T)
-#             else: 
-#                 print "The input number of variables need to be either 2 or 4."
-#                 assert False
-
-#         return Covar
 
 
 
