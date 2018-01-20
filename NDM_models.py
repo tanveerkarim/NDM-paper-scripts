@@ -177,24 +177,25 @@ class DESI_NDM(object):
 
         return
 
-    # def fit_dNdm_broken_pow(self, Niter=5, bw=0.025):
-    #     """
-    #     This function is exclusively used for fitting the dNdm broken power law and nothing else.
-    #     """
-    #     for i in range(5): # Fit densities of classes 0 through 4.
-    #         print "Fitting broken power law for %s" % self.category[i]
-    #         ifit = self.iTrain & (cn==i)
-    #         if i == 0:
-    #             mag_max = 24.
-    #             mag_min = 17.
-    #         else:
-    #             mag_max = 24.25                 
-    #             mag_min = 22.
+    def fit_dNdm_broken_pow(self, save_dir="../data/derived/", Niter=5, bw=0.025):
+        """
+        This function is exclusively used for fitting the dNdm broken power law. 
+        """
+        for i in range(5): # Fit densities of classes 0 through 4.
+            print "Fitting broken power law for %s" % cnames[i]
+            ifit = self.iTrain & (self.cn==i)
+            if i == 4:
+                mag_max = 24.
+                mag_min = 17.
+            else:
+                mag_max = 24.25                 
+                mag_min = 22.
 
-    #         self.MODELS_mag_pow[i] = dNdm_fit_broken_pow(flux2mag(flux), weight, bw, mag_min, mag_max, self.area_train, niter = Niter)
-    #         np.save("MODELS-%s-%s-%s-mag-broken-pow.npy" % (self.category[i], model_tag, cv_tag), self.MODELS_mag_pow[i])
+            params = dNdm_fit_broken_pow(self.gmag[ifit], self.w[ifit], bw, mag_min, mag_max, self.area_train, niter = Niter)
+            np.save(save_dir+"broken-power-law-params-cn%d.npy" % i, params)
+            print "\n"
 
-    #     return None
+        return None
 
 
 #         # Fit parameters for pow/broken pow law
