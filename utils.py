@@ -2793,6 +2793,17 @@ def mag_depth_Xsigma(f_err, sigma=5):
     """
     return flux2mag(f_err*sigma)
 
+def shift_flux_DR46_to_DR5(gflux, rflux, zflux):
+    """
+    Given grz fluxes of DR4 or DR6 data, apply transformation to
+    bring fluxes to DR5 system. 
+    """
+    gflux5 = gflux * 10**(-0.4 * 0.029) * (gflux/rflux)**(-0.068)
+    rflux5 = rflux * 10**(+0.4 * 0.012) * (gflux/rflux)**(-0.029)
+    zflux5 = zflux * 10**(-0.4 * 0.000) * (gflux/rflux)**(+0.009)
+
+    return glux5, rflux5, zflux5 
+
 
 def median_mag_depth(f_err, sn=5):
     """
