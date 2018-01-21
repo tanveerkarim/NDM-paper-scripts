@@ -915,6 +915,7 @@ class DESI_NDM(object):
         start_idx = 0
         end_idx = 0
         for i, n in enumerate(Ndesired_arr[1:]):
+            print "Working on bin i = %d" % i
             Ntotal = 0
             for ncell in MD_hist_N_cal_flat:
                 if Ntotal > n: 
@@ -1047,10 +1048,11 @@ class DESI_NDM(object):
 
         return np.asarray(centers).T
 
-    def gen_select_boundary_slices(self, slice_dir = 2, model_tag="", cv_tag="", centers=None, plot_ext=False,\
+    def gen_select_boundary_slices(self, slice_dir = 2, save_dir="../figures/", \
+        prefix = "test", increment=10, centers=None, plot_ext=False,\
         gflux_ext=None, rflux_ext=None, zflux_ext=None, ibool_ext = None,\
         var_x_ext=None, var_y_ext=None, gmag_ext=None, use_parameterized_ext=False,\
-        pt_size=10, pt_size_ext=10, alpha_ext=0.5, guide=False, output_sparse=False, increment=10):
+        pt_size=10, pt_size_ext=10, alpha_ext=0.5, guide=False, output_sparse=False):
         """
         Given slice direction, generate slices of boundary
 
@@ -1070,7 +1072,7 @@ class DESI_NDM(object):
         """
 
         slice_var_tag = ["mu_gz", "mu_gr", "gmag"]
-        var_names = [self.var_x_name, self.var_y_name, self.gmag_name]
+        var_names = ["$\mu_g - \mu_z$", "$\mu_g - \mu_r$", "$g$"]
 
         if centers is None:
             centers = self.cell_select_centers()
@@ -1128,8 +1130,7 @@ class DESI_NDM(object):
             title_str = "%s [%.3f, %.3f]" % (var_names[slice_dir], bin_edges[i], bin_edges[i+1])
             print i, title_str
             plt.title(title_str, fontsize=15)
-            plt.savefig("%s-%s-boundary-%s-%d.png" % (model_tag, cv_tag, slice_var_tag[slice_dir], i), bbox_inches="tight", dpi=200)
-        #     plt.show()
+            plt.savefig(save_dir+prefix+"-boundary-%s-%d.png" % (slice_var_tag[slice_dir], i), bbox_inches="tight", dpi=200)
             plt.close()        
 
 
