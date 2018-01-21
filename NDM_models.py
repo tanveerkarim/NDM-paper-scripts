@@ -745,7 +745,7 @@ class DESI_NDM(object):
 
     def gen_selection_volume_ext_cal(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
-        Ndesired_arr=np.arange(10, 3500, 10)):
+        Ndesired_arr=np.arange(0, 3500, 10)):
         """
         Given the generated sample (intrinsic val + noise), generate a selection volume 
         following the procedure outlined in the paper. Note that external dataset is used for
@@ -888,7 +888,6 @@ class DESI_NDM(object):
             Ntotal += ncell
             counter += 1
         print np.sum(MD_hist_N_cal_flat[:counter])
-        print "Number of cells in the selection: %d" % counter        
 
         # Save the selection to be used later.
         self.cell_select = np.sort(idx_sort[:counter])            
@@ -902,43 +901,38 @@ class DESI_NDM(object):
         for i in range(5):
             tmp = np.sum(MD_hist_Nj_good[i][:counter])
             Ngood_pred += tmp
-            print "%s: %.3f" % (cnames[i], tmp/Ntotal_pred)
+            print "%s: %.1f %% (%d)" % (cnames[i], tmp/Ntotal_pred * 100, self.num_desired*tmp/Ntotal_pred)
         eff_pred = Ngood_pred/Ntotal_pred
         print "Eff of the sample: %.3f\n" % eff_pred
-        print "Ntotal_pred, Ngood_pred", Ntotal_pred, Ngood_pred
 
         # 2) Compute the marginal efficiency as a function of bins in Ndesired_arr
         # For each bin, compute the efficiency of the bin and its center.
+        # 0-4: f_j_bin: Fraction of desired objects in class j (nj_pred/ntot_pred)
+        # 5: eff_bin
         bin_centers = (Ndesired_arr[1:] + Ndesired_arr[:-1])/2.
-        summary_arr = np.zeros((bin_centers.size, 7))
-        # 0:
+        summary_arr = np.zeros((bin_centers.size, 6))
 
+        start_idx = 0
+        end_idx = 0
+        for i, n in enumerate(Ndesired_arr):
+            Ntotal = 0
+            for ncell in MD_hist_N_cal_flat:
+                if Ntotal > n: 
+                    break            
+                Ntotal += ncell
+                end_idx += 1
 
+            # Computing cell efficiency of each objects class.
+            tmp = np.zeros(6, dtype=float) # place holder for i th array
+            for j in range(5):
+                tmp[j] = np.sum(MD_hist_Nj_good[j][start_idx:end_idx])
+            tmp[-1] = np.sum(tmp[:-1])
+            tmp /= np.sum(MD_hist_N_total[start_idx:end_idx])
+            summary_arr[i, :] = tmp
 
-        # summary_array = np.zeros((Ndesired_arr.size, 7))
+            start_idx = end_idx
 
-        # for i, n in enumerate(Ndesired_var):
-        #     # print "Predicting boundary for Ndensity = %d" % n
-        #     Ntotal = 0
-        #     counter = 0
-        #     for ncell in MD_hist_N_cal_flat:
-        #         if Ntotal > n: 
-        #             break            
-        #         Ntotal += ncell
-        #         counter +=1
-
-        #     # Predicted numbers in the selection.
-        #     Ntotal = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
-        #     Ngood = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
-        #     N_NonELG = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
-        #     N_NoZ = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
-        #     N_ELG_DESI = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
-        #     N_ELG_NonDESI = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
-        #     eff = (Ngood/float(Ntotal))
-
-        #     summary_array[i, :] = np.array([eff, Ntotal, Ngood, N_NonELG, N_NoZ, N_ELG_DESI, N_ELG_NonDESI])
-
-        # return summary_arr
+        return bin_centers, summary_arr
 
 
 # ----- Validation on DEEP2 F234 ----- #
