@@ -100,11 +100,11 @@ class DESI_NDM(object):
         self.MoG_model = [None] * 5
 
         # Fraction of objects we believe to be desired DESI objects
-        self.f_Gold = 1
-        self.f_Silver = 1
+        self.f_Gold = 1.
+        self.f_Silver = 1.
         self.f_NoOII = 0.6
         self.f_NoZ = 0.25
-        self.f_NonELG = 0
+        self.f_NonELG = 0.
 
         #---- MC parameters
         self.area_MC = 10
@@ -239,7 +239,9 @@ class DESI_NDM(object):
         """
         Load calibration data
         - option=0: DR5
-        - option=1: DR4
+        - option=1: DR4 
+
+        Both catalogs have g < 24 cut.
         """
         print "Loading calibration data"
         start = time.time()
@@ -254,8 +256,8 @@ class DESI_NDM(object):
 
         # Asinh magnitude
         gmag = flux2mag(g)
-        asinh_r = flux2asinh_mag(r, band="r")
         asinh_g = flux2asinh_mag(g, band="g")
+        asinh_r = flux2asinh_mag(r, band="r")        
         asinh_z = flux2asinh_mag(z, band="z")
 
         # Variable changes
@@ -800,10 +802,13 @@ class DESI_NDM(object):
             for i in range(5):
                 print "%s" % cnames[i]
                 samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
+
                 Nj, _ = np.histogramdd(samples, bins=self.num_bins, \
                     range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.iw[i])
+
                 Nj_util, _ = np.histogramdd(samples, bins=self.num_bins, \
                     range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.utility_obs[i]*self.iw[i])
+
                 # Special weights for number of desired objects calculation
                 weights = np.copy(self.iw[i]) * f_arr[i]
                 if (i < 2): # Gold and Silver get special treatment because of OII.
@@ -817,9 +822,13 @@ class DESI_NDM(object):
                     gaussian_filter(Nj_util, sig_smoothing_window, order=0, output=Nj_util, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
                     gaussian_filter(Nj_good, sig_smoothing_window, order=0, output=Nj_good, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
 
-                if MD_hist_Nj_good[i] is None:
+                if (batch == 1) & (i==0):
                     MD_hist_N_total = Nj
                     MD_hist_N_util_total = Nj_util
+                    MD_hist_Nj_good[i] = Nj_good
+                elif (batch == 1) & (i>0):
+                    MD_hist_N_total += Nj
+                    MD_hist_N_util_total += Nj_util
                     MD_hist_Nj_good[i] = Nj_good
                 else:
                     MD_hist_N_total += Nj
@@ -833,10 +842,9 @@ class DESI_NDM(object):
             # in that magnitude
             print "Computing magnitude dependent regularization.\n"
             start = time.time()
-            # MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
             num_bins_xy = MD_hist_N_total.shape[0] * MD_hist_N_total.shape[1] # Number of bins in xy subspace
             for k in range(MD_hist_N_total.shape[2]):
-                MD_hist_N_total[:, :, k] += np.sum(MD_hist_N_total[:, :, k]) * fake_density_fraction
+                MD_hist_N_total[:, :, k] += np.sum(MD_hist_N_total[:, :, k]) * fake_density_fraction / float(num_bins_xy)
 
             # #--- dNdm - broken pow law version. ** Save for future reference **
             # for e in self.MODELS_mag_pow: 
@@ -866,7 +874,7 @@ class DESI_NDM(object):
         MD_hist_N_total = MD_hist_N_total.flatten()[idx_sort]
         for i in range(5):
             MD_hist_Nj_good[i] = MD_hist_Nj_good[i].flatten()[idx_sort]
-        MD_hist_N_cal_flat = self.MD_hist_N_cal_flat[idx_sort]            
+        MD_hist_N_cal_flat = self.MD_hist_N_cal_flat[idx_sort]
         print "Time taken: %.2f seconds" % (time.time() - start)
                                    
 
@@ -879,10 +887,11 @@ class DESI_NDM(object):
                 break
             Ntotal += ncell
             counter += 1
+        print np.sum(MD_hist_N_cal_flat[:counter])
+        print "Number of cells in the selection: %d" % counter        
 
         # Save the selection to be used later.
         self.cell_select = np.sort(idx_sort[:counter])            
-        print "Number of cells in the selection: %d" % counter
 
         # Report the overall efficiency.
         print "\nStats on sample with N_tot = %d" % self.num_desired
