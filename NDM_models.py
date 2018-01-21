@@ -737,7 +737,7 @@ class DESI_NDM(object):
         return util                    
 
 
-    def gen_selection_volume_ext_cal(self, area_MC_in_1000 = 1, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
+    def gen_selection_volume_ext_cal(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
         Ndesired_arr=np.arange(10, 3000, 10)):
         """
@@ -754,7 +754,7 @@ class DESI_NDM(object):
         If marginal_eff is True, then compute marginal efficiency. As the selection region grows
         compute selection efficiency in each bin in Ndesired_arr.
 
-        area_MC_in_** sets the size of Monte-Carlo simulations.
+        num_batches * batch_size = total MC area.
     
         General strategy
         - Batch generate samples and construct histograms
@@ -770,11 +770,10 @@ class DESI_NDM(object):
         - Predicted contribution from NoZ and NoOII, seperately.
         """
         print "/---- Selection volume generation starts here."
-        print "Set global area_MC to 1000"
-        self.area_MC = 1000
+        print "Set global area_MC to batch_size = %d" % batch_size
+        self.area_MC = batch_size
 
         #---- Calculate number of batches to work on.
-        num_batches = area_MC_in_1000
         print "Number of batches to process: %d" % num_batches
 
         #---- Placeholder for the histograms
@@ -826,7 +825,9 @@ class DESI_NDM(object):
         print "Time taken: %.2f seconds\n" % (time.time() - start)
 
         if dNdm_mag_reg:
-            print "Computing magnitude dependent regularization."
+            # For each magnitude bin, sum up the number of objects and evenly disperse throughout the grid
+            # in that magnitude
+            print "Computing magnitude dependent regularization.\n"
             start = time.time()
             MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
             num_bins_xy = MD_hist_N_total.shape[0] * MD_hist_N_total.shape[1] # Number of bins in xy subspace
@@ -834,36 +835,27 @@ class DESI_NDM(object):
                 Nreg_in_k_bin = np.sum(MD_hist_N_total[:, :, k]) / float(num_bins_xy)
                 MD_hist_N_total[:, :, k] += Nreg_in_k_bin * fake_density_fraction
 
-        # For each magnitude bin, sum up the number of objects and evenly disperse throughout the grid
-        # in that magnitude
+            # #--- dNdm - broken pow law version. ** Save for future reference **
+            # for e in self.MODELS_mag_pow: 
+            #     m_min, m_max = self.gmag_limits[0], self.gmag_limits[1]
+            #     m_Nbins = self.num_bins[2]
+            #     m = np.linspace(m_min, m_max, m_Nbins, endpoint=False)
+            #     dm = (m_max-m_min)/m_Nbins
+            #     for i, m_tmp in enumerate(m):
+            #         MD_hist_N_regular[:, :, i] += self.frac_regular * integrate_mag_broken_pow_law(e, m_tmp, m_tmp+dm, area=self.area_MC) / np.multiply.reduce((self.num_bins[:2]))
 
+        print "Computing utility and sorting."
+        start = time.time()        
+        # Compute utility
+        utility = MD_hist_N_util_total/MD_hist_N_total
 
-        # #--- dNdm - broken pow law version. ** Save for future reference **
-        # for e in self.MODELS_mag_pow: 
-        #     m_min, m_max = self.gmag_limits[0], self.gmag_limits[1]
-        #     m_Nbins = self.num_bins[2]
-        #     m = np.linspace(m_min, m_max, m_Nbins, endpoint=False)
-        #     dm = (m_max-m_min)/m_Nbins
-        #     for i, m_tmp in enumerate(m):
-        #         MD_hist_N_regular[:, :, i] += self.frac_regular * integrate_mag_broken_pow_law(e, m_tmp, m_tmp+dm, area=self.area_MC) / np.multiply.reduce((self.num_bins[:2]))
+        # Flatten utility array
+        utility_flat = utility.flatten()
 
-        # print "Time taken: %.2f seconds" % (time.time() - start)        
-
-        # print "Computing utility and sorting."
-        # start = time.time()        
-        # # Compute utility
-        # MD_hist_N_total_decision += MD_hist_N_regular
-        # MD_hist_N_total += MD_hist_N_regular
-        # utility = MD_hist_N_FoM_decision/MD_hist_N_total_decision 
-
-        # # Flatten utility array
-        # utility_flat = utility.flatten()
-
-        # # Order cells according to utility
-        # # This corresponds to cell number of descending order sorted array.
-        # idx_sort = (-utility_flat).argsort()
-        # print "Time taken: %.2f seconds" % (time.time() - start)        
-
+        # Order cells according to utility
+        # This corresponds to cell number of descending order sorted array.
+        idx_sort = (-utility_flat).argsort()
+        print "Time taken: %.2f seconds" % (time.time() - start)        
 
         # print "Flattening the MD histograms."
         # start = time.time()        
