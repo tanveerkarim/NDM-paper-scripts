@@ -933,6 +933,7 @@ class DESI_NDM(object):
             summary_arr[i, :] = tmp
 
             start_idx = end_idx
+        print "\n\n"
 
         return bin_centers, summary_arr
 
@@ -965,16 +966,19 @@ class DESI_NDM(object):
 
             # Report the number of objects in each catagory that are desired by DESI.
             print "\---- DEEP2 Field %d" % fnum
-            print "Class: Density of objects desired by DESI (fraction of total)"
-            Ntot_selected = np.sum(w[iselected])/area_sample # Properly normalized total
+            Ntot_selected = np.sum(w[iselected])/area_sample # Properly normalized total            
+            print "Total selected: %d" % Ntot_selected
+            print "Class: Fraction of objects desired by DESI (Density)"
+            Ngood_selected = 0
             for i in range(4):
                 if i < 2: 
                     ibool = (cn == i) & (oii > 8) & iselected
                 else:
                     ibool = (cn == i) & iselected
                 tmp = np.sum(w[ibool])/area_sample
+                Ngood_selected += tmp
                 print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntot_selected * 100, tmp)
-            print "Total density: %d" % Ntot_selected
+            print "Total good: %.1f%% (%d)" % (Ngood_selected/Ntot_selected, Ngood_selected)
             print "\n\n"
         return None
 
