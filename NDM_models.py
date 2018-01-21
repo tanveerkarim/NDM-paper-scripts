@@ -901,7 +901,7 @@ class DESI_NDM(object):
         for i in range(5):
             tmp = np.sum(MD_hist_Nj_good[i][:counter])
             Ngood_pred += tmp
-            print "%s: %.1f %% (%d)" % (cnames[i], tmp/Ntotal_pred * 100, self.num_desired*tmp/Ntotal_pred)
+            print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal_pred * 100, self.num_desired*tmp/Ntotal_pred)
         eff_pred = Ngood_pred/Ntotal_pred
         print "Eff of the sample: %.3f\n" % eff_pred
 
@@ -972,9 +972,9 @@ class DESI_NDM(object):
                     ibool = (cn == i) & (oii > 8) & iselected
                 else:
                     ibool = (cn == i) & iselected
-                tmp = np.sum(w[ibool])/A
-                print "%s: %d (%.3f)" % (cnames[i], tmp, tmp/Ntot_selected)
-            print "Total density: %d" % Ntotal_selected
+                tmp = np.sum(w[ibool])/area_sample
+                print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntot_selected, tmp)
+            print "Total density: %d" % Ntot_selected
             print "\n\n"
         return None
 
