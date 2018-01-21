@@ -737,7 +737,7 @@ class DESI_NDM(object):
         return util                    
 
 
-    def gen_selection_volume_ext_cal(self, gaussian_smoothing=True, smoothing_window=[3, 3, 3], \
+    def gen_selection_volume_ext_cal(self, area_MC_in_100 = 10, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
         Ndesired_arr=np.arange(10, 3000, 10)):
         """
@@ -753,9 +753,11 @@ class DESI_NDM(object):
 
         If marginal_eff is True, then compute marginal efficiency. As the selection region grows
         compute selection efficiency in each bin in Ndesired_arr.
+
+        area_MC_in_100 sets the size of Monte-Carlo simulations.
     
         General strategy
-        - Construct histogram of generate samples
+        - Batch generate samples and construct histograms
         - Smooth the MC sample histograms.
         - Add in the regularization. 
         - Compute utility and sort.
@@ -767,175 +769,179 @@ class DESI_NDM(object):
         - Predicted contribution from Gold (OII>8) and Silver (OII>8), seperately.
         - Predicted contribution from NoZ and NoOII, seperately.
         """
+        print "Set global area_MC to 100"
+        self.area_MC = 100
 
-        # Create MD histogarm of each type of objects. 
-        # 0: NonELG, 1: NoZ, 2: ELG
-        MD_hist_N_NonELG, MD_hist_N_NoZ, MD_hist_N_ELG_DESI, MD_hist_N_ELG_NonDESI = None, None, None, None
-        MD_hist_N_FoM = None # Tally of FoM corresponding to all objects in the category.
-        MD_hist_N_good = None # Tally of only good objects. For example, DESI ELGs.
-        MD_hist_N_total = None # Tally of all objects.
+        #---- Calculate number of batches to work on.
+        num_batches = area_MC_in_100
+        print "Number of batches to process: %d" % num_batches
 
-        print "Start of computing selection region."
-        print "Constructing histograms."
+        #---- Placeholder for the histograms
+        MD_hist_Nj = [None] * 5 # Histogram of objects in class j
+        MD_hist_Nj_good = [None] * 5 # Histogram of objects in class j that are desired for DESI
+        MD_hist_Nj_util = [None] * 5 # Histogram of utility of objects in class j
+
+        #---- Generate samples, convolve error, construct histogram, tally, and repeat."
         start = time.time()
-        # NonELG
-        i = 0
-        samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
-        MD_hist_N_NonELG, edges = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.iw[i])
-        FoM_tmp, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.FoM_obs[i]*self.iw[i])
-        MD_hist_N_FoM = FoM_tmp
-        MD_hist_N_total = np.copy(MD_hist_N_NonELG)
+        for batch in range(1, num_batches+1):
+            print "/---- Batch %d" % batch
+            print "Generate intrinic samples."
+            self.gen_sample_intrinsic_mag()
 
-        # NoZ
-        i=1
-        samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
-        MD_hist_N_NoZ, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.iw[i])
-        FoM_tmp, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.FoM_obs[i]*self.iw[i])
-        MD_hist_N_FoM += FoM_tmp
-        MD_hist_N_good = self.f_NoZ * MD_hist_N_NoZ
-        MD_hist_N_total += MD_hist_N_NoZ
+            print "Add noise to the generated samples."
+            self.gen_err_conv_sample() # Perform error convolution
 
-        # ELG (DESI and NonDESI)
-        i=2
-        samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
-        w_DESI = (self.redz_obs[i]>0.6) & (self.redz_obs[i]<1.6) & (self.oii_obs[i]>8) # Only objects in the correct redshift and OII ranges.
-        w_NonDESI = (self.redz_obs[i]>0.6) & (self.redz_obs[i]<1.6) & (self.oii_obs[i]<8) # Only objects in the correct redshift and OII ranges.
-        MD_hist_N_ELG_DESI, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=w_DESI*self.iw[i])
-        MD_hist_N_ELG_NonDESI, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=w_NonDESI*self.iw[i])
-        FoM_tmp, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.FoM_obs[i]*self.iw[i])
-        MD_hist_N_FoM += FoM_tmp
-        MD_hist_N_good += MD_hist_N_ELG_DESI
-        MD_hist_N_total += MD_hist_N_ELG_DESI 
-        MD_hist_N_total += MD_hist_N_ELG_NonDESI
-        print "Time taken: %.2f seconds" % (time.time() - start)
+            print "Consturct histogram and tally"
+            f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
+            for i in range(5):
+                print "%s" % cnames[i]
+                samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
+                Nj, _ = np.histogramdd(samples, bins=self.num_bins, \
+                    range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.iw[i])
+                Nj_util, _ = np.histogramdd(samples, bins=self.num_bins, \
+                    range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.utility_obs[i]*self.iw[i])
+                # Special weights for number of desired objects calculation
+                weights = np.copy(self.iw[i]) * f_arr[i]
+                if (i < 2): # Gold and Silver get special treatment because of OII.
+                    weights[self.oii_obs[i] < 8] = 0
+                Nj_good, _ = np.histogramdd(samples, bins=self.num_bins, \
+                    range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=weights)
 
+                if gaussian_smoothing: # Applying Gaussian filtering
+                    sigma_smoothing_limit=5                
+                    gaussian_filter(Nj, sig_smoothing_window, order=0, output=Nj, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+                    gaussian_filter(Nj_util, sig_smoothing_window, order=0, output=Nj_util, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+                    gaussian_filter(Nj_good, sig_smoothing_window, order=0, output=Nj_good, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
 
-        if gaussian_smoothing:
-            # Note that we only need to smooth the quantities used for making decisiosns.
-            print "Applying gaussian smoothing."
-            start = time.time()
-            # Applying Gaussian filtering
-            MD_hist_N_FoM_decision = np.zeros_like(MD_hist_N_FoM) # Tally of FoM corresponding to all objects in the category.
-            MD_hist_N_total_decision = np.zeros_like(MD_hist_N_total) # Tally of all objects.            
-            gaussian_filter(MD_hist_N_FoM, self.sigma_smoothing, order=0, output=MD_hist_N_FoM_decision, mode='constant', cval=0.0, truncate=self.sigma_smoothing_limit)
-            gaussian_filter(MD_hist_N_total, self.sigma_smoothing, order=0, output=MD_hist_N_total_decision, mode='constant', cval=0.0, truncate=self.sigma_smoothing_limit)
-            print "Time taken: %.2f seconds" % (time.time() - start)        
-        else:
-            MD_hist_N_FoM_decision = MD_hist_N_FoM # Tally of FoM corresponding to all objects in the category.
-            MD_hist_N_total_decision = MD_hist_N_total # Tally of all objects.            
+                if MD_hist_Nj[i] is None:
+                    MD_hist_Nj[i] = Nj
+                    MD_hist_Nj_util[i] = Nj_util
+                    MD_hist_Nj_good[i] = Nj_good
+                else:
+                    MD_hist_Nj[i] += Nj
+                    MD_hist_Nj_util[i] += Nj_util
+                    MD_hist_Nj_good[i] += Nj_good                    
 
-        print "Computing magnitude dependent regularization."
-        start = time.time()
-        MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
-        # dNdm - broken pow law version
-        for e in self.MODELS_mag_pow: 
-            m_min, m_max = self.gmag_limits[0], self.gmag_limits[1]
-            m_Nbins = self.num_bins[2]
-            m = np.linspace(m_min, m_max, m_Nbins, endpoint=False)
-            dm = (m_max-m_min)/m_Nbins
-
-            for i, m_tmp in enumerate(m):
-                MD_hist_N_regular[:, :, i] += self.frac_regular * integrate_mag_broken_pow_law(e, m_tmp, m_tmp+dm, area=self.area_MC) / np.multiply.reduce((self.num_bins[:2]))
-
-        print "Time taken: %.2f seconds" % (time.time() - start)        
-
-        print "Computing utility and sorting."
-        start = time.time()        
-        # Compute utility
-        MD_hist_N_total_decision += MD_hist_N_regular
-        MD_hist_N_total += MD_hist_N_regular
-        utility = MD_hist_N_FoM_decision/MD_hist_N_total_decision 
-
-        # Flatten utility array
-        utility_flat = utility.flatten()
-
-        # Order cells according to utility
-        # This corresponds to cell number of descending order sorted array.
-        idx_sort = (-utility_flat).argsort()
-        print "Time taken: %.2f seconds" % (time.time() - start)        
+        print "Time taken: %.2f seconds\n" % (time.time() - start)
 
 
-        print "Flattening the MD histograms."
-        start = time.time()        
-        # Flatten other arrays.
-        MD_hist_N_NonELG_flat = MD_hist_N_NonELG.flatten()
-        MD_hist_N_NoZ_flat = MD_hist_N_NoZ.flatten()
-        MD_hist_N_ELG_DESI_flat = MD_hist_N_ELG_DESI.flatten()
-        MD_hist_N_ELG_NonDESI_flat = MD_hist_N_ELG_NonDESI.flatten()
-        MD_hist_N_FoM_flat = MD_hist_N_FoM.flatten()
-        MD_hist_N_good_flat = MD_hist_N_good.flatten()        
-        # Decisions are based on *decision* arrays
-        MD_hist_N_total_flat = MD_hist_N_total.flatten()
-        MD_hist_N_total_flat_decision = MD_hist_N_total_decision.flatten()                
-        print "Time taken: %.2f seconds" % (time.time() - start)        
 
 
-        # Sort flattened arrays according to utility.
-        print "Sorting the flattened arrays."
-        start = time.time()                            
-        MD_hist_N_NonELG_flat = MD_hist_N_NonELG_flat[idx_sort]
-        MD_hist_N_NoZ_flat = MD_hist_N_NoZ_flat[idx_sort]
-        MD_hist_N_ELG_DESI_flat = MD_hist_N_ELG_DESI_flat[idx_sort]
-        MD_hist_N_ELG_NonDESI_flat = MD_hist_N_ELG_NonDESI_flat[idx_sort]
-        MD_hist_N_FoM_flat = MD_hist_N_FoM_flat[idx_sort]
-        MD_hist_N_good_flat = MD_hist_N_good_flat[idx_sort]
-        MD_hist_N_total_flat = MD_hist_N_total_flat[idx_sort]
-        MD_hist_N_total_flat_decision = MD_hist_N_total_flat_decision[idx_sort]
-        # Calibration data histogram.
-        MD_hist_N_cal_flat = self.MD_hist_N_cal_flat[idx_sort]
 
-        print "Time taken: %.2f seconds" % (time.time() - start)                                       
 
-        # Starting from the keep including cells until the desired number is eached.        
-        if Ndesired_var is not None:
-            # Place holder for answer
-            summary_array = np.zeros((Ndesired_var.size, 7))
 
-            for i, n in enumerate(Ndesired_var):
-                # print "Predicting boundary for Ndensity = %d" % n
-                Ntotal = 0
-                counter = 0
-                for ncell in MD_hist_N_cal_flat:
-                    if Ntotal > n: 
-                        break            
-                    Ntotal += ncell
-                    counter +=1
+        # print "Computing magnitude dependent regularization."
+        # start = time.time()
+        # MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
+        # # dNdm - broken pow law version
+        # for e in self.MODELS_mag_pow: 
+        #     m_min, m_max = self.gmag_limits[0], self.gmag_limits[1]
+        #     m_Nbins = self.num_bins[2]
+        #     m = np.linspace(m_min, m_max, m_Nbins, endpoint=False)
+        #     dm = (m_max-m_min)/m_Nbins
 
-                # Predicted numbers in the selection.
-                Ntotal = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
-                Ngood = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
-                N_NonELG = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
-                N_NoZ = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
-                N_ELG_DESI = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
-                N_ELG_NonDESI = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
-                eff = (Ngood/float(Ntotal))
+        #     for i, m_tmp in enumerate(m):
+        #         MD_hist_N_regular[:, :, i] += self.frac_regular * integrate_mag_broken_pow_law(e, m_tmp, m_tmp+dm, area=self.area_MC) / np.multiply.reduce((self.num_bins[:2]))
 
-                summary_array[i, :] = np.array([eff, Ntotal, Ngood, N_NonELG, N_NoZ, N_ELG_DESI, N_ELG_NonDESI])
+        # print "Time taken: %.2f seconds" % (time.time() - start)        
 
-            return summary_array
-        else: 
-            Ntotal_pred = 0
-            counter = 0
-            for ncell in MD_hist_N_cal_flat:
-                if Ntotal_pred > self.num_desired:  # MD_hist_N_cal_flat is already normalized.
-                    break            
-                Ntotal_pred += ncell
-                counter +=1
+        # print "Computing utility and sorting."
+        # start = time.time()        
+        # # Compute utility
+        # MD_hist_N_total_decision += MD_hist_N_regular
+        # MD_hist_N_total += MD_hist_N_regular
+        # utility = MD_hist_N_FoM_decision/MD_hist_N_total_decision 
 
-            # Save the selection
-            self.cell_select = np.sort(idx_sort[:counter])
+        # # Flatten utility array
+        # utility_flat = utility.flatten()
 
-            # Predicted numbers in the selection.
-            Ntotal_pred = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
-            Ngood_pred = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
-            N_NonELG_pred = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
-            N_NoZ_pred = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
-            N_ELG_DESI_pred = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
-            N_ELG_NonDESI_pred = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
-            eff_pred = (Ngood_pred/float(Ntotal_pred))    
+        # # Order cells according to utility
+        # # This corresponds to cell number of descending order sorted array.
+        # idx_sort = (-utility_flat).argsort()
+        # print "Time taken: %.2f seconds" % (time.time() - start)        
 
-            # Return the answer
-            return eff_pred, Ntotal_pred, Ngood_pred, N_NonELG_pred, N_NoZ_pred, N_ELG_DESI_pred, N_ELG_NonDESI_pred                
+
+        # print "Flattening the MD histograms."
+        # start = time.time()        
+        # # Flatten other arrays.
+        # MD_hist_N_NonELG_flat = MD_hist_N_NonELG.flatten()
+        # MD_hist_N_NoZ_flat = MD_hist_N_NoZ.flatten()
+        # MD_hist_N_ELG_DESI_flat = MD_hist_N_ELG_DESI.flatten()
+        # MD_hist_N_ELG_NonDESI_flat = MD_hist_N_ELG_NonDESI.flatten()
+        # MD_hist_N_FoM_flat = MD_hist_N_FoM.flatten()
+        # MD_hist_N_good_flat = MD_hist_N_good.flatten()        
+        # # Decisions are based on *decision* arrays
+        # MD_hist_N_total_flat = MD_hist_N_total.flatten()
+        # MD_hist_N_total_flat_decision = MD_hist_N_total_decision.flatten()                
+        # print "Time taken: %.2f seconds" % (time.time() - start)        
+
+
+        # # Sort flattened arrays according to utility.
+        # print "Sorting the flattened arrays."
+        # start = time.time()                            
+        # MD_hist_N_NonELG_flat = MD_hist_N_NonELG_flat[idx_sort]
+        # MD_hist_N_NoZ_flat = MD_hist_N_NoZ_flat[idx_sort]
+        # MD_hist_N_ELG_DESI_flat = MD_hist_N_ELG_DESI_flat[idx_sort]
+        # MD_hist_N_ELG_NonDESI_flat = MD_hist_N_ELG_NonDESI_flat[idx_sort]
+        # MD_hist_N_FoM_flat = MD_hist_N_FoM_flat[idx_sort]
+        # MD_hist_N_good_flat = MD_hist_N_good_flat[idx_sort]
+        # MD_hist_N_total_flat = MD_hist_N_total_flat[idx_sort]
+        # MD_hist_N_total_flat_decision = MD_hist_N_total_flat_decision[idx_sort]
+        # # Calibration data histogram.
+        # MD_hist_N_cal_flat = self.MD_hist_N_cal_flat[idx_sort]
+
+        # print "Time taken: %.2f seconds" % (time.time() - start)                                       
+
+        # # Starting from the keep including cells until the desired number is eached.        
+        # if Ndesired_var is not None:
+        #     # Place holder for answer
+        #     summary_array = np.zeros((Ndesired_var.size, 7))
+
+        #     for i, n in enumerate(Ndesired_var):
+        #         # print "Predicting boundary for Ndensity = %d" % n
+        #         Ntotal = 0
+        #         counter = 0
+        #         for ncell in MD_hist_N_cal_flat:
+        #             if Ntotal > n: 
+        #                 break            
+        #             Ntotal += ncell
+        #             counter +=1
+
+        #         # Predicted numbers in the selection.
+        #         Ntotal = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
+        #         Ngood = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
+        #         N_NonELG = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
+        #         N_NoZ = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
+        #         N_ELG_DESI = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
+        #         N_ELG_NonDESI = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
+        #         eff = (Ngood/float(Ntotal))
+
+        #         summary_array[i, :] = np.array([eff, Ntotal, Ngood, N_NonELG, N_NoZ, N_ELG_DESI, N_ELG_NonDESI])
+
+        #     return summary_array
+        # else: 
+        #     Ntotal_pred = 0
+        #     counter = 0
+        #     for ncell in MD_hist_N_cal_flat:
+        #         if Ntotal_pred > self.num_desired:  # MD_hist_N_cal_flat is already normalized.
+        #             break            
+        #         Ntotal_pred += ncell
+        #         counter +=1
+
+        #     # Save the selection
+        #     self.cell_select = np.sort(idx_sort[:counter])
+
+        #     # Predicted numbers in the selection.
+        #     Ntotal_pred = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
+        #     Ngood_pred = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
+        #     N_NonELG_pred = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
+        #     N_NoZ_pred = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
+        #     N_ELG_DESI_pred = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
+        #     N_ELG_NonDESI_pred = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
+        #     eff_pred = (Ngood_pred/float(Ntotal_pred))    
+
+        #     # Return the answer
+        #     return eff_pred, Ntotal_pred, Ngood_pred, N_NonELG_pred, N_NoZ_pred, N_ELG_DESI_pred, N_ELG_NonDESI_pred                
 
 
 # ----- Validation on DEEP2 F234 ----- #
