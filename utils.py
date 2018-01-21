@@ -3388,15 +3388,17 @@ def gen_gauss_kernel_3D(N):
 
 def load_DR5_calibration():
     """
-    Note g-magnitude cut
+    Note g-magnitude cut. 
+
+    The calibration files were prepared by choosing four sweep files from DR5 
+    catalogs and trimming (g< 24).
     """
-    A = np.sum(np.load("DR5-calibration-sweeps-areas.npy"))
-    data = np.load("DR5-calibration-sweeps.npy")
-    g = data["g"]
-    data = data[g > mag2flux(24.)]
+    A = np.sum(np.load("../data/DR5/calibration/DR5-calibration-sweeps-areas.npy"))
+    data = np.load("../data/DR5/calibration/DR5-calibration-sweeps.npy")
     g = data["g"]    
     r = data["r"]
     z = data["z"]
     w1 = data["w1"]
     w2  = data["w2"]
+    
     return g, r, z, w1, w2, A

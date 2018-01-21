@@ -125,6 +125,9 @@ class DESI_NDM(object):
         # Desired nubmer of objects
         self.num_desired = 2400
 
+        # External total density histogram (properly normalized with area)
+        self.MD_hist_N_cal_flat = None
+
         # Utility metric options
         self.U_Gold = 1
         self.U_Silver = 1
@@ -227,6 +230,25 @@ class DESI_NDM(object):
         self.oii_lim_err = oii_lim
 
         return        
+        
+    def load_calibration_data(self):
+        g, r, z, _, _, A = load_DR5_calibration()
+        # Asinh magnitude
+        gmag = flux2mag(g)
+        asinh_r = flux2asinh_mag(r, band="r")
+        asinh_g = flux2asinh_mag(g, band="g")
+        asinh_z = flux2asinh_mag(z, band="z")
+
+        # Variable changes
+        varx = asinh_g - asinh_z
+        vary = asinh_g - asinh_r
+
+        # Samples
+        samples = np.array([varx, vary, gmag]).T
+        
+        hist, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits]) # A is for normalization.
+        self.MD_hist_N_cal_flat = hist.flatten() / float(A)
+        return None
 
     def gen_sample_intrinsic_mag(self):
         """
@@ -1014,22 +1036,3 @@ class DESI_NDM(object):
 #         self.num_desired = Ntot
 #         return None
 
-#     def load_calibration_data(self):
-#         g, r, z, w1, w2, A = load_DR5_calibration()
-#         # Asinh magnitude
-#         gmag = flux2mag(g)
-#         asinh_r = flux2asinh_mag(r, band="r")
-#         asinh_g = flux2asinh_mag(g, band="g")
-#         asinh_z = flux2asinh_mag(z, band="z")
-
-#         # Variable changes
-#         varx = asinh_g - asinh_z
-#         vary = asinh_g - asinh_r
-
-#         # Samples
-#         samples = np.array([varx, vary, gmag]).T
-        
-
-#         hist, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits]) # A is for normalization.
-#         self.MD_hist_N_cal_flat = hist.flatten() / float(A)
-#         return None
