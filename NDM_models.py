@@ -230,9 +230,24 @@ class DESI_NDM(object):
         self.oii_lim_err = oii_lim
 
         return        
-        
-    def load_calibration_data(self):
-        g, r, z, _, _, A = load_DR5_calibration()
+
+    def load_calibration_data(self, option=0):
+        """
+        Load calibration data
+        - option=0: DR5
+        - option=1: DR4
+        """
+        print "Loading calibration data"
+        start = time.time()
+
+        if option==0:
+            g, r, z, _, _, A = load_DR5_calibration()
+        elif option==1:
+            assert False
+            g, r, z, _, _, A = load_DR4_calibration()            
+        else:
+            assert False
+
         # Asinh magnitude
         gmag = flux2mag(g)
         asinh_r = flux2asinh_mag(r, band="r")
@@ -245,10 +260,12 @@ class DESI_NDM(object):
 
         # Samples
         samples = np.array([varx, vary, gmag]).T
-        
         hist, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits]) # A is for normalization.
         self.MD_hist_N_cal_flat = hist.flatten() / float(A)
-        return None
+
+        print "Time taken: %.1f seconds" % (time.time()-start)
+
+        return
 
     def gen_sample_intrinsic_mag(self):
         """
