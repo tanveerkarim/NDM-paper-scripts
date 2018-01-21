@@ -756,13 +756,16 @@ class DESI_NDM(object):
     
         General strategy
         - Construct histogram of generate samples
-        - Construct histogram of external calibration dataset. (In future versions, this should be done externally.)
         - Smooth the MC sample histograms.
         - Add in the regularization. 
-        - Compute the utility and sort "All" histograms.
-        - Get the last utility threshold from external calibration to get Ndensity 2400.
-        - Compute the predicted number density and precision. (Get the break down if possible.)
-        - Evaluate the selection on DEEP2 F234 data seperately.
+        - Compute utility and sort.
+        - Sort other histograms from which other relevant information can be gained.
+        - Compute total as well as marginal utility.
+
+        Quantities of interest:
+        - Total and marginal utility.
+        - Predicted contribution from Gold (OII>8) and Silver (OII>8), seperately.
+        - Predicted contribution from NoZ and NoOII, seperately.
         """
 
         # Create MD histogarm of each type of objects. 
@@ -931,77 +934,75 @@ class DESI_NDM(object):
             N_ELG_NonDESI_pred = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
             eff_pred = (Ngood_pred/float(Ntotal_pred))    
 
-            # ----- Validation on DEEP2 F234 ----- #
-            for fnum in range(2, 5):
-                # Selecting only objects in the field.
-                ifield = (self.field == fnum)
-                area_sample = self.areas[fnum-2]
-                gflux = self.gflux[ifield] 
-                rflux = self.rflux[ifield]
-                zflux = self.zflux[ifield]
-                var_x = self.var_x[ifield]
-                var_y = self.var_y[ifield]
-                gmag = self.gmag[ifield]
-                oii = self.oii[ifield]
-                redz = self.red_z[ifield]
-                w = self.w[ifield]
-                iELG = self.iELG[ifield]
-                iNonELG = self.iNonELG[ifield]
-                iNoZ = self.iNoZ[ifield]
-                # ra, dec = self.ra[ifield], self.dec[ifield]
-
-                # Apply the selection.
-                iselected = self.apply_selection(gflux, rflux, zflux)
-
-                # Compute Ntotal and eff
-                Ntotal = np.sum(iselected)/area_sample
-                Ntotal_weighted = np.sum(w[iselected])/area_sample
-
-                # Boolean vectors
-                iELG_DESI = (oii>8) & (redz>0.6) & (redz<1.6) & iELG
-                iselected_ELG_DESI = iselected & iELG_DESI
-                N_ELG_DESI = np.sum(iselected_ELG_DESI)/area_sample
-                N_ELG_DESI_weighted = np.sum(w[iselected_ELG_DESI])/area_sample
-
-                iselected_ELG_NonDESI = iselected & ((oii<8) & (redz>0.6) & (redz<1.6)) & iELG
-                N_ELG_NonDESI = np.sum(iselected_ELG_NonDESI)/area_sample
-                N_ELG_NonDESI_weighted = np.sum(w[iselected_ELG_NonDESI])/area_sample
-
-                iselected_NonELG = iselected & iNonELG
-                N_NonELG = np.sum(iselected_NonELG)/area_sample
-                N_NonELG_weighted = np.sum(w[iselected_NonELG])/area_sample
-
-                iselected_NoZ = iselected & iNoZ
-                N_NoZ = np.sum(iselected_NoZ)/area_sample
-                N_NoZ_weighted = np.sum(w[iselected_NoZ])/area_sample
-
-                # Left over?
-                iselected_leftover = np.logical_and.reduce((~iselected_ELG_DESI, ~iselected_ELG_NonDESI, ~iselected_NonELG, ~iselected_NoZ, iselected))
-                N_leftover = np.sum(iselected_leftover)/area_sample
-                N_leftover_weighted = np.sum(w[iselected_leftover])/area_sample
-
-                # Efficiency
-                eff_val = (N_ELG_DESI_weighted+self.f_NoZ*N_NoZ_weighted)/float(Ntotal_weighted)
-
-                print "Raw/Weigthed/Predicted number of selection"
-                print "----------"
-                print "DESI ELGs: %.1f, %.1f, %.1f" % (N_ELG_DESI, N_ELG_DESI_weighted, N_ELG_DESI_pred)
-                print "NonDESI ELGs: %.1f, %.1f, %.1f" % (N_ELG_NonDESI, N_ELG_NonDESI_weighted, N_ELG_NonDESI_pred)
-                print "NoZ: %.1f, %.1f, %.1f" % (N_NoZ, N_NoZ_weighted, N_NoZ_pred)
-                print "NonELG: %.1f, %.1f, %.1f" % (N_NonELG, N_NonELG_weighted, N_NonELG_pred)
-                print "Poorly characterized objects (not included in density modeling, no prediction): %.1f, %.1f, NA" % (N_leftover, N_leftover_weighted)
-                print "----------"
-                print "Total based on individual parts: NA, %.1f, NA" % ((N_NonELG_weighted + N_NoZ_weighted+ N_ELG_DESI_weighted+ N_ELG_NonDESI_weighted+N_leftover_weighted))        
-                print "Total number: %.1f, %.1f, %.1f" % (Ntotal, Ntotal_weighted, Ntotal_pred)
-                print "----------"
-                print "Efficiency, weighted vs. prediction (DESI/Ntotal): %.3f, %.3f" % (eff_val, eff_pred)            
-                print "\n\n"
-
             # Return the answer
             return eff_pred, Ntotal_pred, Ngood_pred, N_NonELG_pred, N_NoZ_pred, N_ELG_DESI_pred, N_ELG_NonDESI_pred                
 
 
+# ----- Validation on DEEP2 F234 ----- #
+# for fnum in range(2, 5):
+#     # Selecting only objects in the field.
+#     ifield = (self.field == fnum)
+#     area_sample = self.areas[fnum-2]
+#     gflux = self.gflux[ifield] 
+#     rflux = self.rflux[ifield]
+#     zflux = self.zflux[ifield]
+#     var_x = self.var_x[ifield]
+#     var_y = self.var_y[ifield]
+#     gmag = self.gmag[ifield]
+#     oii = self.oii[ifield]
+#     redz = self.red_z[ifield]
+#     w = self.w[ifield]
+#     iELG = self.iELG[ifield]
+#     iNonELG = self.iNonELG[ifield]
+#     iNoZ = self.iNoZ[ifield]
+#     # ra, dec = self.ra[ifield], self.dec[ifield]
 
+#     # Apply the selection.
+#     iselected = self.apply_selection(gflux, rflux, zflux)
+
+#     # Compute Ntotal and eff
+#     Ntotal = np.sum(iselected)/area_sample
+#     Ntotal_weighted = np.sum(w[iselected])/area_sample
+
+#     # Boolean vectors
+#     iELG_DESI = (oii>8) & (redz>0.6) & (redz<1.6) & iELG
+#     iselected_ELG_DESI = iselected & iELG_DESI
+#     N_ELG_DESI = np.sum(iselected_ELG_DESI)/area_sample
+#     N_ELG_DESI_weighted = np.sum(w[iselected_ELG_DESI])/area_sample
+
+#     iselected_ELG_NonDESI = iselected & ((oii<8) & (redz>0.6) & (redz<1.6)) & iELG
+#     N_ELG_NonDESI = np.sum(iselected_ELG_NonDESI)/area_sample
+#     N_ELG_NonDESI_weighted = np.sum(w[iselected_ELG_NonDESI])/area_sample
+
+#     iselected_NonELG = iselected & iNonELG
+#     N_NonELG = np.sum(iselected_NonELG)/area_sample
+#     N_NonELG_weighted = np.sum(w[iselected_NonELG])/area_sample
+
+#     iselected_NoZ = iselected & iNoZ
+#     N_NoZ = np.sum(iselected_NoZ)/area_sample
+#     N_NoZ_weighted = np.sum(w[iselected_NoZ])/area_sample
+
+#     # Left over?
+#     iselected_leftover = np.logical_and.reduce((~iselected_ELG_DESI, ~iselected_ELG_NonDESI, ~iselected_NonELG, ~iselected_NoZ, iselected))
+#     N_leftover = np.sum(iselected_leftover)/area_sample
+#     N_leftover_weighted = np.sum(w[iselected_leftover])/area_sample
+
+#     # Efficiency
+#     eff_val = (N_ELG_DESI_weighted+self.f_NoZ*N_NoZ_weighted)/float(Ntotal_weighted)
+
+#     print "Raw/Weigthed/Predicted number of selection"
+#     print "----------"
+#     print "DESI ELGs: %.1f, %.1f, %.1f" % (N_ELG_DESI, N_ELG_DESI_weighted, N_ELG_DESI_pred)
+#     print "NonDESI ELGs: %.1f, %.1f, %.1f" % (N_ELG_NonDESI, N_ELG_NonDESI_weighted, N_ELG_NonDESI_pred)
+#     print "NoZ: %.1f, %.1f, %.1f" % (N_NoZ, N_NoZ_weighted, N_NoZ_pred)
+#     print "NonELG: %.1f, %.1f, %.1f" % (N_NonELG, N_NonELG_weighted, N_NonELG_pred)
+#     print "Poorly characterized objects (not included in density modeling, no prediction): %.1f, %.1f, NA" % (N_leftover, N_leftover_weighted)
+#     print "----------"
+#     print "Total based on individual parts: NA, %.1f, NA" % ((N_NonELG_weighted + N_NoZ_weighted+ N_ELG_DESI_weighted+ N_ELG_NonDESI_weighted+N_leftover_weighted))        
+#     print "Total number: %.1f, %.1f, %.1f" % (Ntotal, Ntotal_weighted, Ntotal_pred)
+#     print "----------"
+#     print "Efficiency, weighted vs. prediction (DESI/Ntotal): %.3f, %.3f" % (eff_val, eff_pred)            
+#     print "\n\n"
 
 #     def apply_selection(self, gflux, rflux, zflux):
 #         """
