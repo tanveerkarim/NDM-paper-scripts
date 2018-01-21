@@ -737,7 +737,7 @@ class DESI_NDM(object):
         return util                    
 
 
-    def gen_selection_volume_ext_cal(self, area_MC_in_250 = 4, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
+    def gen_selection_volume_ext_cal(self, area_MC_in_500 = 2, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
         Ndesired_arr=np.arange(10, 3000, 10)):
         """
@@ -770,11 +770,11 @@ class DESI_NDM(object):
         - Predicted contribution from NoZ and NoOII, seperately.
         """
         print "/---- Selection volume generation starts here."
-        print "Set global area_MC to 250"
-        self.area_MC = 250
+        print "Set global area_MC to 500"
+        self.area_MC = 500
 
         #---- Calculate number of batches to work on.
-        num_batches = area_MC_in_250
+        num_batches = area_MC_in_500
         print "Number of batches to process: %d" % num_batches
 
         #---- Placeholder for the histograms
@@ -814,7 +814,7 @@ class DESI_NDM(object):
                     gaussian_filter(Nj_util, sig_smoothing_window, order=0, output=Nj_util, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
                     gaussian_filter(Nj_good, sig_smoothing_window, order=0, output=Nj_good, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
 
-                if MD_hist_N_total is None:
+                if MD_hist_Nj_good[i] is None:
                     MD_hist_N_total = Nj
                     MD_hist_N_util_total = Nj_util
                     MD_hist_Nj_good[i] = Nj_good
