@@ -737,7 +737,7 @@ class DESI_NDM(object):
         return util                    
 
 
-    def gen_selection_volume_ext_cal(self, area_MC_in_500 = 2, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
+    def gen_selection_volume_ext_cal(self, area_MC_in_1000 = 1, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
         Ndesired_arr=np.arange(10, 3000, 10)):
         """
@@ -770,11 +770,11 @@ class DESI_NDM(object):
         - Predicted contribution from NoZ and NoOII, seperately.
         """
         print "/---- Selection volume generation starts here."
-        print "Set global area_MC to 500"
-        self.area_MC = 500
+        print "Set global area_MC to 1000"
+        self.area_MC = 1000
 
         #---- Calculate number of batches to work on.
-        num_batches = area_MC_in_500
+        num_batches = area_MC_in_1000
         print "Number of batches to process: %d" % num_batches
 
         #---- Placeholder for the histograms
@@ -825,16 +825,25 @@ class DESI_NDM(object):
 
         print "Time taken: %.2f seconds\n" % (time.time() - start)
 
-        # print "Computing magnitude dependent regularization."
-        # start = time.time()
-        # MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
-        # # dNdm - broken pow law version
+        if dNdm_mag_reg:
+            print "Computing magnitude dependent regularization."
+            start = time.time()
+            MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
+            num_bins_xy = MD_hist_N_total.shape[0] * MD_hist_N_total.shape[1] # Number of bins in xy subspace
+            for k in range(MD_hist_N_total.shape[2]):
+                Nreg_in_k_bin = np.sum(MD_hist_N_total[:, :, k]) / float(num_bins_xy)
+                MD_hist_N_total[:, :, k] += Nreg_in_k_bin * fake_density_fraction
+
+        # For each magnitude bin, sum up the number of objects and evenly disperse throughout the grid
+        # in that magnitude
+
+
+        # #--- dNdm - broken pow law version. ** Save for future reference **
         # for e in self.MODELS_mag_pow: 
         #     m_min, m_max = self.gmag_limits[0], self.gmag_limits[1]
         #     m_Nbins = self.num_bins[2]
         #     m = np.linspace(m_min, m_max, m_Nbins, endpoint=False)
         #     dm = (m_max-m_min)/m_Nbins
-
         #     for i, m_tmp in enumerate(m):
         #         MD_hist_N_regular[:, :, i] += self.frac_regular * integrate_mag_broken_pow_law(e, m_tmp, m_tmp+dm, area=self.area_MC) / np.multiply.reduce((self.num_bins[:2]))
 
