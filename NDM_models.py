@@ -231,6 +231,10 @@ class DESI_NDM(object):
 
         return        
 
+    def set_num_desired(self, Ntot):
+        self.num_desired = Ntot
+        return None
+
     def load_calibration_data(self, option=0):
         """
         Load calibration data
@@ -829,11 +833,10 @@ class DESI_NDM(object):
             # in that magnitude
             print "Computing magnitude dependent regularization.\n"
             start = time.time()
-            MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
+            # MD_hist_N_regular = np.zeros_like(MD_hist_N_total)
             num_bins_xy = MD_hist_N_total.shape[0] * MD_hist_N_total.shape[1] # Number of bins in xy subspace
             for k in range(MD_hist_N_total.shape[2]):
-                Nreg_in_k_bin = np.sum(MD_hist_N_total[:, :, k]) / float(num_bins_xy)
-                MD_hist_N_total[:, :, k] += Nreg_in_k_bin * fake_density_fraction
+                MD_hist_N_total[:, :, k] += np.sum(MD_hist_N_total[:, :, k]) * fake_density_fraction
 
             # #--- dNdm - broken pow law version. ** Save for future reference **
             # for e in self.MODELS_mag_pow: 
@@ -867,56 +870,66 @@ class DESI_NDM(object):
         print "Time taken: %.2f seconds" % (time.time() - start)
                                    
 
-        # # Starting from the keep including cells until the desired number is eached.        
-        # if Ndesired_var is not None:
-        #     # Place holder for answer
-        #     summary_array = np.zeros((Ndesired_var.size, 7))
+        #---- Selection generation.
+        # 1) Compute the total efficiency given self.num_desired
+        Ntotal = 0
+        counter = 0
+        for ncell in MD_hist_N_cal_flat:
+            if Ntotal > self.num_desired: 
+                break
+            Ntotal += ncell
+            counter += 1
 
-        #     for i, n in enumerate(Ndesired_var):
-        #         # print "Predicting boundary for Ndensity = %d" % n
-        #         Ntotal = 0
-        #         counter = 0
-        #         for ncell in MD_hist_N_cal_flat:
-        #             if Ntotal > n: 
-        #                 break            
-        #             Ntotal += ncell
-        #             counter +=1
+        # Save the selection to be used later.
+        self.cell_select = np.sort(idx_sort[:counter])            
+        print "Number of cells in the selection: %d" % counter
 
-        #         # Predicted numbers in the selection.
-        #         Ntotal = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
-        #         Ngood = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
-        #         N_NonELG = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
-        #         N_NoZ = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
-        #         N_ELG_DESI = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
-        #         N_ELG_NonDESI = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
-        #         eff = (Ngood/float(Ntotal))
+        # Report the overall efficiency.
+        print "\nStats on sample with N_tot = %d" % self.num_desired
+        # Note that the quantities below are un-normalized.
+        Ntotal_pred = np.sum(MD_hist_N_total[:counter])
+        Ngood_pred = 0
+        print "Class: (Expected number in desired sample)"
+        for i in range(5):
+            tmp = np.sum(MD_hist_Nj_good[i][:counter])
+            Ngood_pred += tmp
+            print "%s: %.3f" % (cnames[i], tmp/Ntotal_pred)
+        eff_pred = Ngood_pred/Ntotal_pred
+        print "Eff of the sample: %.3f\n" % eff_pred
+        print "Ntotal_pred, Ngood_pred", Ntotal_pred, Ngood_pred
 
-        #         summary_array[i, :] = np.array([eff, Ntotal, Ngood, N_NonELG, N_NoZ, N_ELG_DESI, N_ELG_NonDESI])
+        # 2) Compute the marginal efficiency as a function of bins in Ndesired_arr
+        # For each bin, compute the efficiency of the bin and its center.
+        bin_centers = (Ndesired_arr[1:] + Ndesired_arr[:-1])/2.
+        summary_arr = np.zeros((bin_centers.size, 7))
+        # 0:
 
-        #     return summary_array
-        # else: 
-        #     Ntotal_pred = 0
+
+
+        # summary_array = np.zeros((Ndesired_arr.size, 7))
+
+        # for i, n in enumerate(Ndesired_var):
+        #     # print "Predicting boundary for Ndensity = %d" % n
+        #     Ntotal = 0
         #     counter = 0
         #     for ncell in MD_hist_N_cal_flat:
-        #         if Ntotal_pred > self.num_desired:  # MD_hist_N_cal_flat is already normalized.
+        #         if Ntotal > n: 
         #             break            
-        #         Ntotal_pred += ncell
+        #         Ntotal += ncell
         #         counter +=1
 
-        #     # Save the selection
-        #     self.cell_select = np.sort(idx_sort[:counter])
-
         #     # Predicted numbers in the selection.
-        #     Ntotal_pred = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
-        #     Ngood_pred = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
-        #     N_NonELG_pred = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
-        #     N_NoZ_pred = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
-        #     N_ELG_DESI_pred = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
-        #     N_ELG_NonDESI_pred = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
-        #     eff_pred = (Ngood_pred/float(Ntotal_pred))    
+        #     Ntotal = np.sum(MD_hist_N_total_flat[:counter])/float(self.area_MC)
+        #     Ngood = np.sum(MD_hist_N_good_flat[:counter])/float(self.area_MC)
+        #     N_NonELG = np.sum(MD_hist_N_NonELG_flat[:counter])/float(self.area_MC)
+        #     N_NoZ = np.sum(MD_hist_N_NoZ_flat[:counter])/float(self.area_MC)
+        #     N_ELG_DESI = np.sum(MD_hist_N_ELG_DESI_flat[:counter])/float(self.area_MC)
+        #     N_ELG_NonDESI = np.sum(MD_hist_N_ELG_NonDESI_flat[:counter])/float(self.area_MC)
+        #     eff = (Ngood/float(Ntotal))
 
-        #     # Return the answer
-        #     return eff_pred, Ntotal_pred, Ngood_pred, N_NonELG_pred, N_NoZ_pred, N_ELG_DESI_pred, N_ELG_NonDESI_pred                
+        #     summary_array[i, :] = np.array([eff, Ntotal, Ngood, N_NonELG, N_NoZ, N_ELG_DESI, N_ELG_NonDESI])
+
+        # return summary_arr
 
 
 # ----- Validation on DEEP2 F234 ----- #
@@ -1030,8 +1043,4 @@ class DESI_NDM(object):
 #             centers[i] = bin_centers[idx.astype(int)]
 
 #         return np.asarray(centers).T
-
-#     def set_num_desired(self, Ntot):
-#         self.num_desired = Ntot
-#         return None
 
