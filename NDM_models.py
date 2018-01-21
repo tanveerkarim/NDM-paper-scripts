@@ -1130,7 +1130,7 @@ class DESI_NDM(object):
             plt.ylim(limits[idx[1]])
             title_str = "%s [%.3f, %.3f]" % (var_names[slice_dir], bin_edges[i], bin_edges[i+1])
             print i, title_str
-            plt.title(title_str, fontsize=25)
+            plt.title(title_str, fontsize=25, y =1.1)
             plt.savefig(save_dir+prefix+"-boundary-%s-%d.png" % (slice_var_tag[slice_dir], i), bbox_inches="tight", dpi=200)
             plt.close()        
 
