@@ -964,6 +964,7 @@ class DESI_NDM(object):
             # Apply the selection.
             iselected = self.apply_selection(gflux, rflux, zflux)
 
+            f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
             # Report the number of objects in each catagory that are desired by DESI.
             print "\---- DEEP2 Field %d" % fnum
             Ntot_selected = np.sum(w[iselected])/area_sample # Properly normalized total            
@@ -975,10 +976,10 @@ class DESI_NDM(object):
                     ibool = (cn == i) & (oii > 8) & iselected
                 else:
                     ibool = (cn == i) & iselected
-                tmp = np.sum(w[ibool])/area_sample
+                tmp = f_arr[i]* np.sum(w[ibool])/area_sample
                 Ngood_selected += tmp
                 print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntot_selected * 100, tmp)
-            print "Total good: %.1f%% (%d)" % (Ngood_selected/Ntot_selected, Ngood_selected)
+            print "Total good: %.1f%% (%d)" % (Ngood_selected/Ntot_selected * 100, Ngood_selected)
             print "\n\n"
         return None
 
