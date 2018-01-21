@@ -114,9 +114,9 @@ class DESI_NDM(object):
 
         # Grid parameters
         self.var_x_limits = [-.25, 3.5] # g-z
-        self.var_y_limits = [-0.6, 1.5] # g-r
+        self.var_y_limits = [-1, 1.4] # g-r
         self.gmag_limits = [19.5, 24.]
-        self.num_bins = [375, 210, 450]
+        self.num_bins = [375, 240, 450]
 
         # Cell_number in selection. Together with grid parameters this
         # is a representation of the selection region.
@@ -744,7 +744,7 @@ class DESI_NDM(object):
 
 
     def gen_selection_volume_ext_cal(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
-        dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
+        dNdm_mag_reg=True, fake_density_fraction = 0.03, marginal_eff=True, \
         Ndesired_arr=np.arange(0, 3500, 10)):
         """
         Given the generated sample (intrinsic val + noise), generate a selection volume 
@@ -915,7 +915,8 @@ class DESI_NDM(object):
         start_idx = 0
         end_idx = 0
         for i, n in enumerate(Ndesired_arr[1:]):
-            print "Working on bin i = %d" % i
+            if (i % 50) == 0:
+                print "Working on bin i = %d out of %d" % (i, bin_centers.size)
             Ntotal = 0
             for ncell in MD_hist_N_cal_flat:
                 if Ntotal > n: 
@@ -1049,10 +1050,10 @@ class DESI_NDM(object):
         return np.asarray(centers).T
 
     def gen_select_boundary_slices(self, slice_dir = 2, save_dir="../figures/", \
-        prefix = "test", increment=10, centers=None, plot_ext=False,\
+        prefix = "test", output_sparse=True, increment=10, centers=None, plot_ext=False,\
         gflux_ext=None, rflux_ext=None, zflux_ext=None, ibool_ext = None,\
         var_x_ext=None, var_y_ext=None, gmag_ext=None, use_parameterized_ext=False,\
-        pt_size=10, pt_size_ext=10, alpha_ext=0.5, guide=False, output_sparse=False):
+        pt_size=10, pt_size_ext=10, alpha_ext=0.5, guide=False):
         """
         Given slice direction, generate slices of boundary
 
@@ -1119,8 +1120,8 @@ class DESI_NDM(object):
             if plot_ext:
                 ibool = (variables[slice_dir] < bin_edges[i+1]) & (variables[slice_dir] > bin_edges[i])
                 plt.scatter(variables[idx[0]][ibool], variables[idx[1]][ibool], edgecolors="none", c="red", s=pt_size_ext, alpha=alpha_ext)
-            plt.xlabel(var_names[idx[0]], fontsize=15)
-            plt.ylabel(var_names[idx[1]], fontsize=15)
+            plt.xlabel(var_names[idx[0]], fontsize=25)
+            plt.ylabel(var_names[idx[1]], fontsize=25)
 
             if guide and (slice_dir==2):
                 plt.plot(x_guide, y_guide, c="orange", lw = 2)
@@ -1129,7 +1130,7 @@ class DESI_NDM(object):
             plt.ylim(limits[idx[1]])
             title_str = "%s [%.3f, %.3f]" % (var_names[slice_dir], bin_edges[i], bin_edges[i+1])
             print i, title_str
-            plt.title(title_str, fontsize=15)
+            plt.title(title_str, fontsize=25)
             plt.savefig(save_dir+prefix+"-boundary-%s-%d.png" % (slice_var_tag[slice_dir], i), bbox_inches="tight", dpi=200)
             plt.close()        
 
