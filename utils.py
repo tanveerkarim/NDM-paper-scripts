@@ -24,6 +24,7 @@ from matplotlib.patches import Ellipse
 import numpy as np
 from scipy.stats import norm, chi2
 
+import time
 
 
 # Matplot ticks
@@ -3394,11 +3395,11 @@ def load_DR5_calibration():
     catalogs and trimming (g< 24).
     """
     A = np.sum(np.load("../data/DR5/calibration/DR5-calibration-sweeps-areas.npy"))
-    data = np.load("../data/DR5/calibration/DR5-calibration-sweeps.npy")
+    data = np.load("../data/DR5/calibration/DR5-calibration-sweeps-glim24.npz")
     g = data["g"]    
     r = data["r"]
     z = data["z"]
     w1 = data["w1"]
     w2  = data["w2"]
-    
+
     return g, r, z, w1, w2, A
