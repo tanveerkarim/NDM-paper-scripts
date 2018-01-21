@@ -737,7 +737,7 @@ class DESI_NDM(object):
         return util                    
 
 
-    def gen_selection_volume_ext_cal(self, area_MC_in_100 = 10, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
+    def gen_selection_volume_ext_cal(self, area_MC_in_250 = 4, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
         Ndesired_arr=np.arange(10, 3000, 10)):
         """
@@ -754,7 +754,7 @@ class DESI_NDM(object):
         If marginal_eff is True, then compute marginal efficiency. As the selection region grows
         compute selection efficiency in each bin in Ndesired_arr.
 
-        area_MC_in_100 sets the size of Monte-Carlo simulations.
+        area_MC_in_** sets the size of Monte-Carlo simulations.
     
         General strategy
         - Batch generate samples and construct histograms
@@ -769,17 +769,18 @@ class DESI_NDM(object):
         - Predicted contribution from Gold (OII>8) and Silver (OII>8), seperately.
         - Predicted contribution from NoZ and NoOII, seperately.
         """
-        print "Set global area_MC to 100"
-        self.area_MC = 100
+        print "/---- Selection volume generation starts here."
+        print "Set global area_MC to 250"
+        self.area_MC = 250
 
         #---- Calculate number of batches to work on.
-        num_batches = area_MC_in_100
+        num_batches = area_MC_in_250
         print "Number of batches to process: %d" % num_batches
 
         #---- Placeholder for the histograms
-        MD_hist_Nj = [None] * 5 # Histogram of objects in class j
         MD_hist_Nj_good = [None] * 5 # Histogram of objects in class j that are desired for DESI
-        MD_hist_Nj_util = [None] * 5 # Histogram of utility of objects in class j
+        MD_hist_N_util_total = None
+        MD_hist_N_total = None 
 
         #---- Generate samples, convolve error, construct histogram, tally, and repeat."
         start = time.time()
@@ -813,22 +814,16 @@ class DESI_NDM(object):
                     gaussian_filter(Nj_util, sig_smoothing_window, order=0, output=Nj_util, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
                     gaussian_filter(Nj_good, sig_smoothing_window, order=0, output=Nj_good, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
 
-                if MD_hist_Nj[i] is None:
-                    MD_hist_Nj[i] = Nj
-                    MD_hist_Nj_util[i] = Nj_util
+                if MD_hist_N_total is None:
+                    MD_hist_N_total = Nj
+                    MD_hist_N_util_total = Nj_util
                     MD_hist_Nj_good[i] = Nj_good
                 else:
-                    MD_hist_Nj[i] += Nj
-                    MD_hist_Nj_util[i] += Nj_util
+                    MD_hist_N_total += Nj
+                    MD_hist_N_util_total += Nj_util
                     MD_hist_Nj_good[i] += Nj_good                    
 
         print "Time taken: %.2f seconds\n" % (time.time() - start)
-
-
-
-
-
-
 
         # print "Computing magnitude dependent regularization."
         # start = time.time()
