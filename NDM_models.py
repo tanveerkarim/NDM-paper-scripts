@@ -914,10 +914,10 @@ class DESI_NDM(object):
 
         start_idx = 0
         end_idx = 0
+        Ntotal = 0        
         for i, n in enumerate(Ndesired_arr[1:]):
             if (i % 50) == 0:
                 print "Working on bin i = %d out of %d" % (i, bin_centers.size)
-            Ntotal = 0
             for ncell in MD_hist_N_cal_flat:
                 if Ntotal > n: 
                     break            
