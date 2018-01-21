@@ -39,11 +39,13 @@ To orient the user of this document, I provide a high level overview of the docu
 		/derived
 	/scripts
 	/figures
+	/docs
 
 - "article" contains the manuscript .tex file and all other relevant packages, figures, bibliography, etc. 
 - "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "data/derived/" directory. 
 - "figures" contains all graphic products. Unless mentioned otherwise, all figures saved on the flat directory level.
 - "scripts" contains all Python scripts used to produce any results.
+- "docs" contains external documents that contain technical details.
 
 
 
@@ -279,7 +281,8 @@ Intrinsic density fitting
 			- 1: g-z vs. g-oii
 			- 2: g-r vs. g-oii
 
-Fiducial selection
+Fiducial DR5 selection
+- Notes: The script generates fiducial selection with parameters given in the NDM paper.
 
 
 
