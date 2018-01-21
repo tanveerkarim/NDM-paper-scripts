@@ -739,7 +739,7 @@ class DESI_NDM(object):
 
     def gen_selection_volume_ext_cal(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.01, marginal_eff=True, \
-        Ndesired_arr=np.arange(10, 3000, 10)):
+        Ndesired_arr=np.arange(10, 3500, 10)):
         """
         Given the generated sample (intrinsic val + noise), generate a selection volume 
         following the procedure outlined in the paper. Note that external dataset is used for
@@ -857,36 +857,15 @@ class DESI_NDM(object):
         idx_sort = (-utility_flat).argsort()
         print "Time taken: %.2f seconds" % (time.time() - start)        
 
-        # print "Flattening the MD histograms."
-        # start = time.time()        
-        # # Flatten other arrays.
-        # MD_hist_N_NonELG_flat = MD_hist_N_NonELG.flatten()
-        # MD_hist_N_NoZ_flat = MD_hist_N_NoZ.flatten()
-        # MD_hist_N_ELG_DESI_flat = MD_hist_N_ELG_DESI.flatten()
-        # MD_hist_N_ELG_NonDESI_flat = MD_hist_N_ELG_NonDESI.flatten()
-        # MD_hist_N_FoM_flat = MD_hist_N_FoM.flatten()
-        # MD_hist_N_good_flat = MD_hist_N_good.flatten()        
-        # # Decisions are based on *decision* arrays
-        # MD_hist_N_total_flat = MD_hist_N_total.flatten()
-        # MD_hist_N_total_flat_decision = MD_hist_N_total_decision.flatten()                
-        # print "Time taken: %.2f seconds" % (time.time() - start)        
-
-
-        # # Sort flattened arrays according to utility.
-        # print "Sorting the flattened arrays."
-        # start = time.time()                            
-        # MD_hist_N_NonELG_flat = MD_hist_N_NonELG_flat[idx_sort]
-        # MD_hist_N_NoZ_flat = MD_hist_N_NoZ_flat[idx_sort]
-        # MD_hist_N_ELG_DESI_flat = MD_hist_N_ELG_DESI_flat[idx_sort]
-        # MD_hist_N_ELG_NonDESI_flat = MD_hist_N_ELG_NonDESI_flat[idx_sort]
-        # MD_hist_N_FoM_flat = MD_hist_N_FoM_flat[idx_sort]
-        # MD_hist_N_good_flat = MD_hist_N_good_flat[idx_sort]
-        # MD_hist_N_total_flat = MD_hist_N_total_flat[idx_sort]
-        # MD_hist_N_total_flat_decision = MD_hist_N_total_flat_decision[idx_sort]
-        # # Calibration data histogram.
-        # MD_hist_N_cal_flat = self.MD_hist_N_cal_flat[idx_sort]
-
-        # print "Time taken: %.2f seconds" % (time.time() - start)                                       
+        print "Flatten and sort the MD histograms including the calibration"
+        start = time.time()        
+        # Flatten the histograms
+        MD_hist_N_total = MD_hist_N_total.flatten()[idx_sort]
+        for i in range(5):
+            MD_hist_Nj_good[i] = MD_hist_Nj_good[i].flatten()[idx_sort]
+        MD_hist_N_cal_flat = self.MD_hist_N_cal_flat[idx_sort]            
+        print "Time taken: %.2f seconds" % (time.time() - start)
+                                   
 
         # # Starting from the keep including cells until the desired number is eached.        
         # if Ndesired_var is not None:
