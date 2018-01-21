@@ -914,7 +914,7 @@ class DESI_NDM(object):
 
         start_idx = 0
         end_idx = 0
-        for i, n in enumerate(Ndesired_arr):
+        for i, n in enumerate(Ndesired_arr[1:]):
             Ntotal = 0
             for ncell in MD_hist_N_cal_flat:
                 if Ntotal > n: 
