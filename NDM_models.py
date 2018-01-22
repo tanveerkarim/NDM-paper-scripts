@@ -235,24 +235,18 @@ class DESI_NDM(object):
         self.num_desired = Ntot
         return None
 
-    def load_calibration_data(self, option=0):
+    def load_calibration_data(self, DR46=True):
         """
         Load calibration data
-        - option=0: DR5
-        - option=1: DR4 
+        If DR46 = True, then transform the fluxes before histogramming.
 
-        Both catalogs have g < 24 cut.
         """
         print "Loading calibration data"
         start = time.time()
 
-        if option==0:
-            g, r, z, _, _, A = load_DR5_calibration()
-        elif option==1:
-            assert False
-            g, r, z, _, _, A = load_DR4_calibration()            
-        else:
-            assert False
+        g, r, z, _, _, A = load_DR5_calibration()
+        if DR46:
+            g, r, z = flux_DR5_to_DR46(g, r, z)
 
         # Asinh magnitude
         gmag = flux2mag(g)
