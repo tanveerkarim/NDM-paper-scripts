@@ -1660,6 +1660,31 @@ def mag2flux(mag):
     return 10**(0.4*(22.5-mag))
         
 
+def flux_DR5_to_DR46(gflux, rflux, zflux):
+    """
+    Given the fluxes in DR5 change them to fluxes in DR4/6.
+
+    Need further documentation.
+    """
+        
+    c_vector = np.array([0.029, -0.012, 0])
+    fc_vector = mag2flux(c_vector)
+
+    d_g = -0.068
+    d_r = -0.029
+    d_z = 0.009
+    Lambda \
+    = np.array([
+        [1+d_g, -d_g, 0],
+        [0, 1+d_r, -d_r],
+        [0, d_z, 1-d_z]
+        ])
+    inv_Lambda = np.linalg.inv(Lambda)
+
+    DR5 = np.array([gflux, rflux, zflux]).T # (Nsample, 3)
+    DR46 = np.dot(DR5/fc_vector.T * 10**9, inv_Lambda)
+
+    return DR46[:, 0], DR46[:, 1], DR46[:, 2] # gflux, rflux, zflux.
 
 
 
