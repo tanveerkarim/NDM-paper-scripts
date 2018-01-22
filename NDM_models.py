@@ -749,7 +749,7 @@ class DESI_NDM(object):
 
     def gen_selection_volume_ext_cal(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.03, marginal_eff=True, \
-        Ndesired_arr=np.arange(0, 3500, 10)):
+        Ndesired_arr=np.arange(0, 3500, 10), DR46=True):
         """
         Given the generated sample (intrinsic val + noise), generate a selection volume 
         following the procedure outlined in the paper. Note that external dataset is used for
@@ -765,6 +765,8 @@ class DESI_NDM(object):
         compute selection efficiency in each bin in Ndesired_arr.
 
         num_batches * batch_size = total MC area.
+
+        If DR46 True, then transform the generated data before convolving.
     
         General strategy
         - Batch generate samples and construct histograms
@@ -797,6 +799,10 @@ class DESI_NDM(object):
             print "/---- Batch %d" % batch
             print "Generate intrinic samples."
             self.gen_sample_intrinsic_mag()
+
+            if DR46:
+                print "Color transforming from DR5 to DR46"
+                self.transform_intrinsic_to_DR46()
 
             print "Add noise to the generated samples."
             self.gen_err_conv_sample() # Perform error convolution
