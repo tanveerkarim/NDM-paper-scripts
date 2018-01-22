@@ -273,6 +273,16 @@ class DESI_NDM(object):
 
         return
 
+    def transform_intrinsic_to_DR46(self):
+        """
+        After generating intrinsic samples, bring them to DR46 system.
+        """
+        for i in range(5):
+            self.gflux0[i], self.rflux0[i], self.zflux0[i] = \
+            flux_DR5_to_DR46(self.gflux0[i], self.rflux0[i], self.zflux0[i])
+
+        return None
+
     def gen_sample_intrinsic_mag(self):
         """
         Given load models (dNdm and MoG), draw intrinsic samples proportional to MC area.
