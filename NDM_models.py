@@ -948,11 +948,15 @@ class DESI_NDM(object):
         return bin_centers, summary_arr
 
 
-    def validate_on_DEEP2(self):
+    def validate_on_DEEP2(self, FDR=False):
         """
         Apply the generated selection to each DEEP2 Field data. 
+
+        If FDR True, then apply FDR selection instead.
         """
-        if self.cell_select is None:
+        if FDR:
+            pass
+        elif (self.cell_select is None):
             print "Selection volume must be generated."
             assert False
 
@@ -972,7 +976,10 @@ class DESI_NDM(object):
             cn = self.cn[ifield]
 
             # Apply the selection.
-            iselected = self.apply_selection(gflux, rflux, zflux)
+            if FDR:
+                iselected = FDR_cut([flux2mag(gflux), flux2mag(rflux), flux2mag(zflux)])
+            else:
+                iselected = self.apply_selection(gflux, rflux, zflux)
 
             f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
             # Report the number of objects in each catagory that are desired by DESI.
