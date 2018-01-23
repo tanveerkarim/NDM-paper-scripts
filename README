@@ -288,11 +288,27 @@ Intrinsic density fitting
 			- 2: g-r vs. g-oii
 
 Fiducial DR5 selection
-- Notes: The script generates fiducial selection with parameters given in the NDM paper.
+- Notes: The script generates fiducial selection with parameters given in the NDM paper. 
+- Script used:
+	- run-NDM-fiducial.py
+- Product: 
+	- run-NDM-fiducial-results.txt
+	- /scripts/DR5-NDM1/ contains all results inclindg boundary figures, cell_select grid, and marginal efficiency arrays.
 
-Show normalized dNdm and dNdz based on the prediction... How is this obtained though?
+Utility metric variation
+- Notes: Fiducial parameters except U_Gold = 5 and U_NoZ = 1.
+- Script used:
+	- run-NDM-util-var.py
+- Product: 
+	- run-NDM-util-var-results.txt
+	- /scripts/DR5-NDM2/
+	- /scripts/DR5-NDM3/
 
-2018A-figures need to be updated...
+Selection boundary figures
+- Notes: For certain selection regions, we use the below script to produce figures to go into the paper. In particular the figure show samples from the calibration dataset over plotted so that the reader can get a sense of how many objects are within the selection region.
+
+dNdm and dNdz for the fiducial and U_Gold = 5.
+- Notes: We make dNdm and dNdz plots to compare fiducial and U_Gold = 5 cases. dNdm is based on the external calibration dataset and dNdz is based on
 
 Apply FDR to DEEP2
 - Notes: Script applies FDR cut to DEEP2 data.
@@ -303,16 +319,20 @@ Apply FDR to DEEP2
 Calibration files:
 - DR5: From previous work. Fluxes were properly de-reddened. Refer to DR5-large-Nexp2-area.py. Though the code is not supported, archived here for the record.
 
-Color term correction should happen before the noise addition.
+Notes on marginal efficiency:
+- Each cell of the grid has an efficiency appxoriamted as the conditional probability of good (desirable for DESI) objects. 
+- Each discrete NDM solution gives an ordering of these cells, which then defines marginal efficiency as the efficiency of the last included cell given a desired threshold number.
+- To compute marginal efficiency, we sum the total number of good objects and divided by the total. To do this we use external calibration data and the conditional probability we compute (via histogramming).
 
-Selection region plots should show number density of objects...
-
+Notes on color term correction:
+- To apply the selections, color term corrections should be applied to the intrinsic MC samples and the calibration dataset. Note we shift DR5 fluxes to DR4/6 fluxes based on the correction quoted by Anand, DESI workshop presentation (2017).
 
 DR5-NDM-Obiwan-samples
 - Notes: These samples were genereated as a part of DEEP2 Field 2 incompleteness study. Kaylan will inject these samples to real images and run Tractor on them. Afterwards, we can search for any systematic biases that may have resulted in the incompleteness we observed.
 - Script used: 
 	- generate-NDM-Obiwan-samples.py
 - Products: All figures and files are saved in the folder "/scripts/DR5-NDM-Obiwan-samples/"
+
 
 
 
