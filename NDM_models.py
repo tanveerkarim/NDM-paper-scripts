@@ -899,6 +899,7 @@ class DESI_NDM(object):
 
         #---- Selection generation.
         # 1) Compute the total efficiency given self.num_desired
+        # Computing the total number threshold.
         Ntotal = 0
         counter = 0
         for ncell in MD_hist_N_cal_flat:
@@ -911,23 +912,25 @@ class DESI_NDM(object):
         # Save the selection to be used later.
         self.cell_select = np.sort(idx_sort[:counter])            
 
-        # Report the overall efficiency.
+        # Compute the overall efficiency.
         print "\nStats on sample with N_tot = %d" % self.num_desired
-        # Note that the quantities below are un-normalized.
-        Ntotal_pred = np.sum(MD_hist_N_total[:counter])
+        # Remember to use conditional probability AND external calibration density.
+        # Note cell-by-cell accounting.
         Ngood_pred = 0
         print "Class: (Expected number in desired sample)"
         for i in range(5):
-            tmp = np.sum(MD_hist_Nj_good[i][:counter])
+            tmp = np.sum(MD_hist_N_cal_flat[:counter] * MD_hist_Nj_good[i][:counter]/ MD_hist_N_total[:counter])
             Ngood_pred += tmp
-            print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal_pred * 100, self.num_desired*tmp/Ntotal_pred)
-        eff_pred = Ngood_pred/Ntotal_pred
-        print "Eff of the sample: %.3f\n" % eff_pred
+            print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal * 100, tmp)
+        eff_pred = Ngood_pred/Ntotal
+        print "Eff of the sample: %.3f (%d)\n" % (eff_pred, Ngood_pred)
 
         # 2) Compute the marginal efficiency as a function of bins in Ndesired_arr
         # For each bin, compute the efficiency of the bin and its center.
         # 0-4: f_j_bin: Fraction of desired objects in class j (nj_pred/ntot_pred)
         # 5: eff_bin
+
+        # Remember to perform cell-by-cell accounting.
         bin_centers = (Ndesired_arr[1:] + Ndesired_arr[:-1])/2.
         summary_arr = np.zeros((bin_centers.size, 6))
 
@@ -946,9 +949,8 @@ class DESI_NDM(object):
             # Computing cell efficiency of each objects class.
             tmp = np.zeros(6, dtype=float) # place holder for i th array
             for j in range(5):
-                tmp[j] = np.sum(MD_hist_Nj_good[j][start_idx:end_idx])
+                tmp[j] = np.sum(MD_hist_N_cal_flat[start_idx:end_idx] * MD_hist_Nj_good[j][start_idx:end_idx]/MD_hist_N_total[start_idx:end_idx])
             tmp[-1] = np.sum(tmp[:-1])
-            tmp /= np.sum(MD_hist_N_total[start_idx:end_idx])
             summary_arr[i, :] = tmp
 
             start_idx = end_idx
