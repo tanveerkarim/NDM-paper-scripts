@@ -311,8 +311,10 @@ Selection region plots should show number density of objects...
 
 
 DR5-NDM-Obiwan-samples
-Notes: These samples were genereated as a part of DEEP2 Field 2 incompleteness study. Kaylan will inject these samples to real images and run Tractor on them. Afterwards, we can search for any systematic biases that may have resulted in the incompleteness we observed.
-Script used:
+- Notes: These samples were genereated as a part of DEEP2 Field 2 incompleteness study. Kaylan will inject these samples to real images and run Tractor on them. Afterwards, we can search for any systematic biases that may have resulted in the incompleteness we observed.
+- Script used: 
+	- generate-NDM-Obiwan-samples.py
+- Products: All figures and files are saved in the folder "/scripts/DR5-NDM-Obiwan-samples/"
 
 
 
