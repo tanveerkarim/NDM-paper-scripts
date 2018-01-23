@@ -277,7 +277,7 @@ class DESI_NDM(object):
 
         return None
 
-    def gen_sample_intrinsic_mag(self):
+    def gen_sample_intrinsic_mag(self, intrinsic_only=False):
         """
         Given load models (dNdm and MoG), draw intrinsic samples proportional to MC area.
 
@@ -319,22 +319,31 @@ class DESI_NDM(object):
 
             # Gen err seed and save
             # Also, collect unormalized importance weight factors, multiply and normalize.
-            self.g_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-            # print "g_err_seed importance weights. First 10", iw[]
-            self.iw0[i] *= iw
-            self.r_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-            self.iw0[i] *= iw        
-            self.z_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-            self.iw0[i] *= iw
+            if intrinsic_only:
+                self.g_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
+                self.r_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
+                self.z_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
+            else:
+                self.g_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+                self.iw0[i] *= iw
+                self.r_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+                self.iw0[i] *= iw        
+                self.z_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+                self.iw0[i] *= iw
+
             if (i==0) or (i==1): #ELG 
                 mu_goii = MoG_sample[:, 2]
                 mu_oii = mu_g - mu_goii
                 self.oii0[i] = asinh_mag2flux(mu_oii, band = "oii")
 
-                # oii error seed
-                self.oii_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
-                self.iw0[i] *= iw
-                # Saving
+                if intrinsic_only:
+                    self.oii_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
+                else:
+                    # oii error seed
+                    self.oii_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
+                    self.iw0[i] *= iw
+            
+            # Saving
             self.iw0[i] = (self.iw0[i]/self.iw0[i].sum()) * self.NSAMPLE[i] # Normalization and multiply by the number of samples generated.
 
         return                
