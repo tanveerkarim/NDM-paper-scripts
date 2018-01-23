@@ -769,7 +769,7 @@ class DESI_NDM(object):
             assert False
 
         fig, ax = plt.subplots(1, figsize=(10, 5))
-        ax.plot(self.bin_centers, self.summary_arr[:,-1], label="Tot", c="black", lw=2)
+        ax.plot(self.bin_centers, self.summary_arr[:,-1], label="Total", c="black", lw=2)
         for i in range(4):
             ax.plot(self.bin_centers, self.summary_arr[:,i], label=cnames[i], c=colors[i], lw=2)
         ax.set_xlim([0, 3500])
@@ -779,8 +779,8 @@ class DESI_NDM(object):
         for y in np.arange(0.1, 1, 0.1):
             ax.axhline(y=y, lw=1, ls="--", c="black")            
         ax.legend(loc="upper right", fontsize=18)
-        ax.set_xlabel("Total density per sq. deg.", fontsize=20)
-        ax.set_ylabel("Marginal eff of last bin", fontsize=20)
+        ax.set_xlabel("Sample total density.", fontsize=20)
+        ax.set_ylabel("Marginal eff", fontsize=20)
         plt.savefig(save_dir + "marginal_eff.png", dpi=300, bbox_inches="tight")
         # plt.show()
         plt.close()
