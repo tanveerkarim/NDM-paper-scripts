@@ -235,7 +235,7 @@ class DESI_NDM(object):
         self.num_desired = Ntot
         return None
 
-    def load_calibration_data(self, DR46=True):
+    def load_calibration_data(self, DR46=False):
         """
         Load calibration data
         If DR46 = True, then transform the fluxes before histogramming.
@@ -246,6 +246,7 @@ class DESI_NDM(object):
 
         g, r, z, _, _, A = load_DR5_calibration()
         if DR46:
+            print "Color transforming data."
             g, r, z = flux_DR5_to_DR46(g, r, z)
 
         # Asinh magnitude
@@ -936,11 +937,11 @@ class DESI_NDM(object):
 
         start_idx = 0
         end_idx = 0
-        Ntotal = 0        
+        Ntotal = 0                        
         for i, n in enumerate(Ndesired_arr[1:]):
-            if (i % 50) == 0:
-                print "Working on bin i = %d out of %d" % (i, bin_centers.size)
-            for ncell in MD_hist_N_cal_flat:
+            # if (i % 50) == 0: # Helpful for debuggin but not otherwise.
+                # print "Working on bin i = %d out of %d" % (i, bin_centers.size)
+            for ncell in MD_hist_N_cal_flat[start_idx:]:
                 if Ntotal > n: 
                     break            
                 Ntotal += ncell
