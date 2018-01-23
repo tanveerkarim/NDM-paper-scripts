@@ -769,9 +769,9 @@ class DESI_NDM(object):
             assert False
 
         fig, ax = plt.subplots(1, figsize=(10, 5))
-        ax.plot(bin_centers, summary_arr[:,-1], label="Tot", c="black", lw=2)
+        ax.plot(self.bin_centers, self.summary_arr[:,-1], label="Tot", c="black", lw=2)
         for i in range(4):
-            ax.plot(bin_centers, summary_arr[:,i], label=cnames[i], c=colors[i], lw=2)
+            ax.plot(self.bin_centers, self.summary_arr[:,i], label=cnames[i], c=colors[i], lw=2)
         ax.set_xlim([0, 3500])
         ax.set_ylim([0, 1])
         for x in np.arange(500, 3500, 500):
