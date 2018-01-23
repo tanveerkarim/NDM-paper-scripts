@@ -758,7 +758,7 @@ class DESI_NDM(object):
 
     def gen_selection_volume_ext_cal(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
         dNdm_mag_reg=True, fake_density_fraction = 0.03, marginal_eff=True, \
-        Ndesired_arr=np.arange(0, 3500, 10), DR46=True):
+        Ndesired_arr=np.arange(0, 3500, 10), DR46=False):
         """
         Given the generated sample (intrinsic val + noise), generate a selection volume 
         following the procedure outlined in the paper. Note that external dataset is used for
@@ -951,6 +951,7 @@ class DESI_NDM(object):
             for j in range(5):
                 tmp[j] = np.sum(MD_hist_N_cal_flat[start_idx:end_idx] * MD_hist_Nj_good[j][start_idx:end_idx]/MD_hist_N_total[start_idx:end_idx])
             tmp[-1] = np.sum(tmp[:-1])
+            tmp /= np.sum(MD_hist_N_cal_flat[start_idx:end_idx])
             summary_arr[i, :] = tmp
 
             start_idx = end_idx
