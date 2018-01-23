@@ -1,0 +1,363 @@
+#---- NDM1: Fiducial
+Fraction of unmatched objects with g [17.00, 24.25]: 6.97 %
+We up-weight the matched set by this fraction before fitting the intrinsic densities.
+Loading calibration data
+Time taken: 4.3 seconds
+/---- Selection volume generation starts here.
+Set global area_MC to batch_size = 1000
+Number of batches to process: 10
+/---- Batch 1
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 2
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 3
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 4
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 5
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 6
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 7
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 8
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 9
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+/---- Batch 10
+Generate intrinic samples.
+Gold sample number: 2735445
+Silver sample number: 5210565
+NoOII sample number: 1172786
+NoZ sample number: 4712347
+Non-ELG sample number: 23423122
+Add noise to the generated samples.
+Noise convolution for Gold
+Noise convolution for Silver
+Noise convolution for NoOII
+Noise convolution for NoZ
+Noise convolution for Non-ELG
+Consturct histogram and tally
+Gold
+Silver
+NoOII
+NoZ
+Non-ELG
+Time taken: 1479.66 seconds
+
+Computing magnitude dependent regularization.
+
+Computing utility and sorting.
+Time taken: 11.25 seconds
+Flatten and sort the MD histograms including the calibration
+Time taken: 9.44 seconds
+2400.0038305
+
+Stats on sample with N_tot = 2400
+Class: (Expected number in desired sample)
+Gold: 15.0% (360)
+Silver: 42.6% (1021)
+NoOII: 3.6% (85)
+NoZ: 2.5% (60)
+Non-ELG: 0.0% (0)
+Eff of the sample: 0.637 (1529)
+
+
+
+
+\---- DEEP2 Field 2
+Total selected: 1816
+Class: Fraction of objects desired by DESI (Density)
+Gold: 14.6% (264)
+Silver: 46.3% (841)
+NoOII: 3.2% (58)
+NoZ: 2.3% (42)
+Total good: 66.4% (1206)
+
+
+
+\---- DEEP2 Field 3
+Total selected: 1977
+Class: Fraction of objects desired by DESI (Density)
+Gold: 19.3% (380)
+Silver: 50.1% (991)
+NoOII: 1.8% (35)
+NoZ: 2.0% (39)
+Total good: 73.2% (1447)
+
+
+
+\---- DEEP2 Field 4
+Total selected: 2954
+Class: Fraction of objects desired by DESI (Density)
+Gold: 19.4% (572)
+Silver: 46.4% (1371)
+NoOII: 2.4% (72)
+NoZ: 1.9% (55)
+Total good: 70.1% (2071)
+
+
+
+mu_gz
+0 $\mu_g - \mu_z$ [-0.250, -0.240]
+10 $\mu_g - \mu_z$ [-0.150, -0.140]
+20 $\mu_g - \mu_z$ [-0.050, -0.040]
+30 $\mu_g - \mu_z$ [0.050, 0.060]
+40 $\mu_g - \mu_z$ [0.150, 0.160]
+50 $\mu_g - \mu_z$ [0.250, 0.260]
+60 $\mu_g - \mu_z$ [0.350, 0.360]
+70 $\mu_g - \mu_z$ [0.450, 0.460]
+80 $\mu_g - \mu_z$ [0.550, 0.560]
+90 $\mu_g - \mu_z$ [0.650, 0.660]
+100 $\mu_g - \mu_z$ [0.750, 0.760]
+110 $\mu_g - \mu_z$ [0.850, 0.860]
+120 $\mu_g - \mu_z$ [0.950, 0.960]
+130 $\mu_g - \mu_z$ [1.050, 1.060]
+140 $\mu_g - \mu_z$ [1.150, 1.160]
+150 $\mu_g - \mu_z$ [1.250, 1.260]
+160 $\mu_g - \mu_z$ [1.350, 1.360]
+170 $\mu_g - \mu_z$ [1.450, 1.460]
+180 $\mu_g - \mu_z$ [1.550, 1.560]
+190 $\mu_g - \mu_z$ [1.650, 1.660]
+200 $\mu_g - \mu_z$ [1.750, 1.760]
+210 $\mu_g - \mu_z$ [1.850, 1.860]
+220 $\mu_g - \mu_z$ [1.950, 1.960]
+230 $\mu_g - \mu_z$ [2.050, 2.060]
+240 $\mu_g - \mu_z$ [2.150, 2.160]
+250 $\mu_g - \mu_z$ [2.250, 2.260]
+260 $\mu_g - \mu_z$ [2.350, 2.360]
+270 $\mu_g - \mu_z$ [2.450, 2.460]
+280 $\mu_g - \mu_z$ [2.550, 2.560]
+290 $\mu_g - \mu_z$ [2.650, 2.660]
+300 $\mu_g - \mu_z$ [2.750, 2.760]
+310 $\mu_g - \mu_z$ [2.850, 2.860]
+320 $\mu_g - \mu_z$ [2.950, 2.960]
+330 $\mu_g - \mu_z$ [3.050, 3.060]
+340 $\mu_g - \mu_z$ [3.150, 3.160]
+350 $\mu_g - \mu_z$ [3.250, 3.260]
+360 $\mu_g - \mu_z$ [3.350, 3.360]
+370 $\mu_g - \mu_z$ [3.450, 3.460]
+mu_gr
+0 $\mu_g - \mu_r$ [-1.000, -0.990]
+10 $\mu_g - \mu_r$ [-0.900, -0.890]
+20 $\mu_g - \mu_r$ [-0.800, -0.790]
+30 $\mu_g - \mu_r$ [-0.700, -0.690]
+40 $\mu_g - \mu_r$ [-0.600, -0.590]
+50 $\mu_g - \mu_r$ [-0.500, -0.490]
+60 $\mu_g - \mu_r$ [-0.400, -0.390]
+70 $\mu_g - \mu_r$ [-0.300, -0.290]
+80 $\mu_g - \mu_r$ [-0.200, -0.190]
+90 $\mu_g - \mu_r$ [-0.100, -0.090]
+100 $\mu_g - \mu_r$ [0.000, 0.010]
+110 $\mu_g - \mu_r$ [0.100, 0.110]
+120 $\mu_g - \mu_r$ [0.200, 0.210]
+130 $\mu_g - \mu_r$ [0.300, 0.310]
+140 $\mu_g - \mu_r$ [0.400, 0.410]
+150 $\mu_g - \mu_r$ [0.500, 0.510]
+160 $\mu_g - \mu_r$ [0.600, 0.610]
+170 $\mu_g - \mu_r$ [0.700, 0.710]
+180 $\mu_g - \mu_r$ [0.800, 0.810]
+190 $\mu_g - \mu_r$ [0.900, 0.910]
+200 $\mu_g - \mu_r$ [1.000, 1.010]
+210 $\mu_g - \mu_r$ [1.100, 1.110]
+220 $\mu_g - \mu_r$ [1.200, 1.210]
+230 $\mu_g - \mu_r$ [1.300, 1.310]
+gmag
+0 $g$ [19.500, 19.510]
+10 $g$ [19.600, 19.610]
+20 $g$ [19.700, 19.710]
+30 $g$ [19.800, 19.810]
+40 $g$ [19.900, 19.910]
+50 $g$ [20.000, 20.010]
+60 $g$ [20.100, 20.110]
+70 $g$ [20.200, 20.210]
+80 $g$ [20.300, 20.310]
+90 $g$ [20.400, 20.410]
+100 $g$ [20.500, 20.510]
+110 $g$ [20.600, 20.610]
+120 $g$ [20.700, 20.710]
+130 $g$ [20.800, 20.810]
+140 $g$ [20.900, 20.910]
+150 $g$ [21.000, 21.010]
+160 $g$ [21.100, 21.110]
+170 $g$ [21.200, 21.210]
+180 $g$ [21.300, 21.310]
+190 $g$ [21.400, 21.410]
+200 $g$ [21.500, 21.510]
+210 $g$ [21.600, 21.610]
+220 $g$ [21.700, 21.710]
+230 $g$ [21.800, 21.810]
+240 $g$ [21.900, 21.910]
+250 $g$ [22.000, 22.010]
+260 $g$ [22.100, 22.110]
+270 $g$ [22.200, 22.210]
+280 $g$ [22.300, 22.310]
+290 $g$ [22.400, 22.410]
+300 $g$ [22.500, 22.510]
+310 $g$ [22.600, 22.610]
+320 $g$ [22.700, 22.710]
+330 $g$ [22.800, 22.810]
+340 $g$ [22.900, 22.910]
+350 $g$ [23.000, 23.010]
+360 $g$ [23.100, 23.110]
+370 $g$ [23.200, 23.210]
+380 $g$ [23.300, 23.310]
+390 $g$ [23.400, 23.410]
+400 $g$ [23.500, 23.510]
+410 $g$ [23.600, 23.610]
+420 $g$ [23.700, 23.710]
+430 $g$ [23.800, 23.810]
+440 $g$ [23.900, 23.910]
