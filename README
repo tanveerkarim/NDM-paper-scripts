@@ -38,6 +38,10 @@ To orient the user of this document, I provide a high level overview of the docu
 	/data
 		/derived
 	/scripts
+		/DR5-NDM1
+		/DR5-NDM2
+		/DR5-NDM3
+		/DR5-NDM-Obiwan-samples
 	/figures
 	/docs
 
@@ -46,6 +50,8 @@ To orient the user of this document, I provide a high level overview of the docu
 - "figures" contains all graphic products. Unless mentioned otherwise, all figures saved on the flat directory level.
 - "scripts" contains all Python scripts used to produce any results.
 - "docs" contains external documents that contain technical details.
+
+For a more detailed description of other directories, see below.
 
 
 
@@ -284,6 +290,29 @@ Intrinsic density fitting
 Fiducial DR5 selection
 - Notes: The script generates fiducial selection with parameters given in the NDM paper.
 
+Show normalized dNdm and dNdz based on the prediction... How is this obtained though?
+There is a major flow in the way I was computing the prediction so far because now we are using external calibration...
+Since we are using external calibration, I can just use that to show dNdm...
+For dNdz we should can use DEEP2 test data...
+2018A-figures need to be updated...
+
+Apply FDR to DEEP2
+- Notes: Script applies FDR cut to DEEP2 data.
+- Script used: apply-FDR-to-DEEP2.py
+- Product:
+	- apply-FDR-to-DEEP2-results.txt
+
+Calibration files:
+- DR5: From previous work. Fluxes were properly de-reddened. Refer to DR5-large-Nexp2-area.py. Though the code is not supported, archived here for the record.
+
+Color term correction should happen before the noise addition.
+
+Selection region plots should show number density of objects...
+
+
+DR5-NDM-Obiwan-samples
+Notes: These samples were genereated as a part of DEEP2 Field 2 incompleteness study. Kaylan will inject these samples to real images and run Tractor on them. Afterwards, we can search for any systematic biases that may have resulted in the incompleteness we observed.
+Script used:
 
 
 
