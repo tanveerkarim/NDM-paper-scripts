@@ -184,6 +184,10 @@ class DESI_NDM(object):
         # Observed utility
         self.utility_obs = [None] * 5
 
+        # Marginal efficiency arrs
+        self.bin_centers = None
+        self.summary_arr = None
+
         return
 
     def import_data_DEEP2_full(self):
@@ -754,7 +758,33 @@ class DESI_NDM(object):
         if cat == 4: # If Gold
             util = np.ones(Nsample, dtype=float) * self.U_NonELG
 
-        return util                    
+        return util
+
+    def make_marginal_eff_plot(self, save_dir="./"):
+        """
+        After generating selection volume, make marginal efficiency selection plot.
+        """
+        if (self.bin_centers is None) or (self.summary_arr is None):
+            print "Selection must be generated first."
+            assert False
+
+        fig, ax = plt.subplots(1, figsize=(10, 5))
+        ax.plot(bin_centers, summary_arr[:,-1], label="Tot", c="black", lw=2)
+        for i in range(4):
+            ax.plot(bin_centers, summary_arr[:,i], label=cnames[i], c=colors[i], lw=2)
+        ax.set_xlim([0, 3500])
+        ax.set_ylim([0, 1])
+        for x in np.arange(500, 3500, 500):
+            ax.axvline(x=x, lw=1, ls="--", c="black")
+        for y in np.arange(0.1, 1, 0.1):
+            ax.axhline(y=y, lw=1, ls="--", c="black")            
+        ax.legend(loc="upper right", fontsize=18)
+        ax.set_xlabel("Total density per sq. deg.", fontsize=20)
+        ax.set_ylabel("Marginal eff of last bin", fontsize=20)
+        plt.savefig(save_dir + "marginal_eff.png", dpi=300, bbox_inches="tight")
+        # plt.show()
+        plt.close()
+
 
 
     def gen_selection_volume_ext_cal(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
@@ -957,6 +987,10 @@ class DESI_NDM(object):
 
             start_idx = end_idx
         print "\n\n"
+
+        # Save the marginal calculation results (to be used for plotting later)
+        self.bin_centers = bin_centers
+        self.summary_arr = summary_arr
 
         return bin_centers, summary_arr
 
