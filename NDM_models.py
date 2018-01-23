@@ -320,9 +320,9 @@ class DESI_NDM(object):
             # Gen err seed and save
             # Also, collect unormalized importance weight factors, multiply and normalize.
             if intrinsic_only:
-                self.g_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
-                self.r_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
-                self.z_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
+                self.g_err_seed[i] = np.zeros(self.NSAMPLE[i], dtype=float)
+                self.r_err_seed[i] = np.zeros(self.NSAMPLE[i], dtype=float)
+                self.z_err_seed[i] = np.zeros(self.NSAMPLE[i], dtype=float)
             else:
                 self.g_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
                 self.iw0[i] *= iw
@@ -337,7 +337,7 @@ class DESI_NDM(object):
                 self.oii0[i] = asinh_mag2flux(mu_oii, band = "oii")
 
                 if intrinsic_only:
-                    self.oii_err_seed[i] = np.zeros(NSAMPLE[i], dtype=float)
+                    self.oii_err_seed[i] = np.zeros(self.NSAMPLE[i], dtype=float)
                 else:
                     # oii error seed
                     self.oii_err_seed[i], iw = gen_err_seed(self.NSAMPLE[i], sigma=self.sigma_proposal, return_iw_factor=True)
