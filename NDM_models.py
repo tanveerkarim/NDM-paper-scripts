@@ -1099,8 +1099,8 @@ class DESI_NDM(object):
         prefix = "test", output_sparse=True, increment=10, centers=None, plot_ext=False,\
         gflux_ext=None, rflux_ext=None, zflux_ext=None, ibool_ext = None,\
         var_x_ext=None, var_y_ext=None, gmag_ext=None, use_parameterized_ext=False,\
-        pt_size=10, pt_size_ext=0.1, alpha_ext=0.5, guide=False,\
-        plot_calibration_sample=False, DR46=False, Nsample=100000):
+        pt_size=10, pt_size_ext=1, alpha_ext=0.5, guide=False,\
+        plot_calibration_sample=False, DR46=False, Nsample=None):
         """
         Given slice direction, generate slices of boundary
 
@@ -1127,6 +1127,8 @@ class DESI_NDM(object):
 
         if plot_calibration_sample:
             g, r, z, _, _, A = load_DR5_calibration()
+            if Nsample is None: 
+                Nsample = g.size
             idx = np.random.choice(range(g.size), size=Nsample, replace=False)
             g, r, z = g[idx], r[idx], z[idx]
 
@@ -1182,7 +1184,7 @@ class DESI_NDM(object):
             plt.scatter(centers_slice[:,idx[0]], centers_slice[:,idx[1]], edgecolors="none", c="green", alpha=0.5, s=pt_size)
             if plot_calibration_sample:
                 ibool = (variables_cal[slice_dir] < bin_edges[i+1]) & (variables_cal[slice_dir] > bin_edges[i])
-                plt.scatter(variables[idx[0]][ibool], variables[idx[1]][ibool], edgecolors="none", c="black", s=pt_size_ext)                
+                plt.scatter(variables_cal[idx[0]][ibool], variables_cal[idx[1]][ibool], edgecolors="none", c="black", s=pt_size_ext)                
             if plot_ext:
                 ibool = (variables[slice_dir] < bin_edges[i+1]) & (variables[slice_dir] > bin_edges[i])
                 plt.scatter(variables[idx[0]][ibool], variables[idx[1]][ibool], edgecolors="none", c="red", s=pt_size_ext, alpha=alpha_ext)

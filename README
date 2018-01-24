@@ -306,6 +306,8 @@ Utility metric variation
 
 Selection boundary figures
 - Notes: For certain selection regions, we use the below script to produce figures to go into the paper. In particular the figure show samples from the calibration dataset over plotted so that the reader can get a sense of how many objects are within the selection region.
+- Script used: NDM-fudical-selection-plots.py
+- Products: ./figures/fiducial-boundary-*.png
 
 dNdm and dNdz for the fiducial and U_Gold = 5.
 - Notes: We make dNdm and dNdz plots to compare fiducial and U_Gold = 5 cases. dNdm is based on the external calibration dataset and dNdz is based on
