@@ -1099,7 +1099,8 @@ class DESI_NDM(object):
         prefix = "test", output_sparse=True, increment=10, centers=None, plot_ext=False,\
         gflux_ext=None, rflux_ext=None, zflux_ext=None, ibool_ext = None,\
         var_x_ext=None, var_y_ext=None, gmag_ext=None, use_parameterized_ext=False,\
-        pt_size=10, pt_size_ext=10, alpha_ext=0.5, guide=False):
+        pt_size=10, pt_size_ext=0.1, alpha_ext=0.5, guide=False,\
+        plot_calibration_sample=False, DR46=False, Nsample=100000):
         """
         Given slice direction, generate slices of boundary
 
@@ -1116,10 +1117,26 @@ class DESI_NDM(object):
         If guide True, then plot the guide line.
 
         If output_sparse=True, then only 10% of the boundaries are plotted and saved.
+
+        If plot_calibration_sample True, then load the external calibration data and subsample "Nsample" points,
+        and plot the subsamples in each given slice. If DR46, then make the color transformation before plotting.
         """
 
         slice_var_tag = ["mu_gz", "mu_gr", "gmag"]
         var_names = ["$\mu_g - \mu_z$", "$\mu_g - \mu_r$", "$g$"]
+
+        if plot_calibration_sample:
+            g, r, z, _, _, A = load_DR5_calibration()
+            idx = np.random.choice(range(g.size), size=Nsample, replace=False)
+            g, r, z = g[idx], r[idx], z[idx]
+
+            if DR46: # Make color transformation if requested.
+                g, r, z = flux_DR5_to_DR46(g, r, z)
+            mu_g, mu_r, mu_z = flux2asinh_mag(g, band="g"), flux2asinh_mag(r, band="r"), flux2asinh_mag(z, band="z")
+            var_x_cal = mu_g-mu_z
+            var_y_cal = mu_g-mu_r
+            gmag_cal = flux2mag(g)
+            variables_cal = [var_x_cal, var_y_cal, var_z_cal]
 
         if centers is None:
             centers = self.cell_select_centers()
@@ -1163,6 +1180,9 @@ class DESI_NDM(object):
             idx = range(3)
             idx.remove(slice_dir)
             plt.scatter(centers_slice[:,idx[0]], centers_slice[:,idx[1]], edgecolors="none", c="green", alpha=0.5, s=pt_size)
+            if plot_calibration_sample:
+                ibool = (variables_cal[slice_dir] < bin_edges[i+1]) & (variables_cal[slice_dir] > bin_edges[i])
+                plt.scatter(variables[idx[0]][ibool], variables[idx[1]][ibool], edgecolors="none", c="black", s=pt_size_ext)                
             if plot_ext:
                 ibool = (variables[slice_dir] < bin_edges[i+1]) & (variables[slice_dir] > bin_edges[i])
                 plt.scatter(variables[idx[0]][ibool], variables[idx[1]][ibool], edgecolors="none", c="red", s=pt_size_ext, alpha=alpha_ext)
