@@ -1136,7 +1136,7 @@ class DESI_NDM(object):
             var_x_cal = mu_g-mu_z
             var_y_cal = mu_g-mu_r
             gmag_cal = flux2mag(g)
-            variables_cal = [var_x_cal, var_y_cal, var_z_cal]
+            variables_cal = [var_x_cal, var_y_cal, gmag_cal]
 
         if centers is None:
             centers = self.cell_select_centers()
