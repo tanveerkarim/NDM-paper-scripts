@@ -218,6 +218,12 @@ DECaLS DR5 number density comparison by Field
 	- depths-all-objects.png: grz magnitude 5-sig depths computed from the Tractor quoted errors.
 	- depths-rexp.png: grz magnitude 5-sig depths of r_exp [0.35, 0.55] objects.
 
+DECaLS DR5 number density comparison to external calibration dataset.
+- Notes: We plot area-normalized g-mag histograms for external calibration dataset (DR5) and DEEP2 F234 Tractor data. We find that there are substantial deficit in Field 2 and excess in Field 3 and 4.
+- Script used: Tractor-g-hist-comparison-cal-DEEP2.py
+- Produts:
+	- g-hist-comparison-F{2..4}.png
+
 DEEP2-DECaLS DR5 intersection set (g < 24.25)
 - Notes: The properties of the intersection set (only DEEP2 matched DR5 objects) in different Fields should be comparable to each other: grz-magnitude distribution (weighted AND unweighted), grz-color distributions (division by class), redshift and OII distribution (ELG). 
 - Script used: Intersection-properties.py
