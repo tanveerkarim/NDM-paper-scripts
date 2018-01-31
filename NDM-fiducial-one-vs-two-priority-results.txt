@@ -1,0 +1,31 @@
+/---- One priority
+Number of ELGs in the one priority system before fiber assignment.
+Nelg: 1524
+After taking into account assignment rate of 0.750
+Nelg: 1143
+Total number of fibers filled over 14K: 25.2 M
+
+
+
+/---- One priority extended
+Number of ELGs in the one priority system before fiber assignment.
+Nelg: 1783
+After taking into account assignment rate of 0.700
+Nelg: 1248
+Total number of fibers filled over 14K: 29.4 M
+
+
+
+/---- Two priority
+Number of ELGs in the two priority system before fiber assignment.
+Nelg1/Nelg2: 1068/715
+After taking into account assignment rate of 0.900/ 0.500
+Nelg1/Nelg2: 961/357
+Total: 1319
+Total number of fibers filled over 14K: 29.4 M
+
+
+
+/---- Improvement one ext. to two
+Absolute improvement in density: 70.4
+Fractional improvement 0.056

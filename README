@@ -316,7 +316,12 @@ Selection boundary figures
 - Products: ./figures/fiducial-boundary-*.png
 
 dNdm and dNdz for the fiducial and U_Gold = 5.
-- Notes: We make dNdm and dNdz plots to compare fiducial and U_Gold = 5 cases. dNdm is based on the external calibration dataset and dNdz is based on
+- Notes: We make dNdm and dNdz plots to compare fiducial and U_Gold = 5 cases. dNdm is based on the external calibration dataset and dNdz is based on DEEP2 dataset only.
+
+One vs. two priority classes
+- Notes: A back of the envelop calculation based on the fiducial selection. Compares one vs. two priority system cases.
+- Script used: NDM-fiducial-one-vs-two-priority.py
+- Products: NDM-fiducial-one-vs-two-priority-results.txt
 
 Apply FDR to DEEP2
 - Notes: Script applies FDR cut to DEEP2 data.
@@ -341,6 +346,8 @@ DR5-NDM-Obiwan-samples
 	- generate-NDM-Obiwan-samples.py
 - Products: All figures and files are saved in the folder "/scripts/DR5-NDM-Obiwan-samples/"
 
+Notes on noise variation:
+- Notes: NDM models can be used to study the effect of noise variation. We have to make certain assumptions.
 
 
 

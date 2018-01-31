@@ -187,6 +187,9 @@ class DESI_NDM(object):
         # Marginal efficiency arrs
         self.bin_centers = None
         self.summary_arr = None
+        # 0-4: f_j_bin: Fraction of desired objects in class j (nj_pred/ntot_pred)
+        # 5: eff_bin
+
 
         return
 
