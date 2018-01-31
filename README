@@ -307,7 +307,7 @@ Utility metric variation
 	- run-NDM-util-var.py
 - Product: 
 	- run-NDM-util-var-results.txt
-	- /scripts/DR5-NDM2/
+	- /scripts/DR5-NDM2/: Corresopnds to U_Gold = 5 case.
 	- /scripts/DR5-NDM3/
 
 Selection boundary figures
@@ -320,6 +320,9 @@ dNdm and dNdz for the fiducial and U_Gold = 5.
 - Scripts used: 
 	- NDM-dNdz-fiducial-Ugold5.py
 	- NDM-dNdm-fiducial-Ugold5.py
+- Products:
+	- NDM-dNdz-fiducial-Ugold5-DEEP2F**.png
+
 
 One vs. two priority classes
 - Notes: A back of the envelop calculation based on the fiducial selection. Compares one vs. two priority system cases.
