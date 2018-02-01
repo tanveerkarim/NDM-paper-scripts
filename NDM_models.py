@@ -698,13 +698,14 @@ class DESI_NDM(object):
 
         return Covar
 
-    def gen_err_conv_sample(self):
+    def gen_err_conv_sample(self, verbose=True):
         """
         Given the error properties glim_err, rlim_err, zlim_err, oii_lim_err, 
         add noise to the intrinsic density sample and compute the parametrization.
         """
         for i in range(5):
-            print "Noise convolution for %s" % cnames[i]
+            if verbose:
+                print "Noise convolution for %s" % cnames[i]
             self.gflux_obs[i] = self.gflux0[i] + self.g_err_seed[i] * mag2flux(self.glim_err)/5.
             self.rflux_obs[i] = self.rflux0[i] + self.r_err_seed[i] * mag2flux(self.rlim_err)/5.
             self.zflux_obs[i] = self.zflux0[i] + self.z_err_seed[i] * mag2flux(self.zlim_err)/5.
