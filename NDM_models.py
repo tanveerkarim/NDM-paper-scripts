@@ -1000,7 +1000,7 @@ class DESI_NDM(object):
 
 
     def check_eff_depth_var(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
-        dNdm_mag_reg=True, fake_density_fraction = 0.03, DR46=False):
+        dNdm_mag_reg=True, fake_density_fraction = 0.03, DR46=False, regen_intrinsic=False):
         """
         Given the generated sample (intrinsic val + noise), compute the conditional probability 
         via histogramming. Use external calibration data/external selection (already given as cell select) 
@@ -1015,6 +1015,8 @@ class DESI_NDM(object):
         num_batches * batch_size = total MC area.
 
         If DR46 True, then transform the generated data before convolving.
+
+        If regen_intrinsic True, the regenerate from scratch intrinsic samples. Otherwise, use old samples.
     
         General strategy
         - Batch generate samples and construct histograms.
@@ -1024,28 +1026,73 @@ class DESI_NDM(object):
         (No marginal efficiency is reported)
         """
         print "/---- Selection volume generation starts here."
-        print "Set global area_MC to batch_size = %d" % batch_size
-        self.area_MC = batch_size
-
-        #---- Calculate number of batches to work on.
-        print "Number of batches to process: %d" % num_batches
 
         #---- Placeholder for the histograms
         MD_hist_Nj_good = [None] * 5 # Histogram of objects in class j that are desired for DESI
         MD_hist_N_util_total = None
         MD_hist_N_total = None 
 
-        #---- Generate samples, convolve error, construct histogram, tally, and repeat."
-        start = time.time()
-        for batch in range(1, num_batches+1):
-            print "/---- Batch %d" % batch
-            print "Generate intrinic samples."
-            self.gen_sample_intrinsic_mag()
+        if regen_intrinsic:
+            print "Set global area_MC to batch_size = %d" % batch_size
+            self.area_MC = batch_size
 
-            if DR46:
-                print "Color transforming from DR5 to DR46"
-                self.transform_intrinsic_to_DR46()
+            #---- Calculate number of batches to work on.
+            print "Number of batches to process: %d" % num_batches
 
+            #---- Generate samples, convolve error, construct histogram, tally, and repeat."
+            start = time.time()
+            for batch in range(1, num_batches+1):
+                print "/---- Batch %d" % batch
+                print "Generate intrinic samples."
+                self.gen_sample_intrinsic_mag()
+
+                if DR46:
+                    print "Color transforming from DR5 to DR46"
+                    self.transform_intrinsic_to_DR46()
+
+                print "Add noise to the generated samples."
+                self.gen_err_conv_sample() # Perform error convolution
+
+                print "Consturct histogram and tally"
+                f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
+                for i in range(5):
+                    print "%s" % cnames[i]
+                    samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
+
+                    Nj, _ = np.histogramdd(samples, bins=self.num_bins, \
+                        range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.iw[i])
+
+                    Nj_util, _ = np.histogramdd(samples, bins=self.num_bins, \
+                        range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.utility_obs[i]*self.iw[i])
+
+                    # Special weights for number of desired objects calculation
+                    weights = np.copy(self.iw[i]) * f_arr[i]
+                    if (i < 2): # Gold and Silver get special treatment because of OII.
+                        weights[self.oii_obs[i] < 8] = 0
+                    Nj_good, _ = np.histogramdd(samples, bins=self.num_bins, \
+                        range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=weights)
+
+                    if gaussian_smoothing: # Applying Gaussian filtering
+                        sigma_smoothing_limit=5                
+                        gaussian_filter(Nj, sig_smoothing_window, order=0, output=Nj, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+                        gaussian_filter(Nj_util, sig_smoothing_window, order=0, output=Nj_util, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+                        gaussian_filter(Nj_good, sig_smoothing_window, order=0, output=Nj_good, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+
+                    if (batch == 1) & (i==0):
+                        MD_hist_N_total = Nj
+                        MD_hist_N_util_total = Nj_util
+                        MD_hist_Nj_good[i] = Nj_good
+                    elif (batch == 1) & (i>0):
+                        MD_hist_N_total += Nj
+                        MD_hist_N_util_total += Nj_util
+                        MD_hist_Nj_good[i] = Nj_good
+                    else:
+                        MD_hist_N_total += Nj
+                        MD_hist_N_util_total += Nj_util
+                        MD_hist_Nj_good[i] += Nj_good                    
+
+            print "Time taken: %.2f seconds\n" % (time.time() - start)
+        else: # Use old intrinsic samples
             print "Add noise to the generated samples."
             self.gen_err_conv_sample() # Perform error convolution
 
@@ -1074,20 +1121,15 @@ class DESI_NDM(object):
                     gaussian_filter(Nj_util, sig_smoothing_window, order=0, output=Nj_util, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
                     gaussian_filter(Nj_good, sig_smoothing_window, order=0, output=Nj_good, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
 
-                if (batch == 1) & (i==0):
+                if (i==0):
                     MD_hist_N_total = Nj
                     MD_hist_N_util_total = Nj_util
                     MD_hist_Nj_good[i] = Nj_good
-                elif (batch == 1) & (i>0):
+                elif (i>0):
                     MD_hist_N_total += Nj
                     MD_hist_N_util_total += Nj_util
                     MD_hist_Nj_good[i] = Nj_good
-                else:
-                    MD_hist_N_total += Nj
-                    MD_hist_N_util_total += Nj_util
-                    MD_hist_Nj_good[i] += Nj_good                    
-
-        print "Time taken: %.2f seconds\n" % (time.time() - start)
+            print "Time taken: %.2f seconds\n" % (time.time() - start)
 
         if dNdm_mag_reg:
             # For each magnitude bin, sum up the number of objects and evenly disperse throughout the grid
@@ -1127,7 +1169,7 @@ class DESI_NDM(object):
             print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal * 100, tmp)
             eff_arr[i] = tmp/Ntotal
         eff_arr[-1] = Ngood_pred/Ntotal
-        print "Eff of the sample: %.3f (%d)\n" % (eff_arr[-1] Ngood_pred)
+        print "Eff of the sample: %.3f (%d)\n" % (eff_arr[-1], Ngood_pred)
 
         # 0-4: For each class
         # 5: Total
