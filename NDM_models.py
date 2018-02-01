@@ -999,6 +999,141 @@ class DESI_NDM(object):
         return bin_centers, summary_arr
 
 
+    def check_eff_depth_var(self, num_batches=1, batch_size=1000, gaussian_smoothing=True, sig_smoothing_window=[5, 5, 5], \
+        dNdm_mag_reg=True, fake_density_fraction = 0.03, DR46=False):
+        """
+        Given the generated sample (intrinsic val + noise), compute the conditional probability 
+        via histogramming. Use external calibration data/external selection (already given as cell select) 
+        to compute the total efficiency.
+
+        There are two regularization scheme: 
+        - Gaussian smoothing: If gaussian_smoothing is True, then gaussian convolution with pixel
+        window of size smoothing_window for each dimension is performed.
+        - Magnitude dependent density of fake objects: If dNdm_mag_reg is True, then magnitude dependent
+        density of fake objects are added.
+
+        num_batches * batch_size = total MC area.
+
+        If DR46 True, then transform the generated data before convolving.
+    
+        General strategy
+        - Batch generate samples and construct histograms.
+        - Smooth the MC sample histograms.
+        - Add in the regularization. 
+        - Using external calibration data/selection determine the efficiency of the selection by class and total. 
+        (No marginal efficiency is reported)
+        """
+        print "/---- Selection volume generation starts here."
+        print "Set global area_MC to batch_size = %d" % batch_size
+        self.area_MC = batch_size
+
+        #---- Calculate number of batches to work on.
+        print "Number of batches to process: %d" % num_batches
+
+        #---- Placeholder for the histograms
+        MD_hist_Nj_good = [None] * 5 # Histogram of objects in class j that are desired for DESI
+        MD_hist_N_util_total = None
+        MD_hist_N_total = None 
+
+        #---- Generate samples, convolve error, construct histogram, tally, and repeat."
+        start = time.time()
+        for batch in range(1, num_batches+1):
+            print "/---- Batch %d" % batch
+            print "Generate intrinic samples."
+            self.gen_sample_intrinsic_mag()
+
+            if DR46:
+                print "Color transforming from DR5 to DR46"
+                self.transform_intrinsic_to_DR46()
+
+            print "Add noise to the generated samples."
+            self.gen_err_conv_sample() # Perform error convolution
+
+            print "Consturct histogram and tally"
+            f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
+            for i in range(5):
+                print "%s" % cnames[i]
+                samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
+
+                Nj, _ = np.histogramdd(samples, bins=self.num_bins, \
+                    range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.iw[i])
+
+                Nj_util, _ = np.histogramdd(samples, bins=self.num_bins, \
+                    range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=self.utility_obs[i]*self.iw[i])
+
+                # Special weights for number of desired objects calculation
+                weights = np.copy(self.iw[i]) * f_arr[i]
+                if (i < 2): # Gold and Silver get special treatment because of OII.
+                    weights[self.oii_obs[i] < 8] = 0
+                Nj_good, _ = np.histogramdd(samples, bins=self.num_bins, \
+                    range=[self.var_x_limits, self.var_y_limits, self.gmag_limits], weights=weights)
+
+                if gaussian_smoothing: # Applying Gaussian filtering
+                    sigma_smoothing_limit=5                
+                    gaussian_filter(Nj, sig_smoothing_window, order=0, output=Nj, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+                    gaussian_filter(Nj_util, sig_smoothing_window, order=0, output=Nj_util, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+                    gaussian_filter(Nj_good, sig_smoothing_window, order=0, output=Nj_good, mode='constant', cval=0.0, truncate=sigma_smoothing_limit)
+
+                if (batch == 1) & (i==0):
+                    MD_hist_N_total = Nj
+                    MD_hist_N_util_total = Nj_util
+                    MD_hist_Nj_good[i] = Nj_good
+                elif (batch == 1) & (i>0):
+                    MD_hist_N_total += Nj
+                    MD_hist_N_util_total += Nj_util
+                    MD_hist_Nj_good[i] = Nj_good
+                else:
+                    MD_hist_N_total += Nj
+                    MD_hist_N_util_total += Nj_util
+                    MD_hist_Nj_good[i] += Nj_good                    
+
+        print "Time taken: %.2f seconds\n" % (time.time() - start)
+
+        if dNdm_mag_reg:
+            # For each magnitude bin, sum up the number of objects and evenly disperse throughout the grid
+            # in that magnitude
+            print "Computing magnitude dependent regularization.\n"
+            start = time.time()
+            num_bins_xy = MD_hist_N_total.shape[0] * MD_hist_N_total.shape[1] # Number of bins in xy subspace
+            for k in range(MD_hist_N_total.shape[2]):
+                MD_hist_N_total[:, :, k] += np.sum(MD_hist_N_total[:, :, k]) * fake_density_fraction / float(num_bins_xy)
+
+
+
+        print "Flatten the histograms"
+        start = time.time()        
+        # Flatten the histograms
+        MD_hist_N_total = MD_hist_N_total.flatten()
+        for i in range(5):
+            MD_hist_Nj_good[i] = MD_hist_Nj_good[i].flatten()
+        MD_hist_N_cal_flat = self.MD_hist_N_cal_flat
+        print "Time taken: %.2f seconds" % (time.time() - start)
+        print "\n"                 
+
+        # The flattened arrays are now ordered such that to apply an external selection
+        # based on cell numbers recorded in cell_select, we simply apply slicing.
+
+        #---- Apply externeral selection and compute the overall efficiency.
+        "Efficiency stats:"
+        # Remember to use conditional probability AND external calibration density.
+        # Note cell-by-cell accounting.
+        Ntotal = np.sum(MD_hist_N_total[self.cell_select])
+        eff_arr = np.zeros(6)
+        Ngood_pred = 0
+        print "Class: (Expected number in desired sample)"
+        for i in range(5):
+            tmp = np.sum(MD_hist_N_cal_flat[self.cell_select] * MD_hist_Nj_good[i][self.cell_select]/ MD_hist_N_total[self.cell_select])
+            Ngood_pred += tmp
+            print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal * 100, tmp)
+            eff_arr[i] = tmp/Ntotal
+        eff_arr[-1] = Ngood_pred/Ntotal
+        print "Eff of the sample: %.3f (%d)\n" % (eff_arr[-1] Ngood_pred)
+
+        # 0-4: For each class
+        # 5: Total
+        return eff_arr
+
+
     def validate_on_DEEP2(self, FDR=False):
         """
         Apply the generated selection to each DEEP2 Field data. 
