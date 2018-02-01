@@ -335,6 +335,14 @@ Apply FDR to DEEP2
 - Product:
 	- apply-FDR-to-DEEP2-results.txt
 
+Depths variation:
+- Notes: We explore the effects of varying the noise model while keeping the fiducial selection at N_desired = 2400. If the data is noisier than the resulting selection will have poorer efficiency.
+- Script used: run-NDM-depths-var.py
+- Product: 
+	- ./DR5-NDM4/eff_arr.npy
+	- ./figures/NDM-depths-var.png
+
+
 Calibration files:
 - DR5: From previous work. Fluxes were properly de-reddened. Refer to DR5-large-Nexp2-area.py. Though the code is not supported, archived here for the record.
 
@@ -352,8 +360,7 @@ DR5-NDM-Obiwan-samples
 	- generate-NDM-Obiwan-samples.py
 - Products: All figures and files are saved in the folder "/scripts/DR5-NDM-Obiwan-samples/"
 
-Notes on noise variation:
-- Notes: NDM models can be used to study the effect of noise variation. We have to make certain assumptions.
+
 
 
 

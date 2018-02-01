@@ -1093,6 +1093,7 @@ class DESI_NDM(object):
 
             print "Time taken: %.2f seconds\n" % (time.time() - start)
         else: # Use old intrinsic samples
+            start = time.time()        
             print "Add noise to the generated samples."
             self.gen_err_conv_sample() # Perform error convolution
 
@@ -1159,7 +1160,7 @@ class DESI_NDM(object):
         "Efficiency stats:"
         # Remember to use conditional probability AND external calibration density.
         # Note cell-by-cell accounting.
-        Ntotal = np.sum(MD_hist_N_total[self.cell_select])
+        Ntotal = np.sum(MD_hist_N_cal_flat[self.cell_select])
         eff_arr = np.zeros(6)
         Ngood_pred = 0
         print "Class: (Expected number in desired sample)"
