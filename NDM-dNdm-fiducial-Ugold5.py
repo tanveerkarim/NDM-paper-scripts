@@ -47,7 +47,7 @@ ax.axvline(x=22.4, c="purple", lw=2, ls="--")
 
 
 ax.set_xlabel("Magnitude", fontsize=20)
-ax.set_ylabel("dNd(0.5mag)", fontsize=20)
+ax.set_ylabel("dNd(0.05mag)", fontsize=20)
 ax.set_xlim([mag_min, mag_max])
 
 plt.legend(loc="upper left", fontsize=20)
