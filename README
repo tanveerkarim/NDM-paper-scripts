@@ -342,6 +342,11 @@ Depths variation:
 	- ./DR5-NDM4/eff_arr.npy
 	- ./figures/NDM-depths-var.png
 
+Marginal efficiency plots for fiducial and U_Gold = 5 cases. 
+- Script used: marginal_eff_plots_fiducial_Ugold5.py
+- Product:
+	- ./DR5-NDM1/marginal-eff.png
+	- ./DR5-NDM2/marginal-eff.png
 
 Calibration files:
 - DR5: From previous work. Fluxes were properly de-reddened. Refer to DR5-large-Nexp2-area.py. Though the code is not supported, archived here for the record.
