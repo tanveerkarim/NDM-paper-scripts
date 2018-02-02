@@ -218,3 +218,38 @@ for i, name in enumerate(cnames):
 plt.savefig(dir_figure + "Intersection-grz-color-by-class.png", dpi=200, bbox_inches="tight")
 # plt.show() 
 plt.close()
+
+
+fontsize2 = 20
+print "Color distribution by class only and all together"
+plt.close()
+for i, name in enumerate(cnames):
+    print i
+    fig, ax = plt.subplots(1, figsize = (5, 5))       
+    if i < 5:
+        ibool = (g > 21) & (g < 24) &  (cn == i)
+        ax.scatter(mu_gz[ibool], mu_gr[ibool], s=25, marker="s", c=colors[i], label="%s" % cnames[i])
+        ax.set_xlim([-3, 5])
+        ax.set_ylim([-1, 2]) 
+        ax.grid(ls="--")
+        ax.set_xlabel("$\mu_g-\mu_z$", fontsize=ft_size2 * 1.5)
+        ax.set_ylabel("$\mu_g-\mu_r$", fontsize=ft_size2 * 1.5) 
+        ax.legend(loc="upper left", fontsize=ft_size*1.)
+        plt.savefig(dir_figure + "Intersection-grz-color-%d.png" % i, dpi=400, bbox_inches="tight")
+#         plt.show() 
+        plt.close()
+        
+    else: # Last panel is used to plot everything all together except the unobserved.
+        fig, ax = plt.subplots(1, figsize = (5, 5))            
+        for j in [4, 3, 2, 1, 0]:
+            ibool = (g > 21) & (g < 24) &  (cn == j)
+            ax.scatter(mu_gz[ibool], mu_gr[ibool], s=25, marker="s", c=colors[j], label="%s" % cnames[j])
+            ax.set_xlim([-3, 5])
+            ax.set_ylim([-1, 2]) 
+            ax.grid(ls="--")
+            ax.set_xlabel("$\mu_g-\mu_z$", fontsize=ft_size2 * 1.5)
+            ax.set_ylabel("$\mu_g-\mu_r$", fontsize=ft_size2 * 1.5) 
+        ax.legend(loc="upper left", fontsize=ft_size*1.)
+        plt.savefig(dir_figure + "Intersection-grz-color-all.png", dpi=400, bbox_inches="tight")
+#         plt.show() 
+        plt.close()
