@@ -1360,7 +1360,7 @@ class DESI_NDM(object):
         for i in iterator: 
             ibool = (centers[:, slice_dir] < bin_edges[i+1]) & (centers[:, slice_dir] > bin_edges[i])
             centers_slice = centers[ibool, :]
-            fig = plt.figure(figsize=(7, 7))
+            fig = plt.figure(figsize=(5, 5))
             idx = range(3)
             idx.remove(slice_dir)
             plt.scatter(centers_slice[:,idx[0]], centers_slice[:,idx[1]], edgecolors="none", c="green", alpha=0.5, s=pt_size)
@@ -1370,8 +1370,8 @@ class DESI_NDM(object):
             if plot_ext:
                 ibool = (variables[slice_dir] < bin_edges[i+1]) & (variables[slice_dir] > bin_edges[i])
                 plt.scatter(variables[idx[0]][ibool], variables[idx[1]][ibool], edgecolors="none", c="red", s=pt_size_ext, alpha=alpha_ext)
-            plt.xlabel(var_names[idx[0]], fontsize=25)
-            plt.ylabel(var_names[idx[1]], fontsize=25)
+            plt.xlabel(var_names[idx[0]], fontsize=30)
+            plt.ylabel(var_names[idx[1]], fontsize=30)
 
             if guide and (slice_dir==2):
                 plt.plot(x_guide, y_guide, c="orange", lw = 2)
