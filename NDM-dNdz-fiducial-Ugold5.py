@@ -39,7 +39,7 @@ for fnum in range(2, 5):
 
     plt.close()
     # Plot redshift histograms if requested
-    fig, ax = plt.subplots(1, figsize=(7,7))
+    fig, ax = plt.subplots(1, figsize=(5, 5))
     # -- Fiducial
     # Plot dNdredz of Gold and Silver classes
     ibool = np.logical_or((cn == 0), (cn==1)) * (oii > 8) & iselected
@@ -69,13 +69,13 @@ for fnum in range(2, 5):
     ax.plot([1.4, 1.6], [NoZ_contribution/(.2/dx)]*2, lw=3, c=colors[3], ls="--") 
     
     # -- np=1 line
-    ax.plot(X, Y, lw=2, c="blue", ls="--", label="$np$=1")
+    ax.plot(X, Y, lw=2, c="blue", ls="--", label="$nP$=1")
 
     ax.set_xlim([xmin, xmax])
     ax.set_ylim([ymin, ymax])
     ax.set_xlabel("Redshift z", fontsize=20)
     ax.set_ylabel("dN/d(0.05z)", fontsize=20)
-    plt.legend(loc="upper right", fontsize=20)
+    plt.legend(loc="upper right", fontsize=18)
     plt.savefig("../figures/NDM-dNdz-fiducial-Ugold5-DEEP2F%d.png" % fnum, dpi=400, bbox_inches="tight")
 #     plt.show()
     plt.close()
