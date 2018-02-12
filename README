@@ -1,15 +1,10 @@
 Author: Jae Hyeon Lee
-Last updated: Jan 2018
+Last updated: February 12, 2018
 E-mail: jaekor91@gmail.com
 
-TODO: 
-- Add a description of spitzer data.
-- Study of WISE W1 and W2 band SN.
-- Study of Random Forest application.
+This README documents scripts used to produce results reported in the NDM selection method paper (2018). It also details scripts and their products not reported in the paper but documented here for reproducibility and complete update on the status of the method.
 
-This text file documents scripts used to produce results reported in the NDM selection method paper (2018). It also details scripts and their products not reported in the paper but documented here for reproducibility and complete update on the status of the method.
-
-Warning: I emphasize that the primary purpose of this documentation is for reproducibility rather than the ease of their adaptation to other projects. (I have not made a strong effort to maintain the codes at a professional level beyond general readability and cleanliness.)
+Warning: I emphasize that the primary purpose of this documentation is for reproducibility rather than the ease of their adaptation to other projects. Hence I have not made a substantial effort to maintain the codes at a professional level beyond general readability and cleanliness.
 
 README convention (for the author):
 - "/----" to denote the beginning of a new grouping or section. 
@@ -32,26 +27,24 @@ Contents:
 
 
 /---- Organization
-To orient the user of this document, I provide a high level overview of the documentation. Here is the directory structure
+Here I provide a high level overview of the documentation as a reminder for myself. On the author's local repository, the current directory "/scripts/" is embeded under "/NDM-paper/" directory as below along with other sister directories.
 /NDM-paper
 	/article
 	/data
 		/derived
+		/DEEP2		
+		/DR5		
+		/MMT_data	
+		/spitzer		
+		tycho2.fits	
 	/scripts
-		/DR5-NDM1
-		/DR5-NDM2
-		/DR5-NDM3
-		/DR5-NDM-Obiwan-samples
 	/figures
-	/docs
 
 - "article" contains the manuscript .tex file and all other relevant packages, figures, bibliography, etc. 
-- "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "data/derived/" directory. 
+- "data" contains all primary data files used for the project. Any derived data products such as cross-matched catalogs are stored in "/data/derived/" directory. 
 - "figures" contains all graphic products. Unless mentioned otherwise, all figures saved on the flat directory level.
 - "scripts" contains all Python scripts used to produce any results.
-- "docs" contains external documents that contain technical details.
 
-For a more detailed description of other directories, see below.
 
 
 
@@ -64,7 +57,7 @@ Unless mentioned otherwise, the work contained here is based on Python 2.7.12. B
 - scipy v0.19.0
 - extreme-deconvolution-1.4 (https://github.com/jobovy/extreme-deconvolution)
 
-The rest is based on Python 3.5.2. In particular, Random Forest (RF) module from scikit-learn v0.19.1 was applied to DEEP2-DECaLS DR5 data.
+The rest is based on Python 3.5.2. In particular, Random Forest (RF) module from scikit-learn v0.19.1 was applied to DEEP2-DECaLS DR5 data. 
 
 These are not stringent requirements, and there is no reason to believe that other compatible versions of Python would produce different results.
 
@@ -274,7 +267,7 @@ DESI_NDM class module is able to perform the following tasks:
 - Define a selection region given a desired total number density. (Implement the two regularizing scheme: smoothing and magnitude dependent cruds.) Given grz-fluxes of an external catalog, return the NDM selection as a vector.
 - Provides a prediction for the properties of the selection including grz and OII flux distributions and the redshift distribution.
 
-To keep DESI_NDM as a light-weight class, I made a conscious effort to collect any inessential functions to utils.py.
+To keep DESI_NDM as a light-weight class, I made a conscious effort to collect any convenience functions to utils.py.
 
 Intrinsic density fitting
 - Notes: The script documents how the DESI_NDM class module is used to fit intrinsic densitiy models to the training data. For the color distributions, following the model fitting with various number of component gaussians, I visually inspect the fits and pick a model with the lesat number of components that can adequately reproduce the data.
