@@ -1235,7 +1235,7 @@ def dNdm_fit_broken_pow(mag, weight, bw, magmin, magmax, area, niter = 5, pow_to
     # fit for niter times 
     counter = 0
     while counter < niter:
-        print "Try %d" % counter
+        print("Try %d" % counter)
         # Generate initial parameters
         init_params = pow_mag_param_init(bin_centers, left_hist, right_hist, bw, area)
         A, alpha = init_params
@@ -1259,11 +1259,11 @@ def dNdm_fit_broken_pow(mag, weight, bw, magmin, magmax, area, niter = 5, pow_to
             if nloglike > best_nloglike:
                 best_nloglike = nloglike
                 best_params_pow = fitted_params
-            print "Optimization suceed."
+            print("Optimization suceed.")
         else:
             fitted_params = res["x"]
-            print "Stopped at", fitted_params
-            print "Optimization failed."
+            print("Stopped at", fitted_params)
+            print("Optimization failed.")
 
     print(best_params_pow)
 
@@ -1328,10 +1328,10 @@ def dNdm_fit(mag, weight, bw, magmin, magmax, area, niter = 5, pow_tol =1e-5):
     # fit for niter times 
     counter = 0
     while counter < niter:
-        print "Try %d" % counter
+        print("Try %d" % counter)
         # Generate initial parameters
         init_params = pow_mag_param_init(bin_centers, left_hist, right_hist, bw, area)
-        print init_params
+        print(init_params)
         # assert False
         
         # Optimize the parameters.
@@ -1349,9 +1349,9 @@ def dNdm_fit(mag, weight, bw, magmin, magmax, area, niter = 5, pow_tol =1e-5):
             if nloglike > best_nloglike:
                 best_nloglike = nloglike
                 best_params_pow = fitted_params
-            print "Optimization suceed."
+            print("Optimization suceed.")
         else:
-            print "Optimization failed."
+            print("Optimization failed.")
 
 #     print(best_params_pow)
 
@@ -1552,7 +1552,7 @@ def dNdf_fit_broken_pow(flux, weight, bw, fmin, fmax, area, niter = 5, pow_tol =
     # fit for niter times 
     counter = 0
     while counter < niter:
-        print "Try %d" % counter
+        print("Try %d" % counter)
 
         # Generate initial parameters
         init_params = pow_param_init_dNdf(left_hist, left_f, right_hist, right_f, bw, area)
@@ -1574,9 +1574,9 @@ def dNdf_fit_broken_pow(flux, weight, bw, fmin, fmax, area, niter = 5, pow_tol =
             if nloglike > best_nloglike:
                 best_nloglike = nloglike
                 best_params_pow = fitted_params
-            print "Optimization success"
+            print("Optimization success")
         else:
-            print "Optimization failed."
+            print("Optimization failed.")
 
 #     print(best_params_pow)
 
@@ -1648,7 +1648,7 @@ def dNdf_fit(flux, weight, bw, fmin, fmax, area, niter = 5, pow_tol =1e-5):
                 best_nloglike = nloglike
                 best_params_pow = fitted_params
         else:
-            print "Optimization failed."
+            print("Optimization failed.")
 
 #     print(best_params_pow)
 
@@ -2521,7 +2521,7 @@ def fit_GMM(ydata, ycovar, ND, K, Niter=1, weight=None):
     init_covar = gen_init_covar_from_data(ND, ydata.T, K)
 
     for j in range(Niter): # Number of trials
-        print "Trial num: %d" % j
+        print("Trial num: %d" % j)
         # Initialization of means
         # Randomly pick K samples from the generated set.                
         init_mean_tmp = gen_init_mean_from_sample(ND, ydata, K)
