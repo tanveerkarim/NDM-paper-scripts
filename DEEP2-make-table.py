@@ -14,15 +14,27 @@ for fnum in [2, 3, 4]:
 
 table_header = generate_table_header()
 print("Raw number density")
+<<<<<<< HEAD
 print(table_header))
+=======
+print(table_header)
+>>>>>>> fix-print
 class_breakdown([2, 3, 4], cns, weights, areas, rwd="R")
 print("\n")
 
 print("Weighted number density")
+<<<<<<< HEAD
 print(table_header))
+=======
+print(table_header)
+>>>>>>> fix-print
 class_breakdown([2, 3, 4], cns, weights, areas, rwd="W")
 print("\n")
 
 print("The total densities must match.")
 
+<<<<<<< HEAD
 # print("Completed.\n"))
+=======
+# print("Completed.\n")
+>>>>>>> fix-print
