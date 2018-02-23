@@ -1,10 +1,10 @@
 from utils import *
 
 dir_derived = "../data/derived/"
-print "Import estimated areas"
+print("Import estimated areas")
 areas = np.load(dir_derived+"spec-area.npy")    
 
-print "Import DEEP2 combined catalogs"
+print("Import DEEP2 combined catalogs")
 cns = []
 weights = []
 for fnum in [2, 3, 4]:
@@ -13,16 +13,16 @@ for fnum in [2, 3, 4]:
     weights.append(pcat["TARG_WEIGHT"])
 
 table_header = generate_table_header()
-print "Raw number density"
+print("Raw number density")
 print(table_header)
 class_breakdown([2, 3, 4], cns, weights, areas, rwd="R")
-print "\n"
+print("\n")
 
-print "Weighted number density"
+print("Weighted number density")
 print(table_header)
 class_breakdown([2, 3, 4], cns, weights, areas, rwd="W")
-print "\n"
+print("\n")
 
-print "The total densities must match."
+print("The total densities must match.")
 
 # print("Completed.\n")
