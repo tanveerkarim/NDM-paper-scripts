@@ -2,7 +2,7 @@ from utils import *
 
 dir_derived = "../data/derived/"
 dir_figure = "../figures/"
-print "Import estimated areas"
+print("Import estimated areas")
 areas = np.load(dir_derived+"spec-area.npy")    
 
 def load_tractor_DR5_matched_to_DEEP2_full(ibool=None):
@@ -84,5 +84,5 @@ grz_names = ["g", "r", "z"]
 
 # Definition of asinh magnitude
 for i, mag_err in enumerate([gf_err, rf_err, zf_err]):
-    print grz_names[i], np.median(mag_err)
-print "oii", np.median(oii_err[np.logical_or(cn==0, cn==1)])
+    print(grz_names[i], np.median(mag_err))
+print("oii", np.median(oii_err[np.logical_or(cn==0, cn==1)]))
