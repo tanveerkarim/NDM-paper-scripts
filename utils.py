@@ -15,7 +15,7 @@ import scipy.stats as stats
 from scipy.integrate import simps, trapz, cumtrapz
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
-import extreme_deconvolution as XD
+#import extreme_deconvolution as XD
 
 import numba as nb
 
