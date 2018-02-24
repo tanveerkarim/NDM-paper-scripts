@@ -2,7 +2,7 @@ from utils import *
 
 dir_derived = "../data/derived/"
 dir_figure = "../figures/"
-print "Import estimated areas"
+print("Import estimated areas")
 areas = np.load(dir_derived+"spec-area.npy")    
 
 def load_tractor_DR5_matched_to_DEEP2_full(ibool=None):
@@ -102,7 +102,7 @@ mu_gr = mu_g - mu_r
 
 
 
-print "grz magnitude distributions - raw"
+print("grz magnitude distributions - raw")
 plt.close()
 fig, ax_list = plt.subplots(1, 3, figsize = (25, 7))
 mag_bins = np.arange(19, 26, 0.1)
@@ -122,7 +122,7 @@ plt.savefig(dir_figure + "Intersection-grz-hist-raw.png", dpi=200, bbox_inches="
 plt.close()
 
 
-print "grz magnitude distributions - weighted"
+print("grz magnitude distributions - weighted")
 plt.close()
 fig, ax_list = plt.subplots(1, 3, figsize = (25, 7))
 mag_bins = np.arange(19, 26, 0.1)
@@ -143,7 +143,7 @@ plt.close()
 
 
 
-print "redz-oii weighted"
+print("redz-oii weighted")
 plt.close()
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (16, 7))
 redz_bins = np.arange(0, 2, 0.025)
@@ -170,7 +170,7 @@ plt.close()
 
 
 
-print "Color distribution by class and field"
+print("Color distribution by class and field")
 plt.close()
 fig, ax_list = plt.subplots(len(cnames), 3, figsize = (25, 52))
 for i, name in enumerate(cnames):
@@ -190,7 +190,7 @@ plt.savefig(dir_figure + "Intersection-grz-color-by-class-field.png", dpi=200, b
 plt.close()
 
 
-print "Color distribution by class only and all together"
+print("Color distribution by class only and all together")
 plt.close()
 fig, ax_list = plt.subplots(3, 2, figsize = (16, 25))
 for i, name in enumerate(cnames):
@@ -221,10 +221,10 @@ plt.close()
 
 
 fontsize2 = 20
-print "Color distribution by class only and all together"
+print("Color distribution by class only and all together")
 plt.close()
 for i, name in enumerate(cnames):
-    print i
+    print(i)
     fig, ax = plt.subplots(1, figsize = (5, 5))       
     if i < 5:
         ibool = (g > 21) & (g < 24) &  (cn == i)
