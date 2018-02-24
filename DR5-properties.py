@@ -25,7 +25,7 @@ def load_tractor_DR5(fname, ibool=None):
 
 dir_derived = "../data/derived/"
 dir_figure = "../figures/"
-print "Import estimated areas"
+print("Import estimated areas")
 areas = np.load(dir_derived+"spec-area.npy")    
 
 
