@@ -109,7 +109,7 @@ mag_bins = np.arange(19, 26, 0.1)
 
 glim = 24.25
 for j, fnum in enumerate([2, 3, 4]):    
-    ifield = field == fnum
+    ifield = field == fnum #??
     for i, mag in enumerate([g, r, z]):
         #Added lines to fix NaN issue; certain values of mag are NaN
         weights = np.ones(ifield.sum())/areas[j]
