@@ -111,12 +111,13 @@ glim = 24.25
 for j, fnum in enumerate([2, 3, 4]):    
     ifield = field == fnum #??
     for i, mag in enumerate([g, r, z]):
-        #Added lines to fix NaN issue; certain values of mag are NaN
+        #Added lines to fix NaN issue; certain values of mag[ifield] are NaN
         weights = np.ones(ifield.sum())/areas[j]
-        weights = weights[~np.isnan(mag)]
-        mag = mag[~np.isnan(mag)]
+        weights = weights[~np.isnan(mag[ifield])]
+        mag_ifield = mag[ifield]
+        mag_ifield = mag_ifield[~np.isnan(mag[ifield])]
         #
-        ax_list[i].hist(mag[ifield], bins=mag_bins, color=field_colors[j], histtype="step", alpha=1, lw=2.5, label="F%d" % fnum, weights=weights)
+        ax_list[i].hist(mag_ifield, bins=mag_bins, color=field_colors[j], histtype="step", alpha=1, lw=2.5, label="F%d" % fnum, weights=weights)
         ax_list[i].set_xlim([19, 26])
         ax_list[i].legend(loc="upper right", fontsize=ft_size)
         ax_list[i].set_xlabel(grz_names[i], fontsize=ft_size2)
@@ -136,7 +137,13 @@ glim = 24.25
 for j, fnum in enumerate([2, 3, 4]):    
     ifield = field == fnum
     for i, mag in enumerate([g, r, z]):
-        ax_list[i].hist(mag[ifield], bins=mag_bins, color=field_colors[j], histtype="step", alpha=1, lw=2.5, label="F%d" % fnum, weights=w[ifield]/areas[j])
+        #Added lines to fix NaN issue; certain values of mag[ifield] are NaN
+        weights = np.ones(ifield.sum())/areas[j]
+        weights = weights[~np.isnan(mag[ifield])]
+        mag_ifield = mag[ifield]
+        mag_ifield = mag_ifield[~np.isnan(mag[ifield])]
+        #
+        ax_list[i].hist(mag_ifield, bins=mag_bins, color=field_colors[j], histtype="step", alpha=1, lw=2.5, label="F%d" % fnum, weights=weights)
         ax_list[i].set_xlim([19, 26])
         ax_list[i].legend(loc="upper right", fontsize=ft_size)
         ax_list[i].set_xlabel(grz_names[i], fontsize=ft_size2)
