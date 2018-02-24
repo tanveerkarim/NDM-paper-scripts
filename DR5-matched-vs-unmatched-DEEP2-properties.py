@@ -2,7 +2,7 @@ from utils import *
 
 dir_derived = "../data/derived/"
 dir_figure = "../figures/"
-print "Import estimated areas"
+print("Import estimated areas")
 areas = np.load(dir_derived+"spec-area.npy")    
 
 def load_tractor_DR5_matched_to_DEEP2_full(ibool=None):
