@@ -35,7 +35,7 @@ gmag_max = 25.
 areas = []
 
 
-print "Only consider objects that were matched in DEEP2 when estimating the area."
+print("Only consider objects that were matched in DEEP2 when estimating the area.")
 
 
 figure, ax_list = plt.subplots(2, 3, figsize=(25,13))
@@ -92,6 +92,6 @@ plt.savefig(dir_figures+"estimate-area-monte-carlo-DR5-matched.png", dpi=400, bb
 plt.close()
 
 # Save area
-print areas, sum(areas)
+print(areas, sum(areas))
 np.save(dir_derived+"spec-area", areas)
 

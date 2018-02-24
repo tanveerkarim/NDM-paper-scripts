@@ -207,8 +207,8 @@ class DESI_NDM(object):
 
         frac_unmatched = (nobjs_cut-nobjs_matched)/float(nobjs_cut)
 
-        print "Fraction of unmatched objects with g [%.2f, %.2f]: %.2f %%" % (self.mag_min, self.mag_max, 100 * frac_unmatched)
-        print "We up-weight the matched set by this fraction before fitting the intrinsic densities."
+        print("Fraction of unmatched objects with g [%.2f, %.2f]: %.2f %%" % (self.mag_min, self.mag_max, 100 * frac_unmatched))
+        print("We up-weight the matched set by this fraction before fitting the intrinsic densities.")
 
         bid, objtype, tycho, bp, ra, dec, gflux_raw, rflux_raw, zflux_raw, gflux, rflux, zflux, givar,\
         rivar, zivar, gf_err, rf_err, zf_err, mw_g, mw_r, mw_z, r_dev, r_exp, g_allmask, r_allmask, z_allmask, B, R, I, BRI_cut, cn,\
@@ -248,12 +248,12 @@ class DESI_NDM(object):
         If DR46 = True, then transform the fluxes before histogramming.
 
         """
-        print "Loading calibration data"
+        print("Loading calibration data")
         start = time.time()
 
         g, r, z, _, _, A = load_DR5_calibration()
         if DR46:
-            print "Color transforming data."
+            print("Color transforming data.")
             g, r, z = flux_DR5_to_DR46(g, r, z)
 
         # Asinh magnitude
@@ -271,7 +271,7 @@ class DESI_NDM(object):
         hist, _ = np.histogramdd(samples, bins=self.num_bins, range=[self.var_x_limits, self.var_y_limits, self.gmag_limits]) # A is for normalization.
         self.MD_hist_N_cal_flat = hist.flatten() / float(A)
 
-        print "Time taken: %.1f seconds" % (time.time()-start)
+        print("Time taken: %.1f seconds" % (time.time()-start))
 
         return
 
@@ -298,7 +298,7 @@ class DESI_NDM(object):
 
             #---- Compute the number of sample to draw.
             NSAMPLE = int(integrate_mag_broken_pow_law(self.dNdm_model[i], self.mag_min, self.mag_max, area = self.area_MC))
-            print "%s sample number: %d" % (cnames[i], NSAMPLE)
+            print("%s sample number: %d" % (cnames[i], NSAMPLE))
 
             #---- Generate magnitudes
             gmag = gen_mag_pow_law_samples([1, self.alpha_q[i]], self.mag_min, self.mag_max, NSAMPLE)
@@ -602,7 +602,7 @@ class DESI_NDM(object):
         This function is exclusively used for fitting the dNdm broken power law. 
         """
         for i in range(5): # Fit densities of classes 0 through 4.
-            print "Fitting broken power law for %s" % cnames[i]
+            print("Fitting broken power law for %s" % cnames[i])
             ifit = self.iTrain & (self.cn==i)
             if i == 4:
                 mag_max = 24.
@@ -613,7 +613,7 @@ class DESI_NDM(object):
 
             params = dNdm_fit_broken_pow(self.gmag[ifit], self.w[ifit], bw, mag_min, mag_max, self.area_train, niter = Niter)
             np.save(save_dir+"broken-power-law-params-cn%d.npy" % i, params)
-            print "\n"
+            print("\n")
 
         return None
 
@@ -693,7 +693,7 @@ class DESI_NDM(object):
                                 [M20, M21, M22, M23]])
                 Covar[i] = np.dot(np.dot(M, Cx), M.T)
             else: 
-                print "The input number of variables need to be either 2 or 3."
+                print("The input number of variables need to be either 2 or 3.")
                 assert False
 
         return Covar
@@ -705,7 +705,7 @@ class DESI_NDM(object):
         """
         for i in range(5):
             if verbose:
-                print "Noise convolution for %s" % cnames[i]
+                print("Noise convolution for %s" % cnames[i])
             self.gflux_obs[i] = self.gflux0[i] + self.g_err_seed[i] * mag2flux(self.glim_err)/5.
             self.rflux_obs[i] = self.rflux0[i] + self.r_err_seed[i] * mag2flux(self.rlim_err)/5.
             self.zflux_obs[i] = self.zflux0[i] + self.z_err_seed[i] * mag2flux(self.zlim_err)/5.
@@ -769,7 +769,7 @@ class DESI_NDM(object):
         After generating selection volume, make marginal efficiency selection plot.
         """
         if (self.bin_centers is None) or (self.summary_arr is None):
-            print "Selection must be generated first."
+            print("Selection must be generated first.")
             assert False
 
         fig, ax = plt.subplots(1, figsize=(7, 4))
@@ -825,12 +825,12 @@ class DESI_NDM(object):
         - Predicted contribution from Gold (OII>8) and Silver (OII>8), seperately.
         - Predicted contribution from NoZ and NoOII, seperately.
         """
-        print "/---- Selection volume generation starts here."
-        print "Set global area_MC to batch_size = %d" % batch_size
+        print("/---- Selection volume generation starts here.")
+        print("Set global area_MC to batch_size = %d" % batch_size)
         self.area_MC = batch_size
 
         #---- Calculate number of batches to work on.
-        print "Number of batches to process: %d" % num_batches
+        print("Number of batches to process: %d" % num_batches)
 
         #---- Placeholder for the histograms
         MD_hist_Nj_good = [None] * 5 # Histogram of objects in class j that are desired for DESI
@@ -840,21 +840,21 @@ class DESI_NDM(object):
         #---- Generate samples, convolve error, construct histogram, tally, and repeat."
         start = time.time()
         for batch in range(1, num_batches+1):
-            print "/---- Batch %d" % batch
-            print "Generate intrinic samples."
+            print("/---- Batch %d" % batch)
+            print("Generate intrinic samples.")
             self.gen_sample_intrinsic_mag()
 
             if DR46:
-                print "Color transforming from DR5 to DR46"
+                print("Color transforming from DR5 to DR46")
                 self.transform_intrinsic_to_DR46()
 
-            print "Add noise to the generated samples."
+            print("Add noise to the generated samples.")
             self.gen_err_conv_sample() # Perform error convolution
 
-            print "Consturct histogram and tally"
+            print("Consturct histogram and tally")
             f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
             for i in range(5):
-                print "%s" % cnames[i]
+                print("%s" % cnames[i])
                 samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
 
                 Nj, _ = np.histogramdd(samples, bins=self.num_bins, \
@@ -889,12 +889,12 @@ class DESI_NDM(object):
                     MD_hist_N_util_total += Nj_util
                     MD_hist_Nj_good[i] += Nj_good                    
 
-        print "Time taken: %.2f seconds\n" % (time.time() - start)
+        print("Time taken: %.2f seconds\n" % (time.time() - start))
 
         if dNdm_mag_reg:
             # For each magnitude bin, sum up the number of objects and evenly disperse throughout the grid
             # in that magnitude
-            print "Computing magnitude dependent regularization.\n"
+            print("Computing magnitude dependent regularization.\n")
             start = time.time()
             num_bins_xy = MD_hist_N_total.shape[0] * MD_hist_N_total.shape[1] # Number of bins in xy subspace
             for k in range(MD_hist_N_total.shape[2]):
@@ -909,7 +909,7 @@ class DESI_NDM(object):
             #     for i, m_tmp in enumerate(m):
             #         MD_hist_N_regular[:, :, i] += self.frac_regular * integrate_mag_broken_pow_law(e, m_tmp, m_tmp+dm, area=self.area_MC) / np.multiply.reduce((self.num_bins[:2]))
 
-        print "Computing utility and sorting."
+        print("Computing utility and sorting.")
         start = time.time()        
         # Compute utility
         utility = MD_hist_N_util_total/MD_hist_N_total
@@ -920,16 +920,16 @@ class DESI_NDM(object):
         # Order cells according to utility
         # This corresponds to cell number of descending order sorted array.
         idx_sort = (-utility_flat).argsort()
-        print "Time taken: %.2f seconds" % (time.time() - start)        
+        print("Time taken: %.2f seconds" % (time.time() - start)        )
 
-        print "Flatten and sort the MD histograms including the calibration"
+        print("Flatten and sort the MD histograms including the calibration")
         start = time.time()        
         # Flatten the histograms
         MD_hist_N_total = MD_hist_N_total.flatten()[idx_sort]
         for i in range(5):
             MD_hist_Nj_good[i] = MD_hist_Nj_good[i].flatten()[idx_sort]
         MD_hist_N_cal_flat = self.MD_hist_N_cal_flat[idx_sort]
-        print "Time taken: %.2f seconds" % (time.time() - start)
+        print("Time taken: %.2f seconds" % (time.time() - start))
                                    
 
         #---- Selection generation.
@@ -942,23 +942,23 @@ class DESI_NDM(object):
                 break
             Ntotal += ncell
             counter += 1
-        print np.sum(MD_hist_N_cal_flat[:counter])
+        print(np.sum(MD_hist_N_cal_flat[:counter])
 
         # Save the selection to be used later.
         self.cell_select = np.sort(idx_sort[:counter])            
 
         # Compute the overall efficiency.
-        print "\nStats on sample with N_tot = %d" % self.num_desired
+        print("\nStats on sample with N_tot = %d" % self.num_desired)
         # Remember to use conditional probability AND external calibration density.
         # Note cell-by-cell accounting.
         Ngood_pred = 0
-        print "Class: (Expected number in desired sample)"
+        print("Class: (Expected number in desired sample)")
         for i in range(5):
             tmp = np.sum(MD_hist_N_cal_flat[:counter] * MD_hist_Nj_good[i][:counter]/ MD_hist_N_total[:counter])
             Ngood_pred += tmp
-            print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal * 100, tmp)
+            print("%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal * 100, tmp))
         eff_pred = Ngood_pred/Ntotal
-        print "Eff of the sample: %.3f (%d)\n" % (eff_pred, Ngood_pred)
+        print("Eff of the sample: %.3f (%d)\n" % (eff_pred, Ngood_pred))
 
         # 2) Compute the marginal efficiency as a function of bins in Ndesired_arr
         # For each bin, compute the efficiency of the bin and its center.
@@ -974,7 +974,7 @@ class DESI_NDM(object):
         Ntotal = 0                        
         for i, n in enumerate(Ndesired_arr[1:]):
             # if (i % 50) == 0: # Helpful for debuggin but not otherwise.
-                # print "Working on bin i = %d out of %d" % (i, bin_centers.size)
+                # print("Working on bin i = %d out of %d" % (i, bin_centers.size))
             for ncell in MD_hist_N_cal_flat[start_idx:]:
                 if Ntotal > n: 
                     break            
@@ -990,7 +990,7 @@ class DESI_NDM(object):
             summary_arr[i, :] = tmp
 
             start_idx = end_idx
-        print "\n\n"
+        print("\n\n")
 
         # Save the marginal calculation results (to be used for plotting later)
         self.bin_centers = bin_centers
@@ -1025,7 +1025,7 @@ class DESI_NDM(object):
         - Using external calibration data/selection determine the efficiency of the selection by class and total. 
         (No marginal efficiency is reported)
         """
-        print "/---- Selection volume generation starts here."
+        print("/---- Selection volume generation starts here.")
 
         #---- Placeholder for the histograms
         MD_hist_Nj_good = [None] * 5 # Histogram of objects in class j that are desired for DESI
@@ -1033,30 +1033,30 @@ class DESI_NDM(object):
         MD_hist_N_total = None 
 
         if regen_intrinsic:
-            print "Set global area_MC to batch_size = %d" % batch_size
+            print("Set global area_MC to batch_size = %d" % batch_size)
             self.area_MC = batch_size
 
             #---- Calculate number of batches to work on.
-            print "Number of batches to process: %d" % num_batches
+            print("Number of batches to process: %d" % num_batches)
 
             #---- Generate samples, convolve error, construct histogram, tally, and repeat."
             start = time.time()
             for batch in range(1, num_batches+1):
-                print "/---- Batch %d" % batch
-                print "Generate intrinic samples."
+                print("/---- Batch %d" % batch)
+                print("Generate intrinic samples.")
                 self.gen_sample_intrinsic_mag()
 
                 if DR46:
-                    print "Color transforming from DR5 to DR46"
+                    print("Color transforming from DR5 to DR46")
                     self.transform_intrinsic_to_DR46()
 
-                print "Add noise to the generated samples."
+                print("Add noise to the generated samples.")
                 self.gen_err_conv_sample() # Perform error convolution
 
-                print "Consturct histogram and tally"
+                print("Consturct histogram and tally")
                 f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
                 for i in range(5):
-                    print "%s" % cnames[i]
+                    print("%s" % cnames[i])
                     samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
 
                     Nj, _ = np.histogramdd(samples, bins=self.num_bins, \
@@ -1091,16 +1091,16 @@ class DESI_NDM(object):
                         MD_hist_N_util_total += Nj_util
                         MD_hist_Nj_good[i] += Nj_good                    
 
-            print "Time taken: %.2f seconds\n" % (time.time() - start)
+            print("Time taken: %.2f seconds\n" % (time.time() - start))
         else: # Use old intrinsic samples
             start = time.time()        
-            print "Add noise to the generated samples."
+            print("Add noise to the generated samples.")
             self.gen_err_conv_sample() # Perform error convolution
 
-            print "Consturct histogram and tally"
+            print("Consturct histogram and tally")
             f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
             for i in range(5):
-                print "%s" % cnames[i]
+                print("%s" % cnames[i])
                 samples = np.array([self.var_x_obs[i], self.var_y_obs[i], self.gmag_obs[i]]).T
 
                 Nj, _ = np.histogramdd(samples, bins=self.num_bins, \
@@ -1130,12 +1130,12 @@ class DESI_NDM(object):
                     MD_hist_N_total += Nj
                     MD_hist_N_util_total += Nj_util
                     MD_hist_Nj_good[i] = Nj_good
-            print "Time taken: %.2f seconds\n" % (time.time() - start)
+            print("Time taken: %.2f seconds\n" % (time.time() - start))
 
         if dNdm_mag_reg:
             # For each magnitude bin, sum up the number of objects and evenly disperse throughout the grid
             # in that magnitude
-            print "Computing magnitude dependent regularization.\n"
+            print("Computing magnitude dependent regularization.\n")
             start = time.time()
             num_bins_xy = MD_hist_N_total.shape[0] * MD_hist_N_total.shape[1] # Number of bins in xy subspace
             for k in range(MD_hist_N_total.shape[2]):
@@ -1143,15 +1143,15 @@ class DESI_NDM(object):
 
 
 
-        print "Flatten the histograms"
+        print("Flatten the histograms")
         start = time.time()        
         # Flatten the histograms
         MD_hist_N_total = MD_hist_N_total.flatten()
         for i in range(5):
             MD_hist_Nj_good[i] = MD_hist_Nj_good[i].flatten()
         MD_hist_N_cal_flat = self.MD_hist_N_cal_flat
-        print "Time taken: %.2f seconds" % (time.time() - start)
-        print "\n"                 
+        print("Time taken: %.2f seconds" % (time.time() - start))
+        print("\n"                 )
 
         # The flattened arrays are now ordered such that to apply an external selection
         # based on cell numbers recorded in cell_select, we simply apply slicing.
@@ -1163,14 +1163,14 @@ class DESI_NDM(object):
         Ntotal = np.sum(MD_hist_N_cal_flat[self.cell_select])
         eff_arr = np.zeros(6)
         Ngood_pred = 0
-        print "Class: (Expected number in desired sample)"
+        print("Class: (Expected number in desired sample)")
         for i in range(5):
             tmp = np.sum(MD_hist_N_cal_flat[self.cell_select] * MD_hist_Nj_good[i][self.cell_select]/ MD_hist_N_total[self.cell_select])
             Ngood_pred += tmp
-            print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal * 100, tmp)
+            print("%s: %.1f%% (%d)" % (cnames[i], tmp/Ntotal * 100, tmp))
             eff_arr[i] = tmp/Ntotal
         eff_arr[-1] = Ngood_pred/Ntotal
-        print "Eff of the sample: %.3f (%d)\n" % (eff_arr[-1], Ngood_pred)
+        print("Eff of the sample: %.3f (%d)\n" % (eff_arr[-1], Ngood_pred))
 
         # 0-4: For each class
         # 5: Total
@@ -1186,7 +1186,7 @@ class DESI_NDM(object):
         if FDR:
             pass
         elif (self.cell_select is None):
-            print "Selection volume must be generated."
+            print("Selection volume must be generated.")
             assert False
 
         for fnum in range(2, 5):
@@ -1212,10 +1212,10 @@ class DESI_NDM(object):
 
             f_arr = [self.f_Gold, self.f_Silver, self.f_NoOII, self.f_NoZ, self.f_NonELG]
             # Report the number of objects in each catagory that are desired by DESI.
-            print "\---- DEEP2 Field %d" % fnum
+            print("\---- DEEP2 Field %d" % fnum)
             Ntot_selected = np.sum(w[iselected])/area_sample # Properly normalized total            
-            print "Total selected: %d" % Ntot_selected
-            print "Class: Fraction of objects desired by DESI (Density)"
+            print("Total selected: %d" % Ntot_selected)
+            print("Class: Fraction of objects desired by DESI (Density)")
             Ngood_selected = 0
             for i in range(4):
                 if i < 2: 
@@ -1224,9 +1224,9 @@ class DESI_NDM(object):
                     ibool = (cn == i) & iselected
                 tmp = f_arr[i]* np.sum(w[ibool])/area_sample
                 Ngood_selected += tmp
-                print "%s: %.1f%% (%d)" % (cnames[i], tmp/Ntot_selected * 100, tmp)
-            print "Total good: %.1f%% (%d)" % (Ngood_selected/Ntot_selected * 100, Ngood_selected)
-            print "\n\n"
+                print("%s: %.1f%% (%d)" % (cnames[i], tmp/Ntot_selected * 100, tmp))
+            print("Total good: %.1f%% (%d)" % (Ngood_selected/Ntot_selected * 100, Ngood_selected))
+            print("\n\n")
         return None
 
 
@@ -1351,7 +1351,7 @@ class DESI_NDM(object):
         Xmin, Xmax = limits[slice_dir]
         bin_edges, dX = np.linspace(Xmin, Xmax, self.num_bins[slice_dir]+1, endpoint=True, retstep=True)
 
-        print slice_var_tag[slice_dir]
+        print(slice_var_tag[slice_dir]
         if output_sparse:
             iterator = range(0, self.num_bins[slice_dir], increment)
         else:
@@ -1379,7 +1379,7 @@ class DESI_NDM(object):
             plt.xlim(limits[idx[0]])
             plt.ylim(limits[idx[1]])
             title_str = "%s [%.3f, %.3f]" % (var_names[slice_dir], bin_edges[i], bin_edges[i+1])
-            print i, title_str
+            print(i, title_str
             plt.title(title_str, fontsize=25, y =1.05)
             plt.savefig(save_dir+prefix+"-boundary-%s-%d.png" % (slice_var_tag[slice_dir], i), bbox_inches="tight", dpi=200)
             plt.close()        
