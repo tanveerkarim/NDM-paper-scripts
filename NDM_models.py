@@ -942,7 +942,7 @@ class DESI_NDM(object):
                 break
             Ntotal += ncell
             counter += 1
-        print(np.sum(MD_hist_N_cal_flat[:counter])
+        print(np.sum(MD_hist_N_cal_flat[:counter]))
 
         # Save the selection to be used later.
         self.cell_select = np.sort(idx_sort[:counter])            
@@ -1351,7 +1351,7 @@ class DESI_NDM(object):
         Xmin, Xmax = limits[slice_dir]
         bin_edges, dX = np.linspace(Xmin, Xmax, self.num_bins[slice_dir]+1, endpoint=True, retstep=True)
 
-        print(slice_var_tag[slice_dir]
+        print(slice_var_tag[slice_dir])
         if output_sparse:
             iterator = range(0, self.num_bins[slice_dir], increment)
         else:
@@ -1379,7 +1379,7 @@ class DESI_NDM(object):
             plt.xlim(limits[idx[0]])
             plt.ylim(limits[idx[1]])
             title_str = "%s [%.3f, %.3f]" % (var_names[slice_dir], bin_edges[i], bin_edges[i+1])
-            print(i, title_str
+            print(i, title_str)
             plt.title(title_str, fontsize=25, y =1.05)
             plt.savefig(save_dir+prefix+"-boundary-%s-%d.png" % (slice_var_tag[slice_dir], i), bbox_inches="tight", dpi=200)
             plt.close()        
