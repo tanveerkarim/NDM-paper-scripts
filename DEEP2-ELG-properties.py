@@ -17,7 +17,7 @@ def load_DEEP2(fname, ibool=None):
 
 dir_derived = "../data/derived/"
 dir_figure = "../figures/"
-print "Import estimated areas"
+print("Import estimated areas")
 areas = np.load(dir_derived+"spec-area.npy")    
 
 
